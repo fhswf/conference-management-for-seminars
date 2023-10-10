@@ -1,0 +1,14 @@
+.container {
+    display: flex;
+    flex-direction: column;
+
+}
+
+.container * {
+    margin: 5px;
+}
+
+.container input {
+    height: 40px;
+    margin-top:  10px;
+}

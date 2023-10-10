@@ -1,0 +1,5 @@
+.container{
+    display: flex;
+    grid-template-columns: 10% 60%;
+    align-items: center;
+}

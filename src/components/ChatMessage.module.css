@@ -1,0 +1,13 @@
+.messageContainer{
+    display: flex;
+    align-items: center;
+}
+
+.text{
+    background-color: #adadad;
+
+    border-radius: 10px;
+    border: 1px solid black;
+    padding: 5px;
+    //max-width: 80vw;
+}

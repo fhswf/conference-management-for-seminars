@@ -1,0 +1,39 @@
+.container {
+    background-color: #7ac3ff;
+    width: 900px;
+}
+
+.buttonContainer {
+    background-color: #727272;
+    padding: 5px;
+    display: flex;
+    gap: 2px;
+}
+
+.conversation {
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    height: 400px;
+}
+
+.textfieldAndButton {
+    display: flex;
+    align-items: center;
+}
+
+.textfieldAndButton input{
+    width: 100%;
+}
+
+.messageLeft {
+    align-self: flex-start;
+    padding: 8px;
+    max-width: 80%;
+}
+
+.messageRight {
+    align-self: flex-end;
+    padding: 8px;
+    max-width: 80%;
+}

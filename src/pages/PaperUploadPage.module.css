@@ -1,0 +1,15 @@
+.page{
+
+}
+
+.upload{
+    display: flex;
+    width: 600px;
+    //justify-content: space-between;
+    //background-color: rebeccapurple;
+}
+
+.buttonDiv{
+    display: flex;
+    justify-content: center;
+}
