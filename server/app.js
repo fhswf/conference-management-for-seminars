@@ -1,91 +1,106 @@
-const PORT = process.env.EXPRESS_PORT || 3000;
+require('dotenv').config();
+const PORT_HTTP = process.env.EXPRESS_PORT_HTTP || 3000;
+const PORT_HTTPS = process.env.EXPRESS_PORT_HTTPS || 3443;
 
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-require('dotenv').config();
+const fs = require('fs');
 
-const passport = require('passport');
-const LTIStrategy = require('passport-lti');
-const bodyParser = require('body-parser');
-const session = require('express-session');
 
 const app = express();
 
-// middleware
+// ------------------------------ middleware ------------------------------
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'http://192.168.0.206:5173',
+    credentials: true
 }));
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(session({
-    secret: '123',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {secure: true}
-}));
+
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(express.static('public'));
-app.use(helmet());
+
+// ------------------------------ session setup ------------------------------
+const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
+const dbConfig = require('./config/dbConfig');
+
+const sessionStore = new MySQLStore({
+    host: dbConfig.HOST,
+    user: dbConfig.USER,
+    password: dbConfig.PASSWORD,
+    database: dbConfig.DATABASE,
+    port: dbConfig.PORT,
+});
+
+app.use(session({
+    key: 'session_cookie_name',
+    secret: 'session_cookie_secret',
+    store: sessionStore,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+        secure: false,
+        sameSite: true,
+    }
+}))
+
+sessionStore.onReady().then(() => {
+    console.log('MySQLStore ready');
+}).catch(error => {
+    console.error(error);
+});
+
+
+//app.use(helmet());
+
+// ------------------------------ passport setup ------------------------------
+
+const passport = require('passport');
+require('./config/passport');
+
 app.use(passport.initialize());
 app.use(passport.session());
 
 
-var strategy = new LTIStrategy({
-    consumerKey: '7d13a1331703639ae03cc980eea82c6c7432bd6bb3bc35d50e53976be3da80be',
-    consumerSecret: '014819937df8bbc723a20627f598f86a55a874e07303d6456bdee4eeef037a58'
-}, function (lti, done) {
-    var user = {id: 'user123', lti: lti};
-    return done(null, user);
-});
+// ------------------------------ routes ------------------------------
+const {isAuthenticated} = require("./middleware/authMiddleware");
 
-passport.use(strategy);
-
-
-passport.serializeUser(function (user, cb) {
-    process.nextTick(function () {
-        return cb(null, {
-            id: user.id,
-            username: user.username,
-            picture: user.picture
-        });
-    });
-});
-
-passport.deserializeUser(function (id, cb) {
-    // TODO load user from database
-    var user = {id: 'user123'};
-    console.log('HALLO');
-    process.nextTick(function () {
-        return cb(null, user);
-    });
-});
-
-function checkAuth(req, res, next) {
-    passport.authenticate('lti', {session: false}, function (err, user, info) {
-        if (err) {
-            return next(err);
-        }
-        if (!user) {
-            return res.redirect('/error');
-        }
-        req.user = user;
-        //console.log(user)
-
-        return next();
-    })(req, res, next);
-}
-
-app.post('/lti/launch', checkAuth, function (req, res) {
-        console.log(req.body)
-        res.redirect('/success');
+// Zu Testzwecken
+app.get('/', (req, res) => {
+    if (req.session.views) {
+        req.session.views++
+        res.setHeader('Content-Type', 'application/json')
+        res.send({'views': req.session.views})
+    } else {
+        req.session.views = 1
+        res.send({'views': req.session.views})
     }
-);
+});
+
+/*
+app.use(function (req, res, next) {
+    console.log("------------------");
+    console.log(req.session);
+    console.log(req.isAuthenticated());
+    console.log(req.user);
+    console.log("------------------");
+    next();
+} );
+ */
+
+app.post('/lti/launch', passport.authenticate('lti', {
+    failureRedirect: '/error',
+    successRedirect: '/success',
+    session: true
+}));
 
 app.get('/success', function (req, res) {
     //console.log('LTI launch was successful!');
+    console.log(req.user);
+    console.log(req.session);
     res.redirect('http://192.168.0.206:5173/');
-
 });
 
 app.get('/error', function (req, res) {
@@ -93,17 +108,27 @@ app.get('/error', function (req, res) {
     res.send('Error during LTI launch.');
 });
 
-app.get('/api/user', function (req, res) {
-    console.log('GET /api/user')
-    if (req.isAuthenticated()) {
-        res.json({user: req.user});
-    } else {
-        res.status(401).json({user: null});
-    }
+app.get('/api/authstatus', isAuthenticated, (req, res) => {
+    //res.json({isAuthenticated: req.isAuthenticated()});
 });
 
+// ------------------------------ server setup ------------------------------
 
-// Server starten
-var server = app.listen(PORT, function () {
-    console.log('App listening at http://localhost:3000/');
+const https = require('https');
+
+const key = fs.readFileSync(__dirname + '/../../certs/selfsigned.key');
+const cert = fs.readFileSync(__dirname + '/../../certs/selfsigned.crt');
+const optionsHttps = {
+    key: key,
+    cert: cert
+};
+
+const serverHttps = https.createServer(optionsHttps, app);
+
+serverHttps.listen(PORT_HTTPS, () => {
+    console.log('App listening at https://localhost:' + PORT_HTTPS);
+});
+
+const serverHttp = app.listen(PORT_HTTP, function () {
+    console.log('App listening at http://localhost:' + PORT_HTTP);
 });

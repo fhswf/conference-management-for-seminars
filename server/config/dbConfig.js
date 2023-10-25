@@ -2,8 +2,9 @@ module.exports = {
     HOST: process.env.DB_HOST || "localhost",
     USER: process.env.DB_USER || "root",
     PASSWORD: process.env.DB_PASSWORD || "",
-    DB: process.env.DB_NAME || "konferenz-management",
-    dialect: process.env.DB_TYPE || "mariadb",
+    DATABASE: process.env.DB_NAME || "konferenz-management",
+    DIALECT: process.env.DB_TYPE || "mariadb",
+    PORT: process.env.DB_PORT || 3306,
 
     pool: {
         max: 5,

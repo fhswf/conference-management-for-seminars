@@ -11,12 +11,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "express-mysql-session": "^3.0.0",
     "express-session": "^1.17.3",
+    "fs": "^0.0.1-security",
     "helmet": "^7.0.0",
-    "ltijs": "^5.9.3",
     "mariadb": "^3.2.1",
     "nodemon": "^3.0.1",
     "passport": "^0.6.0",
