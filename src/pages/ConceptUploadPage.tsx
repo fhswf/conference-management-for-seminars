@@ -17,7 +17,7 @@ function ConceptUploadPage() {
         {name: "Betreuer C"},
     ];
 
-    async function onSubmit(event) {
+    async function onSubmit(event: any) {
         //event.preventDefault();
         console.log("Submit");
 
