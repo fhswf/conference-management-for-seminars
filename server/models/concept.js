@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('concept', {
-    conzeptOID: {
+    conceptOID: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -11,8 +11,8 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TEXT,
       allowNull: true
     },
-    pdf: {
-      type: DataTypes.BLOB,
+    filename: {
+      type: DataTypes.TEXT,
       allowNull: true
     },
     personOIDSupervisor: {
@@ -61,7 +61,7 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "conzeptOID" },
+          { name: "conceptOID" },
         ]
       },
       {
