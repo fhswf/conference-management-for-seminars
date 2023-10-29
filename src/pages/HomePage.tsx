@@ -52,17 +52,6 @@ function HomePage() {
                         const data = await result.json();
                         console.log(data);
                     }}>Check Auth</Button>
-                    <Button onClick={async ()=>{
-                        const result = await fetch("http://192.168.0.206:3000/", {
-                            method: "GET",
-                            credentials: 'include',
-                            headers: {
-                                "Content-Type": "text/plain"
-                            }
-                        });
-                        const data = await result.json();
-                        console.log(data);
-                    }}>Counter</Button>
                 {/* <ChatWindowPage/> */}
                 </MainLayout>
             </>

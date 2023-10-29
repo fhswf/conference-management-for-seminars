@@ -53,7 +53,7 @@ sessionStore.onReady().then(() => {
 });
 
 
-//app.use(helmet());
+app.use(helmet());
 
 // ------------------------------ passport setup ------------------------------
 
@@ -66,18 +66,6 @@ app.use(passport.session());
 
 // ------------------------------ routes ------------------------------
 const {isAuthenticated} = require("./middleware/authMiddleware");
-
-// Zu Testzwecken
-app.get('/', (req, res) => {
-    if (req.session.views) {
-        req.session.views++
-        res.setHeader('Content-Type', 'application/json')
-        res.send({'views': req.session.views})
-    } else {
-        req.session.views = 1
-        res.send({'views': req.session.views})
-    }
-});
 
 /*
 app.use(function (req, res, next) {

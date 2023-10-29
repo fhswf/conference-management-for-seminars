@@ -27,8 +27,36 @@ const db = initModels(sequelize, DataTypes);
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.sequelize.sync({ force: false })
+db.sequelize.sync({force: true})
     .then(() => {
+        // Default role values
+        db.rollen.findOrCreate({
+            where: {
+                roleOID: 1
+            },
+            defaults: {
+                roleOID: 1,
+                description: 'admin'
+            }
+        });
+        db.rollen.findOrCreate({
+            where: {
+                roleOID: 2
+            },
+            defaults: {
+                roleOID: 2,
+                description: 'supervisor'
+            }
+        });
+        db.rollen.findOrCreate({
+            where: {
+                roleOID: 3
+            },
+            defaults: {
+                roleOID: 3,
+                description: 'student'
+            }
+        });
         console.log('Sync Database');
     })
 
