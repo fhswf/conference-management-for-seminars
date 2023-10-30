@@ -1,0 +1,31 @@
+version: '3.1'
+
+services:
+  dbserver:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: konferenz-management
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
+
+  express-server:
+    build: ./server
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - dbserver
+
+  frontend:
+    build: .
+    restart: always
+    ports:
+      - 1234:80
