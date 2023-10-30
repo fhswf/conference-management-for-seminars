@@ -12,7 +12,7 @@ const app = express();
 
 // ------------------------------ middleware ------------------------------
 app.use(cors({
-    origin: 'http://192.168.0.206:5173',
+    origin: 'http://192.168.0.206:1234',
     credentials: true
 }));
 
@@ -88,7 +88,7 @@ app.get('/success', function (req, res) {
     //console.log('LTI launch was successful!');
     console.log(req.user);
     console.log(req.session);
-    res.redirect('http://192.168.0.206:5173/');
+    res.redirect('http://192.168.0.206:1234/');
 });
 
 app.get('/error', function (req, res) {
@@ -100,22 +100,30 @@ app.get('/api/authstatus', isAuthenticated, (req, res) => {
     //res.json({isAuthenticated: req.isAuthenticated()});
 });
 
+app.get('/', (req, res) => {
+    res.send('Hello World!');
+});
+
 // ------------------------------ server setup ------------------------------
 
-const https = require('https');
+try {
+    const https = require('https');
 
-const key = fs.readFileSync(__dirname + '/../../certs/selfsigned.key');
-const cert = fs.readFileSync(__dirname + '/../../certs/selfsigned.crt');
-const optionsHttps = {
-    key: key,
-    cert: cert
-};
+    const key = fs.readFileSync(__dirname + '/../../certs/selfsigned.key');
+    const cert = fs.readFileSync(__dirname + '/../../certs/selfsigned.crt');
+    const optionsHttps = {
+        key: key,
+        cert: cert
+    };
 
-const serverHttps = https.createServer(optionsHttps, app);
+    const serverHttps = https.createServer(optionsHttps, app);
 
-serverHttps.listen(PORT_HTTPS, () => {
-    console.log('App listening at https://localhost:' + PORT_HTTPS);
-});
+    serverHttps.listen(PORT_HTTPS, () => {
+        console.log('App listening at https://localhost:' + PORT_HTTPS);
+    });
+} catch (e) {
+    console.log('HTTPS server not started: ' + e);
+}
 
 const serverHttp = app.listen(PORT_HTTP, function () {
     console.log('App listening at http://localhost:' + PORT_HTTP);

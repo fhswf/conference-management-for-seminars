@@ -1,5 +1,3 @@
-const {Sequelize} = require("sequelize");
-
 const passport = require('passport');
 const LTIStrategy = require('passport-lti');
 
@@ -30,7 +28,7 @@ async function addOrUpdatePerson(lti, t) {
         person.mail = lti.lis_person_contact_email_primary;
         person.comment = "updated2";
         person.passwort = "";
-        await person.save();
+        await person.save({transaction: t});
     }
 
     return person;
@@ -52,7 +50,7 @@ async function addOrUpdateSeminar(lti, t) {
     if (!created) {
         seminar.description = lti.context_title;
         //seminar.phase = 1;
-        await seminar.save();
+        await seminar.save({transaction: t});
     }
     return seminar;
 }
@@ -74,7 +72,7 @@ async function addOrUpdateRolleAssignment(lti, t) {
     if (!created) {
         // TODO if role changed, handle uploaded User data (paper, concept)
         assignment.role = mapRole(lti.roles);
-        await assignment.save();
+        await assignment.save({transaction: t});
     }
     return assignment;
 }
@@ -87,7 +85,7 @@ function mapRole(roles) {
 }
 
 const verifyCallback = async (username, lti, done) => {
-    const t = await Sequelize.transaction();
+    const t = await db.sequelize.transaction();
 
     try {
         const person = await addOrUpdatePerson(lti, t);
@@ -95,6 +93,8 @@ const verifyCallback = async (username, lti, done) => {
         await addOrUpdateRolleAssignment(lti, t);
 
         var user = {id: person.personOID, lti: lti};
+
+        await t.commit();
 
         return done(null, user);
     } catch (e) {

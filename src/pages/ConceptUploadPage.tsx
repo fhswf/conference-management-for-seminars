@@ -26,7 +26,7 @@ function ConceptUploadPage() {
         formData.append("file", event.files[0]);
 
         try {
-            const result = await fetch("http://localhost:3000/api/uploadPDF", {
+            const result = await fetch("http://192.168.0.206:3000/api/uploadPDF", {
                 method: "POST",
                 body: formData,
             });
