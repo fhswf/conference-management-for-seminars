@@ -23,8 +23,8 @@ module.exports = function(sequelize, DataTypes) {
         key: 'seminarOID'
       }
     },
-    pdf: {
-      type: DataTypes.BLOB,
+    filename: {
+      type: DataTypes.TEXT,
       allowNull: true
     },
     submitted: {

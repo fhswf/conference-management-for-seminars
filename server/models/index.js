@@ -5,9 +5,9 @@ const initModels = require("./init-models.js");
 
 const {Sequelize, DataTypes} = require("sequelize");
 
-const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
+const sequelize = new Sequelize(dbConfig.DATABASE, dbConfig.USER, dbConfig.PASSWORD, {
     host: dbConfig.HOST,
-    dialect: dbConfig.dialect,
+    dialect: dbConfig.DIALECT,
     pool: {
         max: dbConfig.pool.max,
         min: dbConfig.pool.min,
@@ -27,8 +27,36 @@ const db = initModels(sequelize, DataTypes);
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.sequelize.sync({ force: false })
+db.sequelize.sync({force: false})
     .then(() => {
+        // Default role values
+        db.rollen.findOrCreate({
+            where: {
+                roleOID: 1
+            },
+            defaults: {
+                roleOID: 1,
+                description: 'admin'
+            }
+        });
+        db.rollen.findOrCreate({
+            where: {
+                roleOID: 2
+            },
+            defaults: {
+                roleOID: 2,
+                description: 'supervisor'
+            }
+        });
+        db.rollen.findOrCreate({
+            where: {
+                roleOID: 3
+            },
+            defaults: {
+                roleOID: 3,
+                description: 'student'
+            }
+        });
         console.log('Sync Database');
     })
 
