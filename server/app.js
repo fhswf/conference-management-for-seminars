@@ -43,6 +43,8 @@ app.use(session({
         maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
         secure: false,
         sameSite: true,
+        //secure: true,
+        //sameSite: 'none',
     }
 }))
 
@@ -65,7 +67,7 @@ app.use(passport.session());
 
 
 // ------------------------------ routes ------------------------------
-const {isAuthenticated} = require("./middleware/authMiddleware");
+const {isAuthenticated, isInstructor, isStudent} = require("./middleware/authMiddleware");
 
 /*
 app.use(function (req, res, next) {
@@ -97,7 +99,7 @@ app.get('/error', function (req, res) {
 });
 
 app.get('/api/authstatus', isAuthenticated, (req, res) => {
-    //res.json({isAuthenticated: req.isAuthenticated()});
+    res.json({isAuthenticated: req.isAuthenticated(), user: req.user});
 });
 
 app.get('/', (req, res) => {

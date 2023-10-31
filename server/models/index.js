@@ -27,7 +27,7 @@ const db = initModels(sequelize, DataTypes);
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.sequelize.sync({force: true})
+db.sequelize.sync({force: false})
     .then(() => {
         // Default role values
         db.rollen.findOrCreate({
