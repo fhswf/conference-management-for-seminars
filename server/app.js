@@ -11,8 +11,10 @@ const fs = require('fs');
 const app = express();
 
 // ------------------------------ middleware ------------------------------
+const {isAuthenticated, isInstructor, isStudent} = require("./middleware/authMiddleware");
+
 app.use(cors({
-    origin: 'http://192.168.0.206:1234',
+    origin: 'http://192.168.0.206:5173',
     credentials: true
 }));
 
@@ -67,7 +69,14 @@ app.use(passport.session());
 
 
 // ------------------------------ routes ------------------------------
-const {isAuthenticated, isInstructor, isStudent} = require("./middleware/authMiddleware");
+
+const conceptRouter = require('./routes/conceptRouter');
+const paperRouter = require('./routes/paperRouter');
+const personRouter = require('./routes/personRouter');
+
+app.use('/api/concepts', isAuthenticated, conceptRouter);
+app.use('/api/paper', isAuthenticated, paperRouter);
+app.use('/api/person', isAuthenticated, personRouter);
 
 /*
 app.use(function (req, res, next) {
@@ -90,7 +99,7 @@ app.get('/success', function (req, res) {
     //console.log('LTI launch was successful!');
     console.log(req.user);
     console.log(req.session);
-    res.redirect('http://192.168.0.206:1234/');
+    res.redirect('http://192.168.0.206:5173/');
 });
 
 app.get('/error', function (req, res) {
@@ -105,6 +114,17 @@ app.get('/api/authstatus', isAuthenticated, (req, res) => {
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
+
+//logout
+app.get('/api/logout', (req, res) => {
+    const moodleUrl = req.user.lti.launch_presentation_return_url;
+    req.logout(() => {
+        console.log(req.user);
+        console.log(req.session);
+        res.status(200).json({ url: moodleUrl });
+    });
+});
+
 
 // ------------------------------ server setup ------------------------------
 
