@@ -6,6 +6,9 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const fs = require('fs');
+var bodyParser = require('body-parser');
+
+const fileUpload = require('express-fileupload');
 
 
 const app = express();
@@ -18,9 +21,11 @@ app.use(cors({
     credentials: true
 }));
 
+app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(express.static('public'));
+app.use(fileUpload());
 
 // ------------------------------ session setup ------------------------------
 const session = require('express-session');
@@ -74,9 +79,9 @@ const conceptRouter = require('./routes/conceptRouter');
 const paperRouter = require('./routes/paperRouter');
 const personRouter = require('./routes/personRouter');
 
-app.use('/api/concepts', isAuthenticated, conceptRouter);
-app.use('/api/paper', isAuthenticated, paperRouter);
-app.use('/api/person', isAuthenticated, personRouter);
+app.use('/api/concepts', conceptRouter);
+app.use('/api/paper', paperRouter);
+app.use('/api/person', personRouter);
 
 /*
 app.use(function (req, res, next) {

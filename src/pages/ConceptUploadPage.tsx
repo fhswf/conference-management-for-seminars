@@ -2,14 +2,16 @@ import styles from "./ConceptUploadPage.module.css"
 import MainLayout from "../components/layout/MainLayout.tsx";
 import {FileUpload, FileUploadHandlerEvent, FileUploadSelectEvent} from "primereact/fileupload";
 import {Dropdown} from "primereact/dropdown";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {InputTextarea} from "primereact/inputtextarea";
 import {Button} from "primereact/button";
+import axios from "axios";
 
 function ConceptUploadPage() {
-    const [selectedSupervisor, setSelectedSupervisor] = useState(null)
     const [text, setText] = useState<string>("")
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [availableSupervisor, setAvailableSupervisor] = useState([])
+    const [selectedSupervisor, setSelectedSupervisor] = useState(undefined)
 
     const supervisor = [
         {name: "Betreuer A"},
@@ -18,31 +20,72 @@ function ConceptUploadPage() {
     ];
 
     async function onSubmit(event: any) {
-        //event.preventDefault();
-        console.log("Submit");
+        event.preventDefault();
+
+        if (!selectedFile || !selectedSupervisor || !text.trim()) {
+            alert('Please fill in all fields.');
+            return;
+        }
 
         const formData = new FormData();
+        formData.append('text', text);
+        formData.append('file', selectedFile);
+        formData.append('supervisorOID', selectedSupervisor.personOID);
 
-        formData.append("file", event.files[0]);
+        console.log(text);
+        console.log(selectedFile);
+        console.log(selectedSupervisor);
+        console.log(formData);
 
         try {
-            const result = await fetch("http://192.168.0.206:3000/api/uploadPDF", {
-                method: "POST",
+            const res = await fetch('http://192.168.0.206:3000/api/concepts/upload-concept', {
+                method: 'POST',
                 body: formData,
-            });
+            },);
 
-            if (!result.ok) {
-                console.log("Upload Fehler");
-            }else {
-                console.log("Upload erfolgreich");
+            if (res.status === 200) {
+                alert('Concept uploaded successfully.');
+                // Optionally, you can reset the state here.
+                setText("");
+                setSelectedFile(null);
+                setSelectedSupervisor(undefined);
+            } else {
+                alert('Error uploading concept. Please try again.');
             }
         } catch (error) {
-            console.error(error);
+            console.error("Error uploading concept:", error);
+            alert('Error uploading concept. Please check your internet connection and try again.');
         }
     }
 
-    function handleUpload(event:  FileUploadHandlerEvent) {
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // TODO replace with LTI data
+                const result = await axios.get("http://192.168.0.206:3000/api/person/get-supervisor-list/1");
+                //console.log(result.data);
+                const availableSupervisor:any = [];
+                result.data.map((supervisor: any) => {
+                    availableSupervisor.push({name: supervisor.lastname+", "+ supervisor.firstname, personOID: supervisor.personOID});
+                } )
+                setAvailableSupervisor(availableSupervisor);
+                console.log(availableSupervisor);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+        fetchData();
+    }, []);
 
+    function handleUpload(event:  FileUploadHandlerEvent) {
+        const formData = new FormData();
+        formData.append('file', event.files[0]);
+        console.log(formData);
+
+        const res = fetch('http://192.168.0.206:3000/api/concepts/upload-concept', {
+            method: 'POST',
+            body: formData,
+        },);
     }
 
     return (
@@ -65,7 +108,7 @@ function ConceptUploadPage() {
                                             onClear={()=>setSelectedFile(null)}
                                             onRemove={()=>setSelectedFile(null)}
                                             accept="application/pdf"
-                                            maxFileSize={1000000}
+                                            maxFileSize={16000000}
                                             emptyTemplate={<p>Drag and drop files to here to upload.</p>} />
                             </div>
                             {/* <Button type="button" onClick={()=>console.log(selectedFile[0])} label="show" /> */}
@@ -73,7 +116,7 @@ function ConceptUploadPage() {
                         <div className={styles.container}>
                             <p>Betreuer</p>
                             <Dropdown id="seminar" value={selectedSupervisor} onChange={(e) => setSelectedSupervisor(e.value)}
-                                      showClear options={supervisor} placeholder="Betreuer wählen..." optionLabel="name"/><br/>
+                                      showClear options={availableSupervisor} placeholder="Betreuer wählen..." optionLabel="name"/><br/>
 
                         </div>
                     </div>

@@ -11,9 +11,17 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TEXT,
       allowNull: true
     },
+    pdf: {
+      type: DataTypes.BLOB('medium'),
+      allowNull: true
+    },
     filename: {
       type: DataTypes.TEXT,
-      allowNull: true
+        allowNull: true
+    },
+    mimetype: {
+        type: DataTypes.TEXT,
+        allowNull: true
     },
     personOIDSupervisor: {
       type: DataTypes.INTEGER,

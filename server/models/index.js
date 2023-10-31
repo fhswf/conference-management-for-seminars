@@ -57,6 +57,44 @@ db.sequelize.sync({force: false})
                 description: 'student'
             }
         });
+
+        // Default status values
+        db.status.findOrCreate({
+            where: {
+                statusOID: 1
+            },
+            defaults: {
+                statusOID: 1,
+                description: 'Evaluation pending'
+            }
+        });
+        db.status.findOrCreate({
+            where: {
+                statusOID: 2
+            },
+            defaults: {
+                statusOID: 2,
+                description: 'accepted'
+            }
+        });
+        db.status.findOrCreate({
+            where: {
+                statusOID: 3
+            },
+            defaults: {
+                statusOID: 3,
+                description: 'rejected'
+            }
+        });
+        db.status.findOrCreate({
+            where: {
+                statusOID: 4
+            },
+            defaults: {
+                statusOID: 4,
+                description: 'Correction demanded'
+            }
+        });
         console.log('Sync Database');
     })
 
