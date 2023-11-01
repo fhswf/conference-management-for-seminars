@@ -12,7 +12,7 @@ const app = express();
 
 // ------------------------------ middleware ------------------------------
 app.use(cors({
-    origin: 'http://192.168.0.206:1234',
+    origin: 'https://' + process.env.FRONTEND_IP,
     credentials: true
 }));
 
@@ -41,10 +41,10 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-        secure: false,
-        sameSite: true,
-        //secure: true,
-        //sameSite: 'none',
+//        secure: false,
+//        sameSite: true,
+        secure: true,
+        sameSite: 'none',
     }
 }))
 
@@ -90,7 +90,7 @@ app.get('/success', function (req, res) {
     //console.log('LTI launch was successful!');
     console.log(req.user);
     console.log(req.session);
-    res.redirect('http://192.168.0.206:1234/');
+    res.redirect('https://' + process.env.FRONTEND_IP );
 });
 
 app.get('/error', function (req, res) {
@@ -108,24 +108,24 @@ app.get('/', (req, res) => {
 
 // ------------------------------ server setup ------------------------------
 
-try {
-    const https = require('https');
+//try {
+const https = require('https');
 
-    const key = fs.readFileSync(__dirname + '/../../certs/selfsigned.key');
-    const cert = fs.readFileSync(__dirname + '/../../certs/selfsigned.crt');
-    const optionsHttps = {
-        key: key,
-        cert: cert
-    };
+const key = fs.readFileSync('/etc/letsencrypt/live/' + process.env.FRONTEND_IP +'/privkey.pem', 'utf8');
+const cert = fs.readFileSync('/etc/letsencrypt/live/' + process.env.FRONTEND_IP +'/fullchain.pem', 'utf8');
+const optionsHttps = {
+    key: key,
+    cert: cert
+};
 
-    const serverHttps = https.createServer(optionsHttps, app);
+const serverHttps = https.createServer(optionsHttps, app);
 
-    serverHttps.listen(PORT_HTTPS, () => {
-        console.log('App listening at https://localhost:' + PORT_HTTPS);
-    });
-} catch (e) {
-    console.log('HTTPS server not started: ' + e);
-}
+serverHttps.listen(PORT_HTTPS, () => {
+    console.log('App listening at https://localhost:' + PORT_HTTPS);
+});
+//} catch (e) {
+//    console.log('HTTPS server not started: ' + e);
+//}
 
 const serverHttp = app.listen(PORT_HTTP, function () {
     console.log('App listening at http://localhost:' + PORT_HTTP);

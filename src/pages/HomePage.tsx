@@ -23,26 +23,26 @@ function HomePage() {
         return (
             <>
                 <MainLayout>
-                <div>
-                    <h1>Sie sind in folgenden Seminaren eingeschrieben:</h1>
-                    <div className="card">
-                        <DataTable value={tableData} showGridlines tableStyle={{ minWidth: '50rem' }}>
-                            <Column field="name" header="Bezeichnung"></Column>
-                            <Column field="role" header="Ihre Rolle"></Column>
-                            <Column field="stage" header="Phase"></Column>
-                            <Column field="btnSeminar" header=""></Column>
-                            <Column field="btnSeminarDetails" header=""></Column>
-                        </DataTable>
+                    <div>
+                        <h1>Sie sind in folgenden Seminaren eingeschrieben:</h1>
+                        <div className="card">
+                            <DataTable value={tableData} showGridlines tableStyle={{ minWidth: '50rem' }}>
+                                <Column field="name" header="Bezeichnung"></Column>
+                                <Column field="role" header="Ihre Rolle"></Column>
+                                <Column field="stage" header="Phase"></Column>
+                                <Column field="btnSeminar" header=""></Column>
+                                <Column field="btnSeminarDetails" header=""></Column>
+                            </DataTable>
+                        </div>
+                        <br/>
+                        <form onSubmit={(event)=>{event.preventDefault()}}>
+                            <label htmlFor="seminarName">Seminarname:</label>
+                            <InputText id="seminarName" name="seminarName" placeholder="Search" />
+                            <Button label="Seminar erstellen" type="submit"/>
+                        </form>
                     </div>
-                    <br/>
-                    <form onSubmit={(event)=>{event.preventDefault()}}>
-                        <label htmlFor="seminarName">Seminarname:</label>
-                        <InputText id="seminarName" name="seminarName" placeholder="Search" />
-                        <Button label="Seminar erstellen" type="submit"/>
-                    </form>
-                </div>
                     <Button onClick={async ()=>{
-                        const result = await fetch("http://192.168.0.206:3000/api/authstatus", {
+                        const result = await fetch("https://" + import.meta.env.VITE_BACKEND_URL +"/api/authstatus", {
                             method: "GET",
                             credentials: 'include',
                             headers: {
@@ -52,7 +52,7 @@ function HomePage() {
                         const data = await result.json();
                         console.log(data);
                     }}>Check Auth</Button>
-                {/* <ChatWindowPage/> */}
+                    {/* <ChatWindowPage/> */}
                 </MainLayout>
             </>
         );

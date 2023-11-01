@@ -21,11 +21,20 @@ services:
     restart: always
     ports:
       - 3000:3000
+      - 3443:3443
     depends_on:
       - dbserver
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
 
   frontend:
     build: .
     restart: always
     ports:
-      - 1234:80
+      - 80:80
+      - 443:443
+    volumes:
+      - ./ssl.conf:/usr/local/apache2/conf/ssl.conf
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+
+
