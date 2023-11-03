@@ -2,12 +2,12 @@
 //require('dotenv').config();
 
 module.exports = {
-    HOST: process.env.DB_HOST || "localhost",
-    USER: process.env.DB_USER || "root",
-    PASSWORD: process.env.DB_PASSWORD || "",
-    DATABASE: process.env.DB_NAME || "konferenz-management",
-    DIALECT: process.env.DB_TYPE || "mariadb",
-    PORT: process.env.DB_PORT || 3306,
+    HOST: process.env.DB_HOST ,
+    USER: process.env.DB_USER,
+    PASSWORD: process.env.DB_PASSWORD ,
+    DATABASE: process.env.DB_NAME ,
+    DIALECT: process.env.DB_TYPE ,
+    PORT: process.env.DB_PORT ,
 
     pool: {
         max: 5,

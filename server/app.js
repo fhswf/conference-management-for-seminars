@@ -1,5 +1,6 @@
+//require('dotenv').config({path: __dirname + '/../.env'});
 require('dotenv').config();
-const PORT_HTTP = process.env.EXPRESS_PORT_HTTP || 3000;
+const PORT_HTTP = process.env.EXPRESS_PORT_HTTP;
 const PORT_HTTPS = process.env.EXPRESS_PORT_HTTPS || 3443;
 
 const express = require('express');
@@ -12,7 +13,7 @@ const app = express();
 
 // ------------------------------ middleware ------------------------------
 app.use(cors({
-    origin: 'http://192.168.0.206:1234',
+    origin: process.env.FRONTEND_URL,
     credentials: true
 }));
 
@@ -90,7 +91,7 @@ app.get('/success', function (req, res) {
     //console.log('LTI launch was successful!');
     console.log(req.user);
     console.log(req.session);
-    res.redirect('http://192.168.0.206:1234/');
+    res.redirect('https://' + process.env.FRONTEND_URL);
 });
 
 app.get('/error', function (req, res) {
@@ -98,11 +99,14 @@ app.get('/error', function (req, res) {
     res.send('Error during LTI launch.');
 });
 
-app.get('/api/authstatus', isAuthenticated, (req, res) => {
+app.get('/authstatus', isAuthenticated, (req, res) => {
     res.json({isAuthenticated: req.isAuthenticated(), user: req.user});
 });
 
 app.get('/', (req, res) => {
+    res.send('Hello World!');
+});
+app.get('/test', (req, res) => {
     res.send('Hello World!');
 });
 
@@ -110,16 +114,13 @@ app.get('/', (req, res) => {
 
 try {
     const https = require('https');
-
     const key = fs.readFileSync(__dirname + '/../../certs/selfsigned.key');
     const cert = fs.readFileSync(__dirname + '/../../certs/selfsigned.crt');
     const optionsHttps = {
         key: key,
         cert: cert
     };
-
     const serverHttps = https.createServer(optionsHttps, app);
-
     serverHttps.listen(PORT_HTTPS, () => {
         console.log('App listening at https://localhost:' + PORT_HTTPS);
     });

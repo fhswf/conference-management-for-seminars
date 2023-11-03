@@ -106,8 +106,8 @@ const verifyCallback = async (username, lti, done) => {
 
 
 const strategy = new LTIStrategy({
-    consumerKey: process.env.CONSUMER_KEY || "7d13a1331703639ae03cc980eea82c6c7432bd6bb3bc35d50e53976be3da80be",
-    consumerSecret: process.env.CONSUMER_SECRET || "014819937df8bbc723a20627f598f86a55a874e07303d6456bdee4eeef037a58",
+    consumerKey: process.env.CONSUMER_KEY,
+    consumerSecret: process.env.CONSUMER_SECRET ,
     passReqToCallback: true,
 }, verifyCallback);
 

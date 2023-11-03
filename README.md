@@ -13,23 +13,17 @@ Currently, two official plugins are available:
 
 To run this project you need to create two .env files.
 First one is in the root folder and it should contain the following:
-
   ```
-  VITE_BACKEND_IP=""
-  VITE_BACKEND_PORT_HTTPS=3443
-  VITE_BACKEND_URL="${VITE_BACKEND_IP}:${VITE_BACKEND_PORT_HTTPS}"
+  VITE_BACKEND_URL=""
   ```
-
 Second one is in the server folder:
-
   ```
   EXPRESS_IP=""
-  FRONTEND_IP=""
+  FRONTEND_URL=""
   EXPRESS_PORT_HTTP=3000
-  EXPRESS_PORT_HTTPS=3443
   
   DB_TYPE="mariadb"
-  DB_HOST=""
+  DB_HOST="dbserver"
   DB_NAME=""
   DB_USER=""
   DB_PASSWORD=""
@@ -38,6 +32,32 @@ Second one is in the server folder:
   CONSUMER_KEY=""
   CONSUMER_SECRET=""
   ```
+
+If you build this project with docker you should pass following .env which contains all variables needed in the docker-compose script:
+  ```
+  #Docker Compose
+  MYSQL_ROOT_PASSWORD=""
+  MYSQL_DATABASE="konferenz-management"
+  
+  #Frontend
+  VITE_BACKEND_URL="jupiter.fh-swf.de/conference/api"
+  
+  #Backend
+  FRONTEND_URL="jupiter.fh-swf.de/conference/"
+  FRONTEND_PORT=11001
+  EXPRESS_PORT_HTTP=11000
+  
+  DB_TYPE="mariadb"
+  DB_HOST="dbserver"
+  DB_NAME=""
+  DB_USER=""
+  DB_PASSWORD=""
+  DB_PORT=3306
+  
+  CONSUMER_KEY=""
+  CONSUMER_SECRET=""
+  ```
+
 
 ## Expanding the ESLint configuration
 

@@ -17,6 +17,7 @@ function ConceptUploadPage() {
         {name: "Betreuer C"},
     ];
 
+    //TODO edit
     async function onSubmit(event: any) {
         //event.preventDefault();
         console.log("Submit");
@@ -50,7 +51,7 @@ function ConceptUploadPage() {
             <MainLayout>
                 <p>ConceptUploadPage</p>
 
-                <form onSubmit={onSubmit}>
+                <form onSubmit={()=>{}}>
                     <div>
                         <div className={styles.container}>
                             <p>Text</p>
