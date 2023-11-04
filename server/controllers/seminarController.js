@@ -1,8 +1,31 @@
-
-
 const db = require("../models");
 
 const Seminar = db.seminar;
+const RolLeAssignment = db.rolleassignment;
+
+const getSeminar = async (req, res) => {
+    try {
+        const seminar = await Seminar.findOne({
+                where: {seminaroid: 1}, // TODO req.user.lti.context_id
+                include: [{
+                    model: RolLeAssignment,
+                    as: "rolleassignments",
+                    where: {personOID: 1}, // TODO req.user.personOID
+                }],
+                attributes: ["description", "phase"]
+            },
+        );
+
+        if (seminar) {
+            res.status(200).send(seminar);
+        } else {
+            res.status(404).send({message: "Seminar not found."});
+        }
+    } catch (e) {
+        console.log(e);
+        res.status(500).send({message: "Error while retrieving seminar."});
+    }
+}
 
 const setPhase = async (req, res) => {
     try {
@@ -22,5 +45,6 @@ const setPhase = async (req, res) => {
 }
 
 module.exports = {
+    getSeminar,
     setPhase,
 }

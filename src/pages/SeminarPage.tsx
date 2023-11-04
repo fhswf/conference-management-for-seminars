@@ -6,6 +6,7 @@ import ChatWindowPage from "./ChatWindowPage.tsx";
 import MainLayout from "../components/layout/MainLayout.tsx";
 import {Button} from "primereact/button";
 import Concept from "../entities/Concept.ts";
+import Seminar from "../entities/Seminar.ts";
 
 function SeminarPage() {
     const isStudent = true;
@@ -14,26 +15,34 @@ function SeminarPage() {
     //const [showCommentsStrangerPaper, setShowCommentsStrangerPaper] = useState(false);
     const [showChat, setShowChat] = useState(false);
     const [concept, setConcept] = useState<Concept | null>(null);
-    const [currentPhase, setCurrentPhase] = useState<number>()
+    const [seminar, setSeminar] = useState<Seminar | null>(null)
 
     useEffect(() => {
         const fetchConcept = async () => {
             const response = await fetch("http://192.168.0.206:3000/api/concepts/get-concept/",{
                 method: 'GET',
                 credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
             });
             if (!response.ok) {
                 return;
             }
-            const data = await response.json();
-            setConcept(Concept.fromJson(data));
-            console.log(data);
+            setConcept(Concept.fromJson(await response.json()));
+        }
+        const fetchSeminar = async () => {
+            const response = await fetch("http://192.168.0.206:3000/api/seminar/get-seminar", {
+                method: 'GET',
+                credentials: 'include',
+            });
+            if (!response.ok) {
+                return;
+            }
+            const seminar = Seminar.fromJson(await response.json());
+            console.log(seminar);
+            setSeminar(seminar);
         }
 
         fetchConcept();
+        fetchSeminar();
     }, [])
 
     return (
@@ -41,9 +50,9 @@ function SeminarPage() {
             <MainLayout>
                 <div>
                     <p>Übersicht</p>
-                    <p>Seminarname: Bachelor WS 2023/24</p>
-                    <p>Phase: Konzept-Upload</p>
-                    <p>Rolle: Student</p>
+                    {(seminar) ? <p>Seminarname: {seminar.description}</p> : <p>Seminarname: -</p>}
+                    {(seminar) ? <p>Phase: {seminar.phase}</p> : <p>Phase: -</p>}
+                    {(seminar) ? <p>Rolle: {seminar.roleAssignments.roleOID}</p> : <p>Rolle: -</p>}
                 </div>
                 <br/>
                 {isStudent && <> <p>Konzept:</p>
