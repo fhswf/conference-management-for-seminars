@@ -1,17 +1,40 @@
 import Modal from "../components/Modal.tsx";
 import styles from "./SeminarPage.module.css"
 import {useNavigate} from "react-router-dom";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import ChatWindowPage from "./ChatWindowPage.tsx";
 import MainLayout from "../components/layout/MainLayout.tsx";
 import {Button} from "primereact/button";
+import Concept from "../entities/Concept.ts";
 
 function SeminarPage() {
     const isStudent = true;
     const navigate = useNavigate();
     const [showCommentsOwnPaper, setShowCommentsOwnPaper] = useState(false);
-    const [showCommentsStrangerPaper, setShowCommentsStrangerPaper] = useState(false);
+    //const [showCommentsStrangerPaper, setShowCommentsStrangerPaper] = useState(false);
     const [showChat, setShowChat] = useState(false);
+    const [concept, setConcept] = useState<Concept | null>(null);
+    const [currentPhase, setCurrentPhase] = useState<number>()
+
+    useEffect(() => {
+        const fetchConcept = async () => {
+            const response = await fetch("http://192.168.0.206:3000/api/concepts/get-concept/",{
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (!response.ok) {
+                return;
+            }
+            const data = await response.json();
+            setConcept(Concept.fromJson(data));
+            console.log(data);
+        }
+
+        fetchConcept();
+    }, [])
 
     return (
         <div>
@@ -30,10 +53,26 @@ function SeminarPage() {
                         <div><p>Betreuer</p></div>
                         <div><p>Status</p></div>
                         <div></div>
-                        <div><p>mein text</p></div>
-                        <div><a href="gfgegerg">konzept.pdf</a></div>
-                        <div><p>Prof. Dr. Mustermann</p></div>
-                        <div><p>angenommen</p></div>
+                        <div><p>{(concept) ? concept.text : "-"}</p></div>{/**/}
+                        <div>
+                        {(concept && concept.filename) ? //if filename exists pdf exists
+                            <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts/get-concept-pdf/${concept.conceptOID}`}>{concept.filename}</a> :
+                            <p>-</p>
+                        }
+                        </div>
+                        <div>
+                        {(concept && concept.personOIDSupervisorPerson) ?
+                            <p>{concept.personOIDSupervisorPerson.firstname} {concept.personOIDSupervisorPerson.lastname}</p> :
+                            <p>-</p>
+                        }
+                        </div>
+                        <div>
+                            {(concept && concept.statusO) ?
+                                // TODO evtl mappen
+                                <p>{concept.statusO.description}</p> :
+                                <p>-</p>
+                            }
+                        </div>
                         <div>
                             <Button onClick={() => {
                                 navigate("/concept-upload")

@@ -2,15 +2,31 @@ const db = require("../models");
 const path = require("path");
 
 const Concept = db.concept;
+const Person = db.person;
+const Status = db.status;
 
-//Seminar in dem man sich befindet muss ermittelt werden
 const getConcept = async (req, res) => {
+    // TODO ggf anpassen
     try {
-        const concept = await Concept.findAll({
-            where: { conceptOID: 1 }
+        const concept = await Concept.findOne({
+            where: {
+                personOIDStudent: 1, // TODO req.user.personOID
+                seminarOID: 1 // TODO req.user.lti.context_id
+            },
+            include: [{
+                model: Person,
+                as: 'personOIDSupervisor_person',
+                attributes: ["firstname", "lastname"]
+            },
+            {
+                model: Status,
+                as: 'statusO'
+            }],
+            attributes: ["conceptOID", "text", "filename"]
         });
-        //console.log(concept);
-        //const pdfPath = path.join("./userFiles", concept[0].dataValues.filename);
+        if(!concept) {
+            return res.status(404).json({ error: 'Not Found' });
+        }
         return res.status(200).json(concept);
     } catch (error) {
         console.error(error);
@@ -26,7 +42,7 @@ const getConceptPdf = async (req, res) => {
 
         const concept = await Concept.findByPk(req.params.id);
 
-        if (concept) {
+        if (concept && concept.pdf) {
             res.setHeader('Content-Type', 'application/pdf');
 
             //concept.pdf.data.data
@@ -35,7 +51,7 @@ const getConceptPdf = async (req, res) => {
             res.setHeader('Content-Disposition', `attachment; filename="${concept.filename}"`);
             res.send(Buffer.from(concept.pdf, 'utf8'));
         } else {
-            return res.status(404).end();
+            return res.status(404).json({ error: 'Not Found' });
         }
     } catch (e) {
         console.error(e);
@@ -71,7 +87,6 @@ const uploadConcept = async (req, res) => {
         return res.status(500).end();
     }
 }
-
 
 module.exports = {
     getConcept,

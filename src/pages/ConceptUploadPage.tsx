@@ -41,6 +41,7 @@ function ConceptUploadPage() {
         try {
             const res = await fetch('http://192.168.0.206:3000/api/concepts/upload-concept', {
                 method: 'POST',
+                credentials: 'include',
                 body: formData,
             },);
 
@@ -65,7 +66,7 @@ function ConceptUploadPage() {
         const fetchData = async () => {
             try {
                 // TODO replace with LTI data
-                const result = await axios.get("http://192.168.0.206:3000/api/person/get-supervisor-list/1");
+                const result = await axios.get("http://192.168.0.206:3000/api/person/get-supervisor-list/1"); // TODO replace
                 //console.log(result.data);
                 const availableSupervisor:any = [];
                 result.data.map((supervisor: any) => {
@@ -79,17 +80,6 @@ function ConceptUploadPage() {
         };
         fetchData();
     }, []);
-
-    function handleUpload(event:  FileUploadHandlerEvent) {
-        const formData = new FormData();
-        formData.append('file', event.files[0]);
-        console.log(formData);
-
-        const res = fetch('http://192.168.0.206:3000/api/concepts/upload-concept', {
-            method: 'POST',
-            body: formData,
-        },);
-    }
 
     return (
         <div>

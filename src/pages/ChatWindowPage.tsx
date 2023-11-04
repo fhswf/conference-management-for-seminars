@@ -46,13 +46,13 @@ function ChatWindowPage(){
             </div>
             <div className={styles.conversation}>
 
-                {messages.map((message) => {
+                {messages.map((message, index) => {
                     if(message.sender === "User"){
-                        return <div className={styles.messageRight}>
+                        return <div key={index} className={styles.messageRight}>
                             <ChatMessage message={message}/>
                         </div>
                     } else {
-                        return <div className={styles.messageLeft}>
+                        return <div key={index} className={styles.messageLeft}>
                             <ChatMessage message={message}/>
                         </div>
                     }

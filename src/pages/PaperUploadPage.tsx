@@ -20,6 +20,7 @@ function PaperUploadPage() {
         try {
             const res = await fetch('http://192.168.0.206:3000/api/paper/upload-paper', {
                 method: 'POST',
+                credentials: 'include',
                 body: formData,
             },);
 
