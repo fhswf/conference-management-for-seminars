@@ -22,15 +22,16 @@ function ConceptUploadPage() {
     async function onSubmit(event: any) {
         event.preventDefault();
 
-        if (!selectedFile || !selectedSupervisor || !text.trim()) {
-            alert('Please fill in all fields.');
+        if (!selectedFile && !text.trim()) {
+            alert('Bitte PDF oder Text eingeben.');
             return;
         }
 
         const formData = new FormData();
         formData.append('text', text);
         formData.append('file', selectedFile);
-        formData.append('supervisorOID', selectedSupervisor.personOID);
+        const oid = (selectedSupervisor === undefined) ? null : selectedSupervisor.personOID;
+        formData.append('supervisorOID', oid);
 
         console.log(text);
         console.log(selectedFile);
@@ -43,9 +44,11 @@ function ConceptUploadPage() {
                 body: formData,
             },);
 
+            //TODO res not working
+            console.log("=>" + res.status);
+
             if (res.status === 200) {
                 alert('Concept uploaded successfully.');
-                // Optionally, you can reset the state here.
                 setText("");
                 setSelectedFile(null);
                 setSelectedSupervisor(undefined);
@@ -103,7 +106,7 @@ function ConceptUploadPage() {
                             <p>Anhang (PDF)</p>
                             <div className="card">
                                 <FileUpload customUpload
-                                            uploadHandler={handleUpload}
+                                            uploadHandler={() => {}}
                                             onSelect={(event: FileUploadSelectEvent)=>setSelectedFile(event.files[0])}
                                             onClear={()=>setSelectedFile(null)}
                                             onRemove={()=>setSelectedFile(null)}

@@ -11,10 +11,10 @@ const getConcept = async (req, res) => {
         });
         //console.log(concept);
         //const pdfPath = path.join("./userFiles", concept[0].dataValues.filename);
-        res.status(200).json(concept);
+        return res.status(200).json(concept);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
 }
 
@@ -35,37 +35,40 @@ const getConceptPdf = async (req, res) => {
             res.setHeader('Content-Disposition', `attachment; filename="${concept.filename}"`);
             res.send(Buffer.from(concept.pdf, 'utf8'));
         } else {
-            res.status(404);
+            return res.status(404).end();
         }
     } catch (e) {
         console.error(e);
-        res.status(500).json({ error: 'Internal Server Error' });
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
 }
 
 const uploadConcept = async (req, res) => {
     try {
-        const text = req.body.text;
-        const filename = req.files.file.name;
-        const pdf = req.files.file;
-        const supervisorOID = req.body.supervisorOID;
+        const text = (req.body.text && req.body.text.length > 0) ? req.body.text : null;
+
+        const filename = (req.files) ? req.files.file.name : null;
+        const pdf = (req.files) ? req.files.file : null;
+        const pdfData = (pdf) ? pdf.data : null;
+        const mimetype = (pdf) ? pdf.mimetype : null;
+        const supervisorOID = (!req.body.supervisorOID && req.body.supervisorOID !== undefined) ? req.body.supervisorOID : null; // TODO use below
 
         await Concept.create({
             text: text,
-            pdf: pdf.data, // TODO Optimieren
+            pdf: pdfData, // TODO Optimieren
             filename: filename,
-            mimetype: pdf.mimetype,
-            personOIDSupervisor: supervisorOID,
+            mimetype: mimetype,
+            personOIDSupervisor: null,
             personOIDStudent: 1, // TODO req.user.personOID
             seminarOID: 1, // TODO req.user.lti.context_id
             statusOID: 1, // TODO ersetzen
         } );
 
-        // Antwort senden
-        res.status(200);
+
+        return res.status(200).end();
     } catch (error) {
         console.error("Error :" + error);
-        res.status(500);
+        return res.status(500).end();
     }
 }
 

@@ -78,10 +78,12 @@ app.use(passport.session());
 const conceptRouter = require('./routes/conceptRouter');
 const paperRouter = require('./routes/paperRouter');
 const personRouter = require('./routes/personRouter');
+const seminarRouter = require('./routes/seminarRouter');
 
 app.use('/api/concepts', conceptRouter);
 app.use('/api/paper', paperRouter);
 app.use('/api/person', personRouter);
+app.use('/api/seminar', seminarRouter);
 
 /*
 app.use(function (req, res, next) {
