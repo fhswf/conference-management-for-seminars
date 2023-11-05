@@ -79,8 +79,27 @@ async function getAssignedPaper(req, res) {
     }
 }
 
+async function getUploadedPaper(req, res) {
+    try {
+        const paper = await Paper.findAll({
+            where: {
+                studentOID: 1 // TODO req.user.personOID
+            },
+            attributes: ["paperOID", "filename"]
+        });
+        if (!paper) {
+            return res.status(404).json({error: 'Not Found'});
+        }
+        return res.status(200).json(paper);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({error: 'Internal Server Error'});
+    }
+}
+
 module.exports = {
     getPaperPdf,
     uploadPaper,
-    getAssignedPaper
+    getAssignedPaper,
+    getUploadedPaper
 }

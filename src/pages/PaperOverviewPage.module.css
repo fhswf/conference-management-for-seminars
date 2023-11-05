@@ -1,4 +1,5 @@
 .container {
     display: grid;
     grid-template-columns: 20% 20% 10%;
+    align-items: center;
 }

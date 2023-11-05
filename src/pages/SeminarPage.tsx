@@ -1,7 +1,7 @@
 import Modal from "../components/Modal.tsx";
 import styles from "./SeminarPage.module.css"
 import {useNavigate} from "react-router-dom";
-import {useEffect, useState} from "react";
+import {Fragment, useEffect, useState} from "react";
 import ChatWindowPage from "./ChatWindowPage.tsx";
 import MainLayout from "../components/layout/MainLayout.tsx";
 import {Button} from "primereact/button";
@@ -52,7 +52,7 @@ function SeminarPage() {
             }
             const assignedPaperData = await response.json()
             const assignedPapers = assignedPaperData.map(data => new AssignedPaper(data.paperOID, data.filename));
-            console.log(assignedPaper);
+            //console.log(assignedPaper);
             setAssignedPaper(assignedPapers);
         }
 
@@ -107,8 +107,8 @@ function SeminarPage() {
                         </div>
                     </div>
                     <hr/>
-                    <div>
-                        Paper
+                    <div className={styles.paperContainer}>
+                        <p>Paper</p>
                         <Button onClick={() => {
                             navigate("/paper-upload")
                         }}>➡
@@ -118,14 +118,13 @@ function SeminarPage() {
                 </>
                 }
                 <p>Sie sind dem folgenden {assignedPaper?.length} Paper als Reviewer zugeordnet:</p>
-                <div>
+                <div className={styles.assignedPaperContainer}>
                     {assignedPaper && assignedPaper.map((paper: AssignedPaper, index: number) => {
                         return (
-                            <div key={index}>
-                                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-assigned-paper-pdf/${paper.paperOid}`}>{paper.filename}</a>
+                            <Fragment key={index}>
+                                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-paper/${paper.paperOid}`}>{paper.filename}</a>
                                 <Button onClick={() => setShowChat(true)}>Kommentieren</Button>
-                                <br/>
-                            </div>
+                            </Fragment>
                         )
                     })}
                 </div>
