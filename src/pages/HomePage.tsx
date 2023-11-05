@@ -42,12 +42,9 @@ function HomePage() {
                     </form>
                 </div>
                     <Button onClick={async ()=>{
-                        const result = await fetch("http://192.168.0.206:3000/api/authstatus", {
+                        const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/authstatus`, {
                             method: "GET",
                             credentials: 'include',
-                            headers: {
-                                "Content-Type": "text/plain"
-                            }
                         });
                         const data = await result.json();
                         console.log(data);

@@ -39,7 +39,7 @@ function ConceptUploadPage() {
         console.log(formData);
 
         try {
-            const res = await fetch('http://192.168.0.206:3000/api/concepts/upload-concept', {
+            const res = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts/upload-concept`, {
                 method: 'POST',
                 credentials: 'include',
                 body: formData,
@@ -66,7 +66,7 @@ function ConceptUploadPage() {
         const fetchData = async () => {
             try {
                 // TODO replace with LTI data
-                const result = await axios.get("http://192.168.0.206:3000/api/person/get-supervisor-list/1"); // TODO replace
+                const result = await axios.get(`http://${import.meta.env.VITE_BACKEND_URL}/api/person/get-supervisor-list/1`); // TODO replace
                 //console.log(result.data);
                 const availableSupervisor:any = [];
                 result.data.map((supervisor: any) => {

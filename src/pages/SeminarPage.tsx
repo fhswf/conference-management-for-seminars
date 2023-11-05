@@ -19,7 +19,7 @@ function SeminarPage() {
 
     useEffect(() => {
         const fetchConcept = async () => {
-            const response = await fetch("http://192.168.0.206:3000/api/concepts/get-concept/",{
+            const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts/get-concept/`,{
                 method: 'GET',
                 credentials: 'include',
             });
@@ -29,7 +29,7 @@ function SeminarPage() {
             setConcept(Concept.fromJson(await response.json()));
         }
         const fetchSeminar = async () => {
-            const response = await fetch("http://192.168.0.206:3000/api/seminar/get-seminar", {
+            const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-seminar`, {
                 method: 'GET',
                 credentials: 'include',
             });

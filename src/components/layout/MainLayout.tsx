@@ -14,12 +14,9 @@ function MainLayout({children}: Props) {
         {label: 'Abmelden', icon: PrimeIcons.SIGN_OUT, command: () => {
                 const leave = window.confirm("Wollen Sie sich wirklich abmelden?");
                 if (leave) {
-                    fetch('http://192.168.0.206:3000/api/logout', {
+                    fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/logout`, {
                         method: 'GET',
                         credentials: 'include',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
                     }).then(response => response.json())
                         .then((data) => {
                             if (data.url) {

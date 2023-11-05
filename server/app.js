@@ -17,7 +17,7 @@ const app = express();
 const {isAuthenticated, isInstructor, isStudent} = require("./middleware/authMiddleware");
 
 app.use(cors({
-    origin: 'http://192.168.0.206:5173',
+    origin: `http://${process.env.FRONTEND_URL}`,
     credentials: true
 }));
 
