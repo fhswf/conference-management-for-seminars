@@ -1,5 +1,5 @@
 import Searchbar from "../components/Searchbar.tsx";
-import {FormEvent, useState} from "react";
+import {FormEvent, useEffect, useState} from "react";
 import Modal from "../components/Modal.tsx";
 import AddUserForm from "../components/AddUserForm.tsx";
 import ConceptAcceptReject from "../components/ConceptAcceptReject.tsx";
@@ -8,17 +8,55 @@ import Table from "../components/Table.tsx";
 import {InputText} from "primereact/inputtext";
 import {Dropdown} from "primereact/dropdown";
 import {Button} from "primereact/button";
+import axios from "axios";
 
 function SeminarDetailsPage() {
-    const [isEditMode, setIsEditMode] = useState(false)
-    const [showUserConcept, setShowUserConcept] = useState(false)
-    const [showAddUserModal, setShowAddUserModal] = useState(false)
+    const [isEditMode, setIsEditMode] = useState(0);
+    const [showUserConcept, setShowUserConcept] = useState(false);
     const [selectedRole, setSelectedRole] = useState(null);
-    const [selecetedSupervisor, setSelecetedSupervisor] = useState(null)
+    const [selectedSupervisor, setSelectedSupervisor] = useState(undefined)
+    const [studentList, setStudentList] = useState<any | null>(null);
+    const [availableSupervisor, setAvailableSupervisor] = useState([])
+    const [comment, setComment] = useState("")
+
+    useEffect(() => {
+        const fetchStudentList = async () => {
+            const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-students-list`,{
+                method: 'GET',
+                credentials: 'include'
+            });
+            const data = await response.json();
+            setStudentList(data);
+        }
+        const fetchSupervisorList = async () => {
+            try {
+                const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/person/get-supervisor-list/1`,{
+                    method: 'GET',
+                    credentials: 'include'
+                }); // TODO replace
+                //console.log(result.data);
+                const availableSupervisor: any = [];
+                const data = await result.json();
+                data.map((supervisor: any) => {
+                    availableSupervisor.push({
+                        name: supervisor.lastname + ", " + supervisor.firstname,
+                        personOID: supervisor.personOID
+                    });
+                })
+                setAvailableSupervisor(availableSupervisor);
+                console.log(availableSupervisor);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+        fetchSupervisorList();
+        fetchStudentList();
+    }, []);
 
     const roles = [
-        {name: "Student"},
-        {name: "Betreuer"},
+        {name: "Admin", value: 1},
+        {name: "Betreuer", value: 2},
+        {name: "Student", value: 3},
     ];
 
     const supervisor = [
@@ -26,7 +64,6 @@ function SeminarDetailsPage() {
         {name: "Betreuer B"},
         {name: "Betreuer C"},
     ];
-
 
     const header = [
         {field: "lname", header: "Nachname"},
@@ -51,40 +88,97 @@ function SeminarDetailsPage() {
         {field: "btnDelete", header: ""},
     ];
 
-    const tableData = [
-        {lname: "Mustermann", fname: "Max1", mail: "mustermann.max1@fh-swf.de", comment: "", role: "Student", supervisor: "Betreuer A", concept: "eingereicht", btnEdit: <Button onClick={()=>{setIsEditMode(true)}}>Edit</Button>, btnGoto: <Button onClick={()=>setShowUserConcept(true)}>➡</Button>},
-        {lname: "Mustermann", fname: "Max2", mail: "mustermann.max2@fh-swf.de", comment: "Kommentar", role: "Betreuer", supervisor: "", concept: "Bewertung ausstehend", btnEdit: <Button onClick={()=>{setIsEditMode(true)}}>Edit</Button>, btnGoto: <Button onClick={()=>setShowUserConcept(true)}>➡</Button>},
-    ];
+    //TODO edit
+    const tableData = studentList?.rolleassignments.map(person => ({
+        lname: person.personO.lastName || "-",
+        fname: person.personO.firstName || "-",
+        mail: person.personO.mail || "-",
+        comment: person.personO.comment || "-",
+        role: person.roleOID,
+        supervisor: person.personO.personOIDStudent_concepts[0]?.personOIDSupervisor_person?.firstname + " " + person.personO.personOIDStudent_concepts[0]?.personOIDSupervisor_person?.lastname || '-',
+        concept: person.personO.personOIDStudent_concepts[0]?.conceptOID ? person.personO.personOIDStudent_concepts[0].conceptOID : '-',
+        btnEdit: <Button onClick={() => {
+            setIsEditMode(person.personOID)
+            //set data
+            setComment(person.personO.comment)
+            setSelectedRole(person.roleOID)
+            setSelectedSupervisor(person.personO.personOIDStudent_concepts[0]?.personOIDSupervisor_person?.personOID)
+        }}>Edit</Button>,
+        btnGoto: <Button onClick={() => setShowUserConcept(true)}>➡</Button>
+    }));
 
-    const tableDataEdit = [
-        {lname: "Mustermann", fname: "Max1", mail: "mustermann.max1@fh-swf.de", comment: <InputText/>, role: <Dropdown value={selectedRole} onChange={(e) => setSelectedRole(e.value)} options={roles} optionLabel="name" placeholder="Rolle wählen" />, supervisor: <Dropdown value={selecetedSupervisor} onChange={(e) => setSelecetedSupervisor(e.value)} options={supervisor} optionLabel="name" placeholder="Betreuer wählen" />, concept: "eingereicht", btnDelete: <Button onClick={()=>{}}>Delete</Button>},
-        {lname: "Mustermann", fname: "Max2", mail: "mustermann.max2@fh-swf.de", comment: "Kommentar", role: "Betreuer", supervisor: "", concept: "Bewertung ausstehend", btnEdit: <Button onClick={()=>{setIsEditMode(true)}}>Edit</Button>},
-    ];
+    function onDeleteClicked(personOID: number) {
+        // TODO
+        console.log(personOID);
+    }
+
+    const tableDataEdit = studentList?.rolleassignments.map(person => ({
+        lname: person.personO.lastName,
+        fname: person.personO.firstName,
+        mail: person.personO.mail,
+        comment: isEditMode === person.personOID ? <InputText defaultValue={person.personO.comment}
+                                                              onChange={(e) => setComment(e.target.value)}/> : person.personO.comment,
+        role: isEditMode === person.personOID ?
+            <Dropdown value={selectedRole} options={roles} optionLabel="name" placeholder="Rolle wählen"
+                      onChange={(e) => setSelectedRole(e.value)}/> : person.roleOID,
+        supervisor: isEditMode === person.personOID && person.roleOID === 3 ?
+            <Dropdown showClear value={selectedSupervisor} options={availableSupervisor} optionLabel="name"
+                      placeholder="Betreuer wählen"
+                      onChange={(e) => setSelectedSupervisor(e.value)}/> : person.personO.personOIDStudent_concepts[0]?.personOIDSupervisor_person?.firstname + " " + person.personO.personOIDStudent_concepts[0]?.personOIDSupervisor_person?.lastname,
+        concept: person.personO.personOIDStudent_concepts[0]?.conceptOID ? person.personO.personOIDStudent_concepts[0].conceptOID : "-",
+        btnDelete: isEditMode === person.personOID ?
+            <Button onClick={() => onDeleteClicked(person.personOID)}>Delete</Button> : null
+    }));
 
     return (
         <div>
             <MainLayout>
                 <div>
-                    <p>Seminar Details: “Bachelor WS 2023/24”</p>
+                    <p>Seminar Details: “{studentList && studentList.description ? studentList.description : "-"}”</p>
                     <p onClick={() => {
                         if (confirm('Möchten Sie von "Review-Phase" übergehen zu "Reviews lesen"?')) {
                             // In nächste Phase wechseln
                         }
                     }}>Review-Phase 🖊</p>
-                    <Searchbar/>
+                    {/* TODO Suchleiste einfügen */}
                     {!isEditMode ?
                         <Table header={header} data={tableData}/> :
                         <Table header={headerEdit} data={tableDataEdit}/>
                     }
                     {isEditMode ?
-                        <Button onClick={() => {setIsEditMode(false)}}>Speichern</Button> :
-                        <Button onClick={() => {setShowAddUserModal(true);}}>Add User</Button>
+                        <Button onClick={async () => {
+                            setIsEditMode(false);
+                            console.log("----------------------------------")
+                            console.log(selectedRole);
+                            console.log(selectedSupervisor);
+                            console.log(comment);
+                            console.log("----------------------------------")
+
+                            //TODO send changes
+                            const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/update-person`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    personOID: isEditMode,
+                                    roleOID: roles.find(role => role.value === selectedRole)?.value,
+                                    supervisorOID: selectedSupervisor || null,
+                                    comment: comment,
+                                    seminarOID: studentList.seminarOID
+                                })
+                            });
+
+                            if (result.ok) {
+                                setSelectedRole(null);
+                                setSelectedSupervisor(undefined);
+                                setComment("");
+                            } else {
+                                alert("Fehler beim Speichern");
+                            }
+                        }}>Speichern</Button> :
+                        null
                     }
-                    <Modal isOpen={showAddUserModal} onClose={() => {
-                        setShowAddUserModal(false)
-                    }}>
-                        <AddUserForm onSubmit={(event: FormEvent) => {}}/>
-                    </Modal>
                     <Modal isOpen={showUserConcept} onClose={() => {
                         setShowUserConcept(false)
                     }}><ConceptAcceptReject/></Modal>

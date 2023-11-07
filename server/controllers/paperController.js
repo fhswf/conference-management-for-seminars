@@ -43,7 +43,7 @@ async function uploadPaper(req, res) {
             mimetype: mimetype,
         });
 
-
+        // TODO send mail to Admin and supervisor
         return res.status(200).end();
     } catch (error) {
         console.error("Error :" + error);

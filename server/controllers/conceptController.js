@@ -80,7 +80,7 @@ const uploadConcept = async (req, res) => {
             statusOID: 1, // TODO ersetzen
         } );
 
-        // TODO send mail to Admin
+        // TODO send mail to Admin and supervisor
         return res.status(200).end();
     } catch (error) {
         console.error("Error :" + error);
