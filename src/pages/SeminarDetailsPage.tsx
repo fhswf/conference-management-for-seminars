@@ -1,14 +1,11 @@
-import Searchbar from "../components/Searchbar.tsx";
-import {FormEvent, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import Modal from "../components/Modal.tsx";
-import AddUserForm from "../components/AddUserForm.tsx";
 import ConceptAcceptReject from "../components/ConceptAcceptReject.tsx";
 import MainLayout from "../components/layout/MainLayout.tsx";
 import Table from "../components/Table.tsx";
 import {InputText} from "primereact/inputtext";
 import {Dropdown} from "primereact/dropdown";
 import {Button} from "primereact/button";
-import axios from "axios";
 
 function SeminarDetailsPage() {
     const [isEditMode, setIsEditMode] = useState(0);
@@ -147,7 +144,7 @@ function SeminarDetailsPage() {
                     }
                     {isEditMode ?
                         <Button onClick={async () => {
-                            setIsEditMode(false);
+                            setIsEditMode(0);
                             console.log("----------------------------------")
                             console.log(selectedRole);
                             console.log(selectedSupervisor);

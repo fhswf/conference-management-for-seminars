@@ -16,7 +16,7 @@ const getConcept = async (req, res) => {
             include: [{
                 model: Person,
                 as: 'personOIDSupervisor_person',
-                attributes: ["firstname", "lastname"]
+                attributes: ["personOID", "firstname", "lastname"]
             },
             {
                 model: Status,

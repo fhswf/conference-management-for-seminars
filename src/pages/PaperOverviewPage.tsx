@@ -5,25 +5,18 @@ import PaperUploadPage from "./PaperUploadPage.tsx";
 import MainLayout from "../components/layout/MainLayout.tsx";
 import {Button} from "primereact/button";
 import ChatWindowPage from "./ChatWindowPage.tsx";
-import AssignedPaper from "../entities/AssignedPaper.ts";
+import useFetch from "../hooks/useFetch.ts";
+
+type Paper = {
+    paperOid: number;
+    filename: string;
+}
 
 function PaperOverviewPage() {
     const [showModal, setShowModal] = useState(false);
     const [showChat, setShowChat] = useState(false);
-    const [uploadedPaper, setUploadedPaper] = useState<AssignedPaper[] | null>(null)
-
-    useEffect(() => {
-        const getUploadedPaper = async () => {
-            const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-uploaded-paper/`, {
-                method: "GET",
-                credentials: 'include',
-            });
-            const uploadedPaperData = await response.json()
-            const uploadedPaper = uploadedPaperData.map(data => new AssignedPaper(data.paperOID, data.filename));
-            setUploadedPaper(uploadedPaper)
-        }
-        getUploadedPaper();
-    }, []);
+    //const [uploadedPaper, setUploadedPaper] = useState<AssignedPaper[] | null>(null)
+    const {data: uploadedPaper} = useFetch<Paper[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-uploaded-paper/`);
 
     return (
         <div>
@@ -34,7 +27,7 @@ function PaperOverviewPage() {
                     <p>Anonym</p>
                     <p></p>
                     {uploadedPaper && uploadedPaper.length > 0 ? (
-                        uploadedPaper.map((paper, index) => (
+                        uploadedPaper.map((paper: Paper, index: number) => (
                             <Fragment key={index}>
                                 <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-paper/${paper.paperOid}`}>{paper.filename}</a>
                                 <p>JA</p>

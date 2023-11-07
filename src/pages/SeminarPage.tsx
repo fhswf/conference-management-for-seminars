@@ -1,74 +1,64 @@
 import Modal from "../components/Modal.tsx";
 import styles from "./SeminarPage.module.css"
 import {useNavigate} from "react-router-dom";
-import {Fragment, useEffect, useState} from "react";
+import {Fragment, useState} from "react";
 import ChatWindowPage from "./ChatWindowPage.tsx";
 import MainLayout from "../components/layout/MainLayout.tsx";
 import {Button} from "primereact/button";
-import Concept from "../entities/Concept.ts";
-import Seminar from "../entities/Seminar.ts";
-import AssignedPaper from "../entities/AssignedPaper.ts";
+import useFetch from "../hooks/useFetch.ts";
+
+type RolleAssignment = {
+    personOID: number;
+    seminarOID: number;
+    roleOID: number;
+}
+
+type Seminar = {
+    description: string;
+    phase: string;
+    rolleassignments: RolleAssignment[];
+}
+
+type Paper = {
+    paperOid: number;
+    filename: string;
+}
+
+type Concept = {
+    conceptOID: number;
+    text: string;
+    filename: string;
+    personOIDSupervisor_person: {
+        personOID: number;
+        firstname: string;
+        lastname: string;
+    };
+    statusO: {
+        statusOID: number;
+        description: string;
+    };
+}
 
 function SeminarPage() {
-    const isStudent = true;
+    const isStudent = true; // TODO replace
     const navigate = useNavigate();
     const [showCommentsOwnPaper, setShowCommentsOwnPaper] = useState(false);
     //const [showCommentsStrangerPaper, setShowCommentsStrangerPaper] = useState(false);
     const [showChat, setShowChat] = useState(false);
-    const [concept, setConcept] = useState<Concept | null>(null);
-    const [seminar, setSeminar] = useState<Seminar | null>(null)
-    const [assignedPaper, setAssignedPaper] = useState<AssignedPaper[] | null>(null)
+    const {data: concept} = useFetch<Concept>(`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts/get-concept/`);
+    const {data: seminar} = useFetch<Seminar>(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-seminar`);
+    const {data: assignedPaper} = useFetch<Paper[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-assigned-paper`);
 
-    useEffect(() => {
-        const fetchConcept = async () => {
-            const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts/get-concept/`, {
-                method: 'GET',
-                credentials: 'include',
-            });
-            if (!response.ok) {
-                return;
-            }
-            setConcept(Concept.fromJson(await response.json()));
-        }
-        const fetchSeminar = async () => {
-            const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-seminar`, {
-                method: 'GET',
-                credentials: 'include',
-            });
-            if (!response.ok) {
-                return;
-            }
-            const seminar = Seminar.fromJson(await response.json());
-            console.log(seminar);
-            setSeminar(seminar);
-        }
-        const fetchAssignedPaper = async () => {
-            const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-assigned-paper`, {
-                method: 'GET',
-                credentials: 'include',
-            });
-            if (!response.ok) {
-                return;
-            }
-            const assignedPaperData = await response.json()
-            const assignedPapers = assignedPaperData.map(data => new AssignedPaper(data.paperOID, data.filename));
-            //console.log(assignedPaper);
-            setAssignedPaper(assignedPapers);
-        }
 
-        fetchConcept();
-        fetchSeminar();
-        fetchAssignedPaper();
-    }, [])
 
     return (
         <div>
             <MainLayout>
                 <div>
                     <p>Übersicht</p>
-                    {(seminar) ? <p>Seminarname: {seminar.description}</p> : <p>Seminarname: -</p>}
-                    {(seminar) ? <p>Phase: {seminar.phase}</p> : <p>Phase: -</p>}
-                    {(seminar) ? <p>Rolle: {seminar.roleAssignments.roleOID}</p> : <p>Rolle: -</p>}
+                    <p>Seminarname: {seminar?.description || "-"}</p>
+                    <p>Phase: {seminar?.phase}</p>
+                    <p>Rolle: {seminar?.rolleassignments[0].roleOID}</p>
                 </div>
                 <br/>
                 {isStudent && <> <p>Konzept:</p>
@@ -81,14 +71,14 @@ function SeminarPage() {
                         <div><p>{(concept) ? concept.text : "-"}</p></div>
                         {/**/}
                         <div>
-                            {(concept && concept.filename) ? //if filename exists pdf exists
+                            {(concept?.filename) ? //if filename exists pdf exists
                                 <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts/get-concept-pdf/${concept.conceptOID}`}>{concept.filename}</a> :
                                 <p>-</p>
                             }
                         </div>
                         <div>
-                            {(concept && concept.personOIDSupervisorPerson) ?
-                                <p>{concept.personOIDSupervisorPerson.firstname} {concept.personOIDSupervisorPerson.lastname}</p> :
+                            {(concept && concept.personOIDSupervisor_person) ?
+                                <p>{concept.personOIDSupervisor_person.firstname} {concept.personOIDSupervisor_person.lastname}</p> :
                                 <p>-</p>
                             }
                         </div>
@@ -119,7 +109,7 @@ function SeminarPage() {
                 }
                 <p>Sie sind dem folgenden {assignedPaper?.length} Paper als Reviewer zugeordnet:</p>
                 <div className={styles.assignedPaperContainer}>
-                    {assignedPaper && assignedPaper.map((paper: AssignedPaper, index: number) => {
+                    {assignedPaper && assignedPaper.map((paper: Paper, index: number) => {
                         return (
                             <Fragment key={index}>
                                 <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-paper/${paper.paperOid}`}>{paper.filename}</a>

@@ -1,11 +1,10 @@
 import styles from "./ConceptUploadPage.module.css"
 import MainLayout from "../components/layout/MainLayout.tsx";
-import {FileUpload, FileUploadHandlerEvent, FileUploadSelectEvent} from "primereact/fileupload";
+import {FileUpload, FileUploadSelectEvent} from "primereact/fileupload";
 import {Dropdown} from "primereact/dropdown";
 import {useEffect, useState} from "react";
 import {InputTextarea} from "primereact/inputtextarea";
 import {Button} from "primereact/button";
-import axios from "axios";
 
 function ConceptUploadPage() {
     const [text, setText] = useState<string>("")
@@ -27,6 +26,7 @@ function ConceptUploadPage() {
             return;
         }
 
+        //TODO replace formdata with body json
         const formData = new FormData();
         formData.append('text', text);
         formData.append('file', selectedFile);
@@ -66,10 +66,14 @@ function ConceptUploadPage() {
         const fetchData = async () => {
             try {
                 // TODO replace with LTI data
-                const result = await axios.get(`http://${import.meta.env.VITE_BACKEND_URL}/api/person/get-supervisor-list/1`); // TODO replace
+                const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/person/get-supervisor-list/1`,{
+                    method: 'GET',
+                    credentials: 'include'
+                });
                 //console.log(result.data);
                 const availableSupervisor:any = [];
-                result.data.map((supervisor: any) => {
+                const data = await result.json();
+                data.map((supervisor: any) => {
                     availableSupervisor.push({name: supervisor.lastname+", "+ supervisor.firstname, personOID: supervisor.personOID});
                 } )
                 setAvailableSupervisor(availableSupervisor);
