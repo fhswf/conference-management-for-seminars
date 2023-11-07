@@ -43,7 +43,8 @@ const router = createBrowserRouter([
         path: "/paper-upload",
         element: <PaperOverviewPage/>,
     },
-]);
+], {basename: "/conference"}
+    );
 
 function App() {
     return (

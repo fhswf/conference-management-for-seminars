@@ -2,24 +2,31 @@ version: '3.1'
 
 services:
   dbserver:
+    container_name: conference-db
     image: mariadb
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
+    networks:
+      - nginx-proxy_default
 
   phpmyadmin:
+    container_name: conference-phpmyadmin
     image: phpmyadmin
     restart: always
     #    expose:
     #      - 11012
-    ports:
-      - "127.0.0.1:11012:11012"
+    #ports:
+    #  - "127.0.0.1:11012:11012"
     environment:
       - PMA_ARBITRARY=1
       - APACHE_PORT=11012
+    networks:
+      - nginx-proxy_default
 
   express-server:
+    container_name: conference-api
     build: ./server
     restart: always
     depends_on:
@@ -37,13 +44,23 @@ services:
       - DB_PORT=${DB_PORT}
       - CONSUMER_KEY=${CONSUMER_KEY}
       - CONSUMER_SECRET=${CONSUMER_SECRET}
-    ports:
-      - "127.0.0.1:11000:11000"
+    #ports:
+    #  - "127.0.0.1:11000:11000"
+    networks:
+      - nginx-proxy_default
 
   frontend:
+    container_name: conference-frontend
     build: .
     restart: always
     environment:
       - VITE_BACKEND_URL=${VITE_BACKEND_URL}
-    ports:
-      - "127.0.0.1:11001:11001"
+    #ports:
+    #  - "127.0.0.1:11001:11001"
+    networks:
+      - nginx-proxy_default
+
+networks:
+  nginx-proxy_default:
+    external: true
+
