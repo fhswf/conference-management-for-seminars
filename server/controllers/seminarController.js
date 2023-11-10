@@ -60,7 +60,7 @@ const getPersonList = async (req, res) => {
                     include: [{
                         model: Concept,
                         as: "personOIDStudent_concepts",
-                        attributes: ["conceptOID", "statusOID", "personOIDSupervisor"],
+                        attributes: ["conceptOID", "statusOID", "personOIDSupervisor", "text", "filename"],
                         include: [{
                             model: Person,
                             as: "personOIDSupervisor_person",
@@ -130,9 +130,33 @@ const updatePersonInSeminar = async (req, res) => {
     }
 }
 
+const evaluateConcept = async (req, res) => {
+    // TODO check permissions
+    try{
+        const conceptoid = req.body.conceptOID;
+        const accepted = req.body.accepted;
+        const statusoid = accepted ? 2 : 3;
+        // TODO set note
+        const note = req.body.note;
+        const concept = await Concept.update(
+            {statusOID: statusoid},
+            {where: {conceptoid: conceptoid}}
+        );
+        if(concept[0] === 1){
+            res.status(200).send({message: "Concept successfully evaluated."});
+        }else{
+            res.status(500).send({message: "Error while evaluating concept."});
+        }
+    }catch (e){
+        console.log(e);
+        res.status(500).send({message: "Error while evaluating concept."});
+    }
+}
+
 module.exports = {
     getSeminar,
     setPhase,
     getPersonList,
-    updatePersonInSeminar
+    updatePersonInSeminar,
+    evaluateConcept
 }
