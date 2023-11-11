@@ -102,8 +102,21 @@ app.post('/lti/launch', passport.authenticate('lti', {
     session: true
 }));
 
+app.post('/login', passport.authenticate('local', {
+    failureRedirect: '/error-login',
+    successRedirect: '/success-login',
+    session: true
+}));
+
+
 app.get('/success', function (req, res) {
-    //console.log('LTI launch was successful!');
+    console.log('LTI launch was successful!');
+    console.log(req.user);
+    console.log(req.session);
+    res.redirect('http://192.168.0.206:5173/');
+});
+app.get('/success-login', function (req, res) {
+    console.log('Login was successful!');
     console.log(req.user);
     console.log(req.session);
     res.redirect('http://192.168.0.206:5173/');
@@ -111,7 +124,11 @@ app.get('/success', function (req, res) {
 
 app.get('/error', function (req, res) {
     console.log('Error during LTI launch.');
-    res.send('Error during LTI launch.');
+    res.status(401).send('Error during LTI launch.');
+});
+app.get('/error-login', function (req, res) {
+    console.log('Error during Login');
+    res.status(401).send('Error during Login');
 });
 
 app.get('/api/authstatus', isAuthenticated, (req, res) => {
@@ -131,6 +148,13 @@ app.get('/api/logout', (req, res) => {
         res.status(200).json({ url: moodleUrl });
     });
 });
+
+// TODO
+/*
+app.get('/logout', (req, res) => {
+    req.logout();
+    res.redirect('/');
+});*/
 
 
 // ------------------------------ server setup ------------------------------

@@ -1,5 +1,7 @@
 const passport = require('passport');
 const LTIStrategy = require('passport-lti');
+const LocalStrategy = require('passport-local');
+const bcrypt = require('bcrypt');
 
 const db = require("../models");
 const Person = db.person;
@@ -84,7 +86,7 @@ function mapRole(roles) {
     return null;
 }
 
-const verifyCallback = async (username, lti, done) => {
+const ltiVerifyCallback = async (username, lti, done) => {
     const t = await db.sequelize.transaction();
 
     try {
@@ -104,14 +106,39 @@ const verifyCallback = async (username, lti, done) => {
     }
 }
 
+const localVerifyCallback = async (username, password, done) => {
+    await Person.findOne({where: {mail: username}}).then(async (user) => {
+        if (!user) {
+            return done(null, false)
+        }
 
-const strategy = new LTIStrategy({
+        //const hashedPassword = await bcrypt.hash(password, 10);
+        const isValid = await bcrypt.compare(password, user.passwort)
+
+        if (isValid) {
+            const userObject = {id: user.personOID, lti: null};
+            return done(null, userObject);
+        } else {
+            return done(null, false);
+        }
+    }).catch((err) => {
+        done(err);
+    });
+}
+
+const localStrategy = new LocalStrategy({
+    usernameField: 'username',
+    passwordField: 'password'
+}, localVerifyCallback);
+
+const ltiStrategy = new LTIStrategy({
     consumerKey: process.env.CONSUMER_KEY || "7d13a1331703639ae03cc980eea82c6c7432bd6bb3bc35d50e53976be3da80be",
     consumerSecret: process.env.CONSUMER_SECRET || "014819937df8bbc723a20627f598f86a55a874e07303d6456bdee4eeef037a58",
     passReqToCallback: true,
-}, verifyCallback);
+}, ltiVerifyCallback);
 
-passport.use(strategy);
+passport.use(ltiStrategy);
+passport.use(localStrategy);
 
 passport.serializeUser((user, done) => {
     done(null, {
