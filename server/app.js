@@ -96,7 +96,8 @@ app.get('/conference/api/success', function (req, res) {
 
 app.get('/conference/api/error', function (req, res) {
     console.log('Error during LTI launch.');
-    res.send('Error during LTI launch.');
+//    res.send('Error during LTI launch.');
+    res.redirect('https://' + process.env.FRONTEND_URL);
 });
 
 app.get('/conference/api/authstatus', isAuthenticated, (req, res) => {
@@ -112,21 +113,21 @@ app.get('/conference/api/test', (req, res) => {
 
 // ------------------------------ server setup ------------------------------
 
-//try {
-//    const https = require('https');
-//    const key = fs.readFileSync(__dirname + '/../../certs/selfsigned.key');
-//    const cert = fs.readFileSync(__dirname + '/../../certs/selfsigned.crt');
-//    const optionsHttps = {
-//        key: key,
-//        cert: cert
-//    };
-//    const serverHttps = https.createServer(optionsHttps, app);
-//    serverHttps.listen(PORT_HTTPS, () => {
-//        console.log('App listening at https://localhost:' + PORT_HTTPS);
-//    });
-//} catch (e) {
-//    console.log('HTTPS server not started: ' + e);
-//}
+try {
+    const https = require('https');
+    const key = fs.readFileSync('./certificates/key.pem', 'utf8');
+    const cert = fs.readFileSync('./certificates/cert.pem', 'utf8');
+    const optionsHttps = {
+        key: key,
+        cert: cert
+    };
+    const serverHttps = https.createServer(optionsHttps, app);
+    serverHttps.listen(PORT_HTTPS, () => {
+        console.log('App listening at https://localhost:' + PORT_HTTPS);
+    });
+} catch (e) {
+    console.log('HTTPS server not started: ' + e);
+}
 
 const serverHttp = app.listen(PORT_HTTP, function () {
     console.log('App listening at http://localhost:' + PORT_HTTP);

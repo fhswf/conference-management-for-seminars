@@ -44,10 +44,13 @@ services:
       - DB_PORT=${DB_PORT}
       - CONSUMER_KEY=${CONSUMER_KEY}
       - CONSUMER_SECRET=${CONSUMER_SECRET}
+      - FRONTEND_IP=${FRONTEND_IP}
     #ports:
     #  - "127.0.0.1:11000:11000"
     networks:
       - nginx-proxy_default
+    volumes:
+      - ./server/certificates:/usr/src/app/certificates
 
   frontend:
     container_name: conference-frontend
