@@ -1,12 +1,12 @@
 const passport = require('passport');
 const LTIStrategy = require('passport-lti');
-const LocalStrategy = require('passport-local');
-const bcrypt = require('bcrypt');
+const OpenIDConnectStrategy = require('passport-openidconnect');
 
 const db = require("../models");
 const Person = db.person;
 const RoleAssignment = db.rolleassignment;
 const Seminar = db.seminar;
+const OidcUser = db.oidcuser;
 
 async function addOrUpdatePerson(lti, t) {
     const [person, created] = await Person.findOrCreate({
@@ -94,7 +94,11 @@ const ltiVerifyCallback = async (username, lti, done) => {
         await addOrUpdateSeminar(lti, t);
         await addOrUpdateRolleAssignment(lti, t);
 
-        var user = {id: person.personOID, lti: lti};
+        var user = {
+            id: person.personOID,
+            lti: lti,
+            authtype: "lti"
+        };
 
         await t.commit();
 
@@ -106,30 +110,66 @@ const ltiVerifyCallback = async (username, lti, done) => {
     }
 }
 
-const localVerifyCallback = async (username, password, done) => {
-    await Person.findOne({where: {mail: username}}).then(async (user) => {
-        if (!user) {
-            return done(null, false)
-        }
+async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken, refreshToken, params, done) {
+    const t = await db.sequelize.transaction();
+    try {
+        const cred = await OidcUser.findOne({
+            where: {
+                provider: issuer,
+                subject: profile.id
+            }
+        });
 
-        //const hashedPassword = await bcrypt.hash(password, 10);
-        const isValid = await bcrypt.compare(password, user.passwort)
+        if (!cred) {
+            // Create a new person
+            const person = await Person.create({
+                firstName: profile.name?.givenName || "",
+                lastName: profile.name?.familyName || "",
+                mail: profile.emails && profile.emails[0]?.value || "",
+                comment: null,
+                passwort: ""
+            }, {transaction: t});
 
-        if (isValid) {
-            const userObject = {id: user.personOID, lti: null};
-            return done(null, userObject);
+            // Create OidcUser
+            await OidcUser.create({
+                subject: profile.id,
+                provider: issuer,
+                personOID: person.personOID,
+                idToken: idToken,
+            }, {transaction: t});
+
+            await t.commit();
+
+            return done(null, {
+                id: person.personOID,
+                lti: null,
+                authtype: "oidc",
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+                idToken: idToken
+            });
         } else {
-            return done(null, false);
-        }
-    }).catch((err) => {
-        done(err);
-    });
-}
+            // Person already exists
+            const person = await Person.findByPk(cred.dataValues.personOID);
 
-const localStrategy = new LocalStrategy({
-    usernameField: 'username',
-    passwordField: 'password'
-}, localVerifyCallback);
+            if (!person) {
+                return done(null, false);
+            }
+
+            return done(null, {
+                id: person.personOID,
+                lti: null,
+                authtype: "oidc",
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+                idToken: idToken
+            });
+        }
+    } catch (err) {
+        await t.rollback();
+        return done(err);
+    }
+}
 
 const ltiStrategy = new LTIStrategy({
     consumerKey: process.env.CONSUMER_KEY || "7d13a1331703639ae03cc980eea82c6c7432bd6bb3bc35d50e53976be3da80be",
@@ -138,12 +178,26 @@ const ltiStrategy = new LTIStrategy({
 }, ltiVerifyCallback);
 
 passport.use(ltiStrategy);
-passport.use(localStrategy);
+
+passport.use(new OpenIDConnectStrategy({
+    issuer: process.env.ISSUER,
+    authorizationURL: process.env.AUTHORIZATION_URL,
+    tokenURL: process.env.TOKEN_URL,
+    userInfoURL: process.env.USERINFO_URL,
+    clientID: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    callbackURL: process.env.CALLBACK_URL
+}, oidcVerifyCallback));
+
 
 passport.serializeUser((user, done) => {
     done(null, {
         personOID: user.id,
         lti: user.lti,
+        authtype: user.authtype,
+        accessToken: user.accessToken,
+        refreshToken: user.refreshToken,
+        idToken: user.idToken
     });
 });
 
@@ -152,6 +206,10 @@ passport.deserializeUser((serializedUser, done) => {
         .then((user) => {
             if (user) {
                 user.lti = serializedUser.lti;
+                user.authtype = serializedUser.authtype;
+                user.accessToken = serializedUser.accessToken;
+                user.refreshToken = serializedUser.refreshToken;
+                user.idToken = serializedUser.idToken;
                 done(null, user);
             } else {
                 done(null, false);

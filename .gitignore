@@ -26,3 +26,7 @@ dist-ssr
 .env
 
 /server/certs/*
+.env*
+.flaskenv*
+!.env.project
+!.env.vault

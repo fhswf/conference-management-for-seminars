@@ -1,6 +1,6 @@
 const dbConfig = require("../config/dbConfig.js");
 
-//create file with: sequelize-auto -h "localhost" -d "konferenz-management" -u "root" -p 3306  --dialect "mariadb" -o .\server\models\
+//create file with: sequelize-auto -h "localhost" -d "konferenz-management" -u "root" -p 3306  --dialect "mariadb" -o .\models\
 const initModels = require("./init-models.js");
 
 const {Sequelize, DataTypes} = require("sequelize");

@@ -48,15 +48,17 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-        secure: false,
-        sameSite: true,
+        //erstmal auskommentiert wegen Keycloak Login
+        //secure: false,
+        //sameSite: true,
+
         //secure: true,
         //sameSite: 'none',
     }
 }))
 
 sessionStore.onReady().then(() => {
-    console.log('MySQLStore ready');
+    console.log('MariDB Store ready');
 }).catch(error => {
     console.error(error);
 });
@@ -102,21 +104,16 @@ app.post('/lti/launch', passport.authenticate('lti', {
     session: true
 }));
 
-app.post('/login', passport.authenticate('local', {
-    failureRedirect: '/error-login',
-    successRedirect: '/success-login',
-    session: true
-}));
 
+app.get('/login', passport.authenticate('openidconnect'));
+
+
+app.get('/login/callback', passport.authenticate('openidconnect', {failureRedirect: '/login'}), function (req, res) {
+        res.redirect('/success');
+    }
+);
 
 app.get('/success', function (req, res) {
-    console.log('LTI launch was successful!');
-    console.log(req.user);
-    console.log(req.session);
-    res.redirect('http://192.168.0.206:5173/');
-});
-app.get('/success-login', function (req, res) {
-    console.log('Login was successful!');
     console.log(req.user);
     console.log(req.session);
     res.redirect('http://192.168.0.206:5173/');
@@ -128,7 +125,7 @@ app.get('/error', function (req, res) {
 });
 app.get('/error-login', function (req, res) {
     console.log('Error during Login');
-    res.status(401).send('Error during Login');
+    res.status(401).send('Error during OIDC Login');
 });
 
 app.get('/api/authstatus', isAuthenticated, (req, res) => {
@@ -141,11 +138,12 @@ app.get('/', (req, res) => {
 
 //logout
 app.get('/api/logout', (req, res) => {
-    const moodleUrl = req.user.lti.launch_presentation_return_url;
+    console.log("");
+    const redirectUrl = req.user.lti?.launch_presentation_return_url || process.env.ENDSESSION_ENDPOINT;
     req.logout(() => {
-        console.log(req.user);
-        console.log(req.session);
-        res.status(200).json({ url: moodleUrl });
+        //console.log(req.user);
+        //console.log(req.session);
+        res.status(200).json({url: redirectUrl});
     });
 });
 

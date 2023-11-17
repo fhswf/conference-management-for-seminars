@@ -1,5 +1,6 @@
 var DataTypes = require("sequelize").DataTypes;
 var _concept = require("./concept");
+var _oidcuser = require("./oidcuser");
 var _paper = require("./paper");
 var _person = require("./person");
 var _registrationkeys = require("./registrationkeys");
@@ -11,6 +12,7 @@ var _status = require("./status");
 
 function initModels(sequelize) {
   var concept = _concept(sequelize, DataTypes);
+  var oidcuser = _oidcuser(sequelize, DataTypes);
   var paper = _paper(sequelize, DataTypes);
   var person = _person(sequelize, DataTypes);
   var registrationkeys = _registrationkeys(sequelize, DataTypes);
@@ -30,6 +32,8 @@ function initModels(sequelize) {
   person.hasMany(concept, { as: "concepts", foreignKey: "personOIDSupervisor"});
   concept.belongsTo(person, { as: "personOIDStudent_person", foreignKey: "personOIDStudent"});
   person.hasMany(concept, { as: "personOIDStudent_concepts", foreignKey: "personOIDStudent"});
+  oidcuser.belongsTo(person, { as: "personO", foreignKey: "personOID"});
+  person.hasMany(oidcuser, { as: "oidcusers", foreignKey: "personOID"});
   paper.belongsTo(person, { as: "studentO", foreignKey: "studentOID"});
   person.hasMany(paper, { as: "papers", foreignKey: "studentOID"});
   reviewerassignment.belongsTo(person, { as: "reviewerA_person", foreignKey: "reviewerA"});
@@ -51,6 +55,7 @@ function initModels(sequelize) {
 
   return {
     concept,
+    oidcuser,
     paper,
     person,
     registrationkeys,
