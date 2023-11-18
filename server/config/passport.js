@@ -49,6 +49,7 @@ async function addOrUpdateSeminar(lti, t) {
         transaction: t
     });
 
+    // TODO delete
     if (!created) {
         seminar.description = lti.context_title;
         //seminar.phase = 1;
@@ -57,7 +58,7 @@ async function addOrUpdateSeminar(lti, t) {
     return seminar;
 }
 
-async function addOrUpdateRolleAssignment(lti, t) {
+async function addRoleAssignment(lti, t) {
     const [assignment, created] = await RoleAssignment.findOrCreate({
         where: {
             personOID: lti.user_id,
@@ -66,20 +67,15 @@ async function addOrUpdateRolleAssignment(lti, t) {
         defaults: {
             personOID: lti.user_id,
             seminarOID: lti.context_id,
-            roleOID: mapRole(lti.roles)
+            roleOID: mapLtiRoles(lti.roles)
         },
         transaction: t
     });
 
-    if (!created) {
-        // TODO if role changed, handle uploaded User data (paper, concept)
-        assignment.role = mapRole(lti.roles);
-        await assignment.save({transaction: t});
-    }
     return assignment;
 }
 
-function mapRole(roles) {
+function mapLtiRoles(roles) {
     //if(roles[0] === 'Admin') return 1; //moodle role does not exist
     if (roles[0] === 'Instructor') return 2;
     if (roles[0] === 'Learner') return 3;
@@ -92,7 +88,7 @@ const ltiVerifyCallback = async (username, lti, done) => {
     try {
         const person = await addOrUpdatePerson(lti, t);
         await addOrUpdateSeminar(lti, t);
-        await addOrUpdateRolleAssignment(lti, t);
+        await addRoleAssignment(lti, t);
 
         var user = {
             id: person.personOID,
@@ -110,10 +106,12 @@ const ltiVerifyCallback = async (username, lti, done) => {
     }
 }
 
+// TODO addRoleAssignment
 async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken, refreshToken, params, done) {
     const t = await db.sequelize.transaction();
+
     try {
-        const cred = await OidcUser.findOne({
+        let cred = await OidcUser.findOne({
             where: {
                 provider: issuer,
                 subject: profile.id
@@ -131,40 +129,50 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
             }, {transaction: t});
 
             // Create OidcUser
-            await OidcUser.create({
+            cred = await OidcUser.create({
                 subject: profile.id,
                 provider: issuer,
                 personOID: person.personOID,
                 idToken: idToken,
             }, {transaction: t});
-
-            await t.commit();
-
-            return done(null, {
-                id: person.personOID,
-                lti: null,
-                authtype: "oidc",
-                accessToken: accessToken,
-                refreshToken: refreshToken,
-                idToken: idToken
-            });
-        } else {
-            // Person already exists
-            const person = await Person.findByPk(cred.dataValues.personOID);
-
-            if (!person) {
-                return done(null, false);
-            }
-
-            return done(null, {
-                id: person.personOID,
-                lti: null,
-                authtype: "oidc",
-                accessToken: accessToken,
-                refreshToken: refreshToken,
-                idToken: idToken
-            });
         }
+        // only the person table should be updated
+        const [person, created] = await Person.findOrCreate({
+            where: {
+                personOID: cred.subject
+            },
+            defaults: {
+                firstName: profile.name?.givenName || "",
+                lastName: profile.name?.familyName || "",
+                mail: profile.emails && profile.emails[0]?.value || "",
+                comment: null,
+                passwort: ""
+            }, transaction: t});
+
+        if (!created) {
+            // update person
+            person.firstName = profile.name?.givenName || "";
+            person.lastName = profile.name?.familyName || "";
+            person.mail = profile.emails && profile.emails[0]?.value || "";
+            person.comment = null;
+            person.passwort = "";
+            await person.save({transaction: t});
+        }
+
+        if (!person) {
+            return done(null, false);
+        }
+
+        await t.commit();
+
+        return done(null, {
+            id: person.personOID,
+            lti: null,
+            authtype: "oidc",
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+            idToken: idToken
+        });
     } catch (err) {
         await t.rollback();
         return done(err);

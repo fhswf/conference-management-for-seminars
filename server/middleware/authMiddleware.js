@@ -19,8 +19,14 @@ async function isAuthenticated(req, res, next) {
         let newAccessToken = null;
         if (isAccessTokenExpired(req.user.accessToken)) {
             console.log("refreshing token");
-            newAccessToken = await refreshAccessToken(req.user.refreshToken);
-            req.session.passport.user.accessToken = newAccessToken;
+            try {
+                newAccessToken = await refreshAccessToken(req.user.refreshToken);
+                req.session.passport.user.accessToken = newAccessToken;
+            } catch (e) {
+                console.error(e);
+                req.logout(() => {});
+                return res.status(401).json({msg: "Logged out because token could not be refreshed"});
+            }
         }
 
         // check if token is active
@@ -75,8 +81,12 @@ function isStudent(req, res, next) {
 }
 
 function isAccessTokenExpired(accessToken) {
-    const tokenData = jwt.decode(accessToken);
-    return Date.now() >= (tokenData.exp * 1000);
+    try {
+        const tokenData = jwt.decode(accessToken);
+        return Date.now() >= (tokenData.exp * 1000);
+    } catch (e) {
+        return true;
+    }
 }
 
 
@@ -99,6 +109,11 @@ async function refreshAccessToken(refreshToken) {
     });
 
     const data = await response.json();
+
+    if(data.error) {
+        throw new Error(data.error_description);
+    }
+
     return data.access_token; // Das neue Access Token
 }
 
