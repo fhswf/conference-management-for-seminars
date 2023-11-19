@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const db = require("../models");
 
 const Seminar = db.seminar;
@@ -153,10 +154,36 @@ const evaluateConcept = async (req, res) => {
     }
 }
 
+const createSeminar = async (req, res) => {
+    try{
+        let existingSeminar = null;
+        let key = null;
+        do{
+            key = crypto.randomUUID()
+
+            //check if seminar already exists with this key
+            existingSeminar = await Seminar.findOne({
+                where: {key: key}
+            });
+        }while(existingSeminar)
+
+        const seminar = await Seminar.create({
+            description: req.body.name,
+            phase: 1,
+            key: key.toString()
+        });
+        res.status(200).send({message: "Seminar successfully created."});
+    }catch (e){
+        console.log(e);
+        res.status(500).send({message: "Error while creating seminar."});
+    }
+}
+
 module.exports = {
     getSeminar,
     setPhase,
     getPersonList,
     updatePersonInSeminar,
-    evaluateConcept
+    evaluateConcept,
+    createSeminar
 }

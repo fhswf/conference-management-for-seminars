@@ -6,6 +6,8 @@ import Table from "../components/Table.tsx";
 import {InputText} from "primereact/inputtext";
 import {Dropdown} from "primereact/dropdown";
 import {Button} from "primereact/button";
+import HiddenLabel from "../components/ToggleLabel.tsx";
+import {Password} from "primereact/password";
 
 function SeminarDetailsPage() {
     const [isEditMode, setIsEditMode] = useState(0);
@@ -132,13 +134,14 @@ function SeminarDetailsPage() {
         <div>
             <MainLayout>
                 <div>
-                    <p>Seminar Details: “{studentList && studentList.description ? studentList.description : "-"}”</p>
+                    <p>Seminar Details: “{studentList?.description || "-"}”</p>
                     <p onClick={() => {
                         if (confirm('Möchten Sie von "Review-Phase" übergehen zu "Reviews lesen"?')) {
                             // In nächste Phase wechseln
                         }
                     }}>Review-Phase 🖊</p>
                     {/* TODO Suchleiste einfügen */}
+                    <HiddenLabel text={studentList?.key}/>
                     {!isEditMode ?
                         <Table header={header} data={tableData}/> :
                         <Table header={headerEdit} data={tableDataEdit}/>

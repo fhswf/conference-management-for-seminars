@@ -14,6 +14,10 @@ module.exports = function(sequelize, DataTypes) {
     phase: {
       type: DataTypes.INTEGER,
       allowNull: true
+    },
+    key:{
+        type: DataTypes.CHAR(32),
+        allowNull: true
     }
   }, {
     sequelize,

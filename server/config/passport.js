@@ -36,7 +36,7 @@ async function addOrUpdatePerson(lti, t) {
     return person;
 }
 
-async function addOrUpdateSeminar(lti, t) {
+async function addSeminar(lti, t) {
     const [seminar, created] = await Seminar.findOrCreate({
         where: {
             seminarOID: lti.context_id
@@ -50,23 +50,28 @@ async function addOrUpdateSeminar(lti, t) {
     });
 
     // TODO delete
-    if (!created) {
-        seminar.description = lti.context_title;
-        //seminar.phase = 1;
-        await seminar.save({transaction: t});
-    }
+    //if (!created) {
+    //    seminar.description = lti.context_title;
+    //    //seminar.phase = 1;
+    //    await seminar.save({transaction: t});
+    //}
     return seminar;
 }
 
-async function addRoleAssignment(lti, t) {
+// TODO
+function getUserIdfromLti(lti) {
+
+}
+
+async function addRoleAssignment(lti, seminar, t) {
     const [assignment, created] = await RoleAssignment.findOrCreate({
         where: {
-            personOID: lti.user_id,
-            seminarOID: lti.context_id
+            personOID: lti.user_id, //TODO replace with UserId
+            seminarOID: seminar.seminarOID
         },
         defaults: {
             personOID: lti.user_id,
-            seminarOID: lti.context_id,
+            seminarOID: seminar.seminarOID,
             roleOID: mapLtiRoles(lti.roles)
         },
         transaction: t
@@ -87,8 +92,25 @@ const ltiVerifyCallback = async (username, lti, done) => {
 
     try {
         const person = await addOrUpdatePerson(lti, t);
-        await addOrUpdateSeminar(lti, t);
-        await addRoleAssignment(lti, t);
+
+        let seminar = null;
+        if(lti.custom_seminar_key){
+            //join seminar
+            seminar = await Seminar.findOne({
+                where: {
+                    key: lti.custom_seminar_key
+                }
+            });
+            if(!seminar){
+                console.log("invalid seminar key")
+                return done(null, false);
+            }
+        }else{
+            //create seminar
+            seminar = await addSeminar(lti, t);
+        }
+
+        await addRoleAssignment(lti, seminar, t);
 
         var user = {
             id: person.personOID,

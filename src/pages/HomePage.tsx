@@ -4,6 +4,7 @@ import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import {InputText} from "primereact/inputtext";
 import {Button} from "primereact/button";
+import {FormEvent} from "react";
 
 function HomePage() {
     const navigate = useNavigate();
@@ -11,6 +12,30 @@ function HomePage() {
     //let userLoggedIn = localStorage.getItem("accessToken") !== null;
     let userLoggedIn = true
 
+    async function onCreateSeminar(e: FormEvent<HTMLFormElement>) {
+        e.preventDefault()
+
+        //send data to backend
+        const seminarName = e.currentTarget.seminarName.value;
+        const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/seminar`, {
+            method: "POST",
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({name: seminarName})
+        });
+        const data = await result.json();
+        console.log(data);
+
+        if (result.ok) {
+            //navigate to seminar page
+            //navigate("/seminar/1");
+            alert("Seminar erstellt")
+        }else{
+            alert("Seminar konnte nicht erstellt werden")
+        }
+    }
 
     if (!userLoggedIn) {
         return <Navigate to="/login" replace={true}/>
@@ -35,9 +60,9 @@ function HomePage() {
                         </DataTable>
                     </div>
                     <br/>
-                    <form onSubmit={(event)=>{event.preventDefault()}}>
+                    <form onSubmit={(e: FormEvent<HTMLFormElement>)=> onCreateSeminar(e)}>
                         <label htmlFor="seminarName">Seminarname:</label>
-                        <InputText id="seminarName" name="seminarName" placeholder="Search" />
+                        <InputText id="seminarName" name="seminarName" placeholder="name" />
                         <Button label="Seminar erstellen" type="submit"/>
                     </form>
                 </div>
