@@ -8,6 +8,8 @@ import {Dropdown} from "primereact/dropdown";
 import {Button} from "primereact/button";
 import HiddenLabel from "../components/ToggleLabel.tsx";
 import {Password} from "primereact/password";
+import AddUserForm from "../components/AddUserForm.tsx";
+import useFetch from "../hooks/useFetch.ts";
 
 function SeminarDetailsPage() {
     const [isEditMode, setIsEditMode] = useState(0);
@@ -15,8 +17,9 @@ function SeminarDetailsPage() {
     const [selectedRole, setSelectedRole] = useState(null);
     const [selectedSupervisor, setSelectedSupervisor] = useState(undefined)
     const [studentList, setStudentList] = useState<any | null>(null);
-    const [availableSupervisor, setAvailableSupervisor] = useState([])
-    const [comment, setComment] = useState("")
+    const [availableSupervisor, setAvailableSupervisor] = useState([]);
+    const [comment, setComment] = useState("");
+    const [showAddUser, setShowAddUser] = useState(false);
 
     //TODO replace with useFetch
     useEffect(() => {
@@ -181,11 +184,14 @@ function SeminarDetailsPage() {
                             }}>Speichern</Button>
                             <Button onClick={() => {setIsEditMode(0)}}>Abbrechen</Button>
                         </> :
-                        null
+                        <Button onClick={() => {setShowAddUser(true)}}>Add User</Button>
                     }
                     <Modal isOpen={showUserConcept} onClose={() => {
                         setShowUserConcept(false)
                     }}><ConceptAcceptReject concept={showUserConcept}/></Modal>
+                    <Modal isOpen={showAddUser} onClose={() => {
+                        setShowAddUser(false)
+                    }}><AddUserForm seminarname={studentList?.description} seminarOID={studentList?.seminarOID}/></Modal>
                 </div>
             </MainLayout>
         </div>

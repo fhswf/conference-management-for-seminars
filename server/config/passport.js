@@ -128,7 +128,12 @@ const ltiVerifyCallback = async (username, lti, done) => {
     }
 }
 
-// TODO addRoleAssignment
+const ltiStrategy = new LTIStrategy({
+    consumerKey: process.env.CONSUMER_KEY || "7d13a1331703639ae03cc980eea82c6c7432bd6bb3bc35d50e53976be3da80be",
+    consumerSecret: process.env.CONSUMER_SECRET || "014819937df8bbc723a20627f598f86a55a874e07303d6456bdee4eeef037a58",
+    passReqToCallback: true,
+}, ltiVerifyCallback);
+
 async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken, refreshToken, params, done) {
     const t = await db.sequelize.transaction();
 
@@ -161,7 +166,7 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
         // only the person table should be updated
         const [person, created] = await Person.findOrCreate({
             where: {
-                personOID: cred.subject
+                personOID: db.sequelize.literal(`(SELECT personOID FROM oidcuser WHERE subject = '${cred.subject}' AND provider = '${cred.provider}')`)
             },
             defaults: {
                 firstName: profile.name?.givenName || "",
@@ -201,11 +206,7 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
     }
 }
 
-const ltiStrategy = new LTIStrategy({
-    consumerKey: process.env.CONSUMER_KEY || "7d13a1331703639ae03cc980eea82c6c7432bd6bb3bc35d50e53976be3da80be",
-    consumerSecret: process.env.CONSUMER_SECRET || "014819937df8bbc723a20627f598f86a55a874e07303d6456bdee4eeef037a58",
-    passReqToCallback: true,
-}, ltiVerifyCallback);
+
 
 passport.use(ltiStrategy);
 

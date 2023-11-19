@@ -1,6 +1,6 @@
 const db = require("../models");
-const { Op } = require('sequelize');
 
+const Op = db.Sequelize.Op;
 const Paper = db.paper;
 const ReviewerAssignment = db.reviewerassignment;
 const Person = db.person;

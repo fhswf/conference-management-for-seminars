@@ -1,78 +1,84 @@
-import {FormEvent, useState} from "react";
+import {FormEvent, useEffect, useState} from "react";
 import {Dropdown} from "primereact/dropdown";
 import {InputText} from "primereact/inputtext";
 import styles from "./AddUserForm.module.css";
 import {Button} from "primereact/button";
+import useFetch from "../hooks/useFetch.ts";
 
 interface Props {
-    onSubmit: (event: FormEvent) => void;
+    seminarOID: number;
+    seminarname: string;
+    onClose: () => void;
 }
 
-function AddUserForm({onSubmit}: Props) {
-    const [selectedSupervisor, setSelectedSupervisor] = useState(null);
-    const [selectedMail, setSelectedMail] = useState(null);
-    const [selectedSeminar, setSelectedSeminar] = useState(null);
+function AssignUserPage({seminarOID, seminarname, onClose}: Props) {
+    const [selectedRole, setSelectedRole] = useState(null);
+    const [selectedUser, setSelectedUser] = useState(null);
 
-    const [firstname, setFirstname] = useState<string>("");
-    const [lastname, setLastname] = useState<string>("");
-    const [comment, setComment] = useState<string>("")
+    const userList = useFetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/person/get-addable-users/${seminarOID}`);
 
-    const [roleIsSupervisor, setRoleIsSupervisor] = useState(false);
-
-    function handleSubmit(event: FormEvent) {
+    async function handleSubmit(event: FormEvent) {
         event.preventDefault();
-        onSubmit(event);
+
+        if (selectedUser === null) {
+            return;
+        }
+
+        const res = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/person/assign-to-seminar`, {
+            method: 'POST',
+            credentials: 'include',
+            body: JSON.stringify({
+                seminarOID: seminarOID,
+                personOID: selectedUser.personOID,
+                //index
+                roleOID: selectedRole,
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (res.ok) {
+            alert("User wurde eingetragen");
+            onClose();
+        } else {
+            alert("User konnte nicht eingetragen werden");
+        }
     }
 
-    const seminare = [
-        {name: "Bachelor WS 2023/24"},
-        {name: "Bachelor WS 2024/25"},
-    ];
     const rollen = [
-        {name: "Student"},
-        {name: "Betreuer"},
+        {name: "Kurs-Admin", value: 1},
+        {name: "Betreuer", value: 2},
+        {name: "Student", value: 3},
     ];
-    const mails = [
-        {name: "1@1.de"},
-        {name: "2@1.de"},
-    ];
+
+    useEffect(() => {
+        setSelectedRole(rollen[2].value);
+    }, [])
+
+    let usersJson = [];
+
+    userList?.data?.map((user: any) => {
+        usersJson.push({name: `${user.lastname}, ${user.firstname}`, comment: user.comment, personOID: user.personOID})
+    });
 
 
     return (
         <div className={styles.container}>
-            <h1>Neuen User erstellen</h1>
+            <h1>OIDC User Seminar zuordnen</h1>
             <form onSubmit={handleSubmit}>
-                <Dropdown id="email" value={selectedMail} onChange={(e) => setSelectedMail(e.value)} options={mails}
-                          placeholder="Mail wählen" optionLabel="name"/><br/>
-                <Dropdown id="seminar" value={selectedSeminar} onChange={(e) => setSelectedSeminar(e.value)}
-                          options={seminare} placeholder="Seminar wählen" optionLabel="name"/><br/>
-                <Dropdown id="role" value={selectedSupervisor} onChange={(e) => {
-                    setSelectedSupervisor(e.value);
-                    if (e.value.name === "Betreuer") {
-                        setRoleIsSupervisor(true)
-                    } else {
-                        setRoleIsSupervisor(false)
-                    }
-                }} options={rollen} placeholder="Rolle wählen" optionLabel="name"/><br/>
-                <span className="p-float-label">
-                    <InputText id="fname" value={firstname} onChange={(e) => setFirstname(e.target.value)}
-                               disabled={!roleIsSupervisor}/>
-                    <label htmlFor="fname">Vorname</label>
-                </span>
-                <span className="p-float-label">
-                    <InputText id="lname" value={lastname} onChange={(e) => setLastname(e.target.value)}
-                               disabled={!roleIsSupervisor}/>
-                    <label htmlFor="username">Nachname</label>
-                </span>
-                <span className="p-float-label">
-                    <InputText id="comment" value={comment} onChange={(e) => setComment(e.target.value)}
-                               disabled={!roleIsSupervisor}/>
-                    <label htmlFor="comment">Kommentar</label>
-                </span>
-                <Button type="submit" label="Einladung senden"/>
+                <Dropdown id="users" value={selectedUser} onChange={(e) => setSelectedUser(e.value)} options={usersJson}
+                          optionLabel="name" placeholder="User wählen" filter/><br/>
+                <Dropdown id="role" value={selectedRole} onChange={(e) => setSelectedRole(e.value)} options={rollen}
+                          placeholder="Rolle wählen" optionLabel="name"/><br/>
+                <p>Seminar: {seminarname}</p>
+                <p>Kommentar: {selectedUser?.comment || "-"}</p>
+
+                <Button type="submit" label="Nutzer eintragen"/>
+                <p>{JSON.stringify(userList?.data)}</p>
             </form>
         </div>
     );
 }
 
-export default AddUserForm;
+export default AssignUserPage;
