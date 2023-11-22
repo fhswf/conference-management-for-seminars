@@ -2,19 +2,20 @@ require('dotenv').config();
 const PORT_HTTP = process.env.EXPRESS_PORT_HTTP || 3000;
 const PORT_HTTPS = process.env.EXPRESS_PORT_HTTPS || 3443;
 
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const fs = require('fs');
-var bodyParser = require('body-parser');
+//´´import './@custom_types/custom';
+import express, { Request, Response } from 'express';
 
-const fileUpload = require('express-fileupload');
+import cors from 'cors';
+import helmet from 'helmet';
+import fs from 'fs';
+import bodyParser from 'body-parser';
+import fileUpload from 'express-fileupload';
 
 
 const app = express();
 
 // ------------------------------ middleware ------------------------------
-const {isAuthenticated, isInstructor, isStudent} = require("./middleware/authMiddleware");
+import {isAuthenticated, isInstructor, isStudent} from "./middleware/authMiddleware";
 
 app.use(cors({
     origin: `http://${process.env.FRONTEND_URL}`,
@@ -59,7 +60,7 @@ app.use(session({
 
 sessionStore.onReady().then(() => {
     console.log('MariDB Store ready');
-}).catch(error => {
+}).catch((error: Error) => {
     console.error(error);
 });
 
@@ -137,9 +138,20 @@ app.get('/', (req, res) => {
 });
 
 //logout
-app.get('/api/logout', (req, res) => {
+app.get('/api/logout', (req: Request, res: Response) => {
     console.log("");
-    const redirectUrl = req.user.lti?.launch_presentation_return_url || process.env.ENDSESSION_ENDPOINT;
+
+    if(!req.user){
+        return res.status(401).json({msg: "Not authenticated"});
+    }
+
+    let redirectUrl: string | undefined;
+    if(req.user["lti"]) {
+        redirectUrl = req.user["lti"]["launch_presentation_return_url"];
+    }else{
+        redirectUrl = process.env.ENDSESSION_ENDPOINT;
+    }
+
     req.logout(() => {
         //console.log(req.user);
         //console.log(req.session);

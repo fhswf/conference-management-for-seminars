@@ -1,12 +1,14 @@
-const db = require("../models");
-const path = require("path");
+import { Request, Response } from 'express';
+import fileUpload, { UploadedFile } from 'express-fileupload';
 
+const db = require("../models");
 const Concept = db.concept;
 const Person = db.person;
 const Status = db.status;
 
-const getConcept = async (req, res) => {
+const getConcept = async (req: Request, res: Response) => {
     // TODO ggf anpassen
+    console.log("HALLO")
     try {
         const concept = await Concept.findOne({
             where: {
@@ -34,7 +36,7 @@ const getConcept = async (req, res) => {
     }
 }
 
-const getConceptPdf = async (req, res) => {
+const getConceptPdf = async (req: Request, res: Response) => {
     // TODO check if user is allowed to download this file
     try {
         //const pdfPath = path.join("./userFiles/concept", req.params.filename);
@@ -59,14 +61,14 @@ const getConceptPdf = async (req, res) => {
     }
 }
 
-const uploadConcept = async (req, res) => {
+const uploadConcept = async (req: Request, res: Response) => {
     try {
         const text = (req.body.text && req.body.text.length > 0) ? req.body.text : null;
 
-        const filename = (req.files) ? req.files.file.name : null;
-        const pdf = (req.files) ? req.files.file : null;
-        const pdfData = (pdf) ? pdf.data : null;
-        const mimetype = (pdf) ? pdf.mimetype : null;
+        const pdf: any = req.files?.file;
+        const filename = (pdf as UploadedFile)?.name;
+        const pdfData = (pdf as UploadedFile)?.data;
+        const mimetype = (pdf as UploadedFile)?.mimetype;
         const supervisorOID = (!req.body.supervisorOID && req.body.supervisorOID !== undefined) ? req.body.supervisorOID : null; // TODO use below
 
         await Concept.create({
@@ -88,7 +90,7 @@ const uploadConcept = async (req, res) => {
     }
 }
 
-module.exports = {
+export default {
     getConcept,
     getConceptPdf,
     uploadConcept

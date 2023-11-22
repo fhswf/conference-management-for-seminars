@@ -4,5 +4,5 @@ const Registrationkeys = db.registrationkeys;
 
 
 
-module.exports = {
+export default {
 }

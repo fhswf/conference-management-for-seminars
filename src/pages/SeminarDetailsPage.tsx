@@ -13,7 +13,7 @@ import useFetch from "../hooks/useFetch.ts";
 
 function SeminarDetailsPage() {
     const [isEditMode, setIsEditMode] = useState(0);
-    const [showUserConcept, setShowUserConcept] = useState(null);
+    const [showUserConcept, setShowUserConcept] = useState(false);
     const [selectedRole, setSelectedRole] = useState(null);
     const [selectedSupervisor, setSelectedSupervisor] = useState(undefined)
     const [studentList, setStudentList] = useState<any | null>(null);
@@ -191,7 +191,7 @@ function SeminarDetailsPage() {
                     }}><ConceptAcceptReject concept={showUserConcept}/></Modal>
                     <Modal isOpen={showAddUser} onClose={() => {
                         setShowAddUser(false)
-                    }}><AddUserForm seminarname={studentList?.description} seminarOID={studentList?.seminarOID}/></Modal>
+                    }}><AddUserForm seminarname={studentList?.description} seminarOID={studentList?.seminarOID} onClose={() => {setShowAddUser(false)}}/></Modal>
                 </div>
             </MainLayout>
         </div>

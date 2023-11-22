@@ -4,5 +4,5 @@ const Status = db.status;
 
 
 
-module.exports = {
+export default {
 }

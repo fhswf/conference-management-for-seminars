@@ -1,3 +1,4 @@
+import { Request, Response } from 'express';
 const crypto = require('crypto');
 const db = require("../models");
 
@@ -6,7 +7,7 @@ const RolleAssignment = db.rolleassignment;
 const Person = db.person;
 const Concept = db.concept;
 
-const getSeminar = async (req, res) => {
+const getSeminar = async (req: Request, res: Response) => {
     try {
         const seminar = await Seminar.findByPk(1, // TODO req.user.lti.context_id
             {
@@ -30,7 +31,7 @@ const getSeminar = async (req, res) => {
     }
 }
 
-const setPhase = async (req, res) => {
+const setPhase = async (req: Request, res: Response) => {
     try {
         const seminaroid = req.params.phase; // TODO req.user.lti.context_id
         const phase = req.body.phase;
@@ -47,7 +48,7 @@ const setPhase = async (req, res) => {
     }
 }
 
-const getPersonList = async (req, res) => {
+const getPersonList = async (req: Request, res: Response) => {
     try{
         const persons = await Seminar.findByPk(1, // TODO req.user.lti.context_id
              {
@@ -87,7 +88,7 @@ const getPersonList = async (req, res) => {
     }
 }
 
-const updatePersonInSeminar = async (req, res) => {
+const updatePersonInSeminar = async (req: Request, res: Response) => {
     const t = await db.sequelize.transaction();
     try{
         const personOid = req.body.personOID;
@@ -131,7 +132,7 @@ const updatePersonInSeminar = async (req, res) => {
     }
 }
 
-const evaluateConcept = async (req, res) => {
+const evaluateConcept = async (req: Request, res: Response) => {
     // TODO check permissions
     try{
         const conceptoid = req.body.conceptOID;
@@ -154,7 +155,7 @@ const evaluateConcept = async (req, res) => {
     }
 }
 
-const createSeminar = async (req, res) => {
+const createSeminar = async (req: Request, res: Response) => {
     try{
         let existingSeminar = null;
         let key = null;
@@ -170,7 +171,7 @@ const createSeminar = async (req, res) => {
         const seminar = await Seminar.create({
             description: req.body.name,
             phase: 1,
-            key: key.toString()
+            key: key!
         });
         res.status(200).send({message: "Seminar successfully created."});
     }catch (e){
@@ -179,7 +180,7 @@ const createSeminar = async (req, res) => {
     }
 }
 
-module.exports = {
+export default {
     getSeminar,
     setPhase,
     getPersonList,

@@ -1,15 +1,16 @@
+import { Request, Response, NextFunction } from 'express';
 const jwt = require('jsonwebtoken');
 
-async function isAuthenticated(req, res, next) {
+export async function isAuthenticated(req: Express.Request, res: Response, next: NextFunction) {
     if (!req.isAuthenticated()) {
         return res.status(401).json({msg: "Not authenticated"});
     }
 
-    if (req.user.authtype === "lti") {
+    if (req.user["authtype"] === "lti") {
         return next();
-    } else if (req.user.authtype === "oidc") {
+    } else if (req.user["authtype"] === "oidc") {
         //alternativ: public key vom Server holen
-        //jwt.verify(req.user.accessToken, `-----BEGIN PUBLIC KEY-----\n${process.env.KEYCLOAK_PUBLIC_KEY}\n-----END PUBLIC KEY-----`, (err, decodedToken) => {
+        //jwt.verify(req.user["accessToken"], `-----BEGIN PUBLIC KEY-----\n${process.env.KEYCLOAK_PUBLIC_KEY}\n-----END PUBLIC KEY-----`, (err, decodedToken) => {
         //    if (err) {
         //        console.error(err);
         //        return res.status(403).json({msg: "Token is not valid"});
@@ -17,11 +18,11 @@ async function isAuthenticated(req, res, next) {
         //});
 
         let newAccessToken = null;
-        if (isAccessTokenExpired(req.user.accessToken)) {
+        if (isAccessTokenExpired(req.user["accessToken"])) {
             console.log("refreshing token");
             try {
-                newAccessToken = await refreshAccessToken(req.user.refreshToken);
-                req.session.passport.user.accessToken = newAccessToken;
+                newAccessToken = await refreshAccessToken(req.user["refreshToken"]);
+                req.session["passport"]["user"]["accessToken"] = newAccessToken;
             } catch (e) {
                 console.error(e);
                 req.logout(() => {});
@@ -30,7 +31,7 @@ async function isAuthenticated(req, res, next) {
         }
 
         // check if token is active
-        //const tokenActive = newAccessToken ? await introspectToken(newAccessToken) : await introspectToken(req.user.accessToken);
+        //const tokenActive = newAccessToken ? await introspectToken(newAccessToken) : await introspectToken(req.user["accessToken"]);
         const tokenActive = true;
 
         if (tokenActive) {
@@ -45,15 +46,18 @@ async function isAuthenticated(req, res, next) {
 
 
 //TODO edit
-function isInstructor(req, res, next) {
-    if (req.user.lti) {
-        if (req.user.lti.roles.includes("Instructor")) {
+export function isInstructor(req: Request, res: Response, next: NextFunction) {
+    if (!req.user) {
+        return res.status(401).json({ msg: "Not authenticated" });
+    }
+    if (req.user["lti"]) {
+        if (req.user!["lti"]["roles"].includes("Instructor")) {
             return next();
         } else {
             res.status(401).json({msg: "Not authorized"});
         }
     } else {
-        const tokenData = jwt.decode(req.user.accessToken);
+        const tokenData = jwt.decode(req.user!["accessToken"]);
         if (tokenData.realm_access.roles.includes("instructor")) {
             return next();
         } else {
@@ -63,15 +67,18 @@ function isInstructor(req, res, next) {
 }
 
 //TODO edit
-function isStudent(req, res, next) {
-    if (req.user.lti) {
-        if (req.user.lti.roles.includes("Learner")) {
+export function isStudent(req: Request, res: Response, next: NextFunction) {
+    if (!req.user) {
+        return res.status(401).json({ msg: "Not authenticated" });
+    }
+    if (req.user["lti"]) {
+        if (req.user!["lti"]["roles"].includes("Learner")) {
             return next();
         } else {
             res.status(401).json({msg: "Not authorized"});
         }
     } else {
-        const tokenData = jwt.decode(req.user.accessToken);
+        const tokenData = jwt.decode(req.user!["accessToken"]);
         if (tokenData.realm_access.roles.includes("student")) {
             return next();
         } else {
@@ -80,7 +87,7 @@ function isStudent(req, res, next) {
     }
 }
 
-function isAccessTokenExpired(accessToken) {
+export function isAccessTokenExpired(accessToken: string) {
     try {
         const tokenData = jwt.decode(accessToken);
         return Date.now() >= (tokenData.exp * 1000);
@@ -90,10 +97,10 @@ function isAccessTokenExpired(accessToken) {
 }
 
 
-async function refreshAccessToken(refreshToken) {
-    const tokenEndpoint = process.env.TOKEN_URL;
-    const clientId = process.env.CLIENT_ID;
-    const clientSecret = process.env.CLIENT_SECRET;
+export async function refreshAccessToken(refreshToken: string) {
+    const tokenEndpoint = process.env.TOKEN_URL || "";
+    const clientId = process.env.CLIENT_ID || "";
+    const clientSecret = process.env.CLIENT_SECRET || "";
 
     const response = await fetch(tokenEndpoint, {
         method: 'POST',
@@ -117,13 +124,13 @@ async function refreshAccessToken(refreshToken) {
     return data.access_token; // Das neue Access Token
 }
 
-async function introspectToken(accessToken) {
+export async function introspectToken(accessToken: string) {
     var urlencoded = new URLSearchParams();
-    urlencoded.append("client_id", process.env.CLIENT_ID);
-    urlencoded.append("client_secret", process.env.CLIENT_SECRET);
+    urlencoded.append("client_id", process.env.CLIENT_ID || "");
+    urlencoded.append("client_secret", process.env.CLIENT_SECRET || "");
     urlencoded.append("token", accessToken);
 
-    const response = await fetch(process.env.INTROSPECT_URL, {
+    const response = await fetch(process.env.INTROSPECT_URL || "", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -134,10 +141,3 @@ async function introspectToken(accessToken) {
 
     return data.active;
 }
-
-
-module.exports = {
-    isAuthenticated,
-    isInstructor,
-    isStudent
-};

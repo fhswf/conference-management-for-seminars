@@ -1,3 +1,6 @@
+import { Request, Response } from 'express';
+import fileUpload, { UploadedFile } from 'express-fileupload';
+
 const db = require("../models");
 
 const Op = db.Sequelize.Op;
@@ -5,7 +8,7 @@ const Paper = db.paper;
 const ReviewerAssignment = db.reviewerassignment;
 const Person = db.person;
 
-const getPaperPdf = async (req, res) => {
+const getPaperPdf = async (req: Request, res: Response) => {
     // TODO check if user is allowed to download this file
     try {
         const paper = await Paper.findByPk(req.params.id);
@@ -25,15 +28,15 @@ const getPaperPdf = async (req, res) => {
     }
 }
 
-async function uploadPaper(req, res) {
+async function uploadPaper(req: Request, res: Response) {
     try {
         if (!req.files) {
             return res.status(400).send('No files were uploaded.');
         }
-        const filename = (req.files) ? req.files.file.name : null;
-        const pdf = (req.files) ? req.files.file : null;
-        const pdfData = (pdf) ? pdf.data : null;
-        const mimetype = (pdf) ? pdf.mimetype : null;
+        const pdf: any = req.files?.file;
+        const filename = (pdf as UploadedFile)?.name;
+        const pdfData = (pdf as UploadedFile)?.data;
+        const mimetype = (pdf as UploadedFile)?.mimetype;
 
         await Paper.create({
             studentOID: 1, // TODO req.user.personOID
@@ -51,7 +54,7 @@ async function uploadPaper(req, res) {
     }
 }
 
-async function getAssignedPaper(req, res) {
+async function getAssignedPaper(req: Request, res: Response) {
     try {
         const paper = await Paper.findAll({
             include: [
@@ -79,7 +82,7 @@ async function getAssignedPaper(req, res) {
     }
 }
 
-async function getUploadedPaper(req, res) {
+async function getUploadedPaper(req: Request, res: Response) {
     try {
         const paper = await Paper.findAll({
             where: {
@@ -97,7 +100,7 @@ async function getUploadedPaper(req, res) {
     }
 }
 
-module.exports = {
+export default {
     getPaperPdf,
     uploadPaper,
     getAssignedPaper,

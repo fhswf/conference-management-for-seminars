@@ -1,3 +1,4 @@
+import { Request, Response } from 'express';
 const db = require("../models");
 
 const Op = db.Sequelize.Op;
@@ -7,7 +8,7 @@ const Status = db.status;
 const RolleAssignment = db.rolleassignment;
 const OidcUser = db.oidcuser;
 
-const getPersonById = async (req, res) => {
+const getPersonById = async (req: Request, res: Response) => {
     try {
         const person = await Person.findAll({
             include: [{
@@ -27,7 +28,7 @@ const getPersonById = async (req, res) => {
     }
 };
 
-const getSupervisorList = async (req, res) => {
+const getSupervisorList = async (req: Request, res: Response) => {
     // TODO check if USer is member of requested Seminar
     try {
         const supervisors = await Person.findAll({
@@ -49,7 +50,7 @@ const getSupervisorList = async (req, res) => {
     }
 }
 
-const getAddableUsers = async (req, res) => {
+const getAddableUsers = async (req: Request, res: Response) => {
     try {
         const seminarOID = req.params.seminarOID;
         const users = await Person.findAll({
@@ -74,7 +75,7 @@ const getAddableUsers = async (req, res) => {
 
 
 //TODO check if User isAdmin
-const assignToSeminar = async (req, res) => {
+const assignToSeminar = async (req: Request, res: Response) => {
     try {
         const personOID = req.body.personOID;
         const seminarOID = req.body.seminarOID;
@@ -93,7 +94,7 @@ const assignToSeminar = async (req, res) => {
 }
 
 
-module.exports = {
+export default {
     getPersonById,
     getSupervisorList,
     getAddableUsers,

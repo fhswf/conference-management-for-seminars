@@ -4,5 +4,5 @@ const Reviewerassignment = db.reviewerassignment;
 
 
 
-module.exports = {
+export default {
 }

@@ -4,5 +4,5 @@ const Rolleassignment = db.rolleassignment;
 
 
 
-module.exports = {
+export default {
 }

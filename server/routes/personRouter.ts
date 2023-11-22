@@ -1,6 +1,7 @@
-const personController = require('../controllers/personController.js');
+import personController from '../controllers/personController';
+import express from 'express';
+const router = express.Router();
 
-const router = require('express').Router();
 
 router.get('/get-person/:id', personController.getPersonById);
 router.get('/get-supervisor-list/:seminarOID', personController.getSupervisorList);

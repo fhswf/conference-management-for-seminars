@@ -9,8 +9,8 @@ import {Button} from "primereact/button";
 function ConceptUploadPage() {
     const [text, setText] = useState<string>("")
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [availableSupervisor, setAvailableSupervisor] = useState([])
-    const [selectedSupervisor, setSelectedSupervisor] = useState(undefined)
+    const [availableSupervisor, setAvailableSupervisor] = useState<any[] | undefined>([])
+    const [selectedSupervisor, setSelectedSupervisor] = useState<any | undefined>(undefined)
 
     const supervisor = [
         {name: "Betreuer A"},
@@ -29,8 +29,8 @@ function ConceptUploadPage() {
         //TODO replace formdata with body json
         const formData = new FormData();
         formData.append('text', text);
-        formData.append('file', selectedFile);
-        const oid = (selectedSupervisor === undefined) ? null : selectedSupervisor.personOID;
+        formData.append('file', (selectedFile as any));
+        const oid = selectedSupervisor?.personOID;
         formData.append('supervisorOID', oid);
 
         console.log(text);

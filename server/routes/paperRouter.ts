@@ -1,6 +1,6 @@
-const paperController = require('../controllers/paperController');
-
-const router = require('express').Router();
+import paperController from '../controllers/paperController';
+import express from 'express';
+const router = express.Router();
 
 router.get('/get-paper/:id', paperController.getPaperPdf);
 router.get('/get-assigned-paper/', paperController.getAssignedPaper);

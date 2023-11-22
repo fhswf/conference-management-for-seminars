@@ -12,8 +12,8 @@ interface Props {
 }
 
 function AssignUserPage({seminarOID, seminarname, onClose}: Props) {
-    const [selectedRole, setSelectedRole] = useState(null);
-    const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedRole, setSelectedRole] = useState<number | null>(null);
+    const [selectedUser, setSelectedUser] = useState<any | null>(null);
 
     const userList = useFetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/person/get-addable-users/${seminarOID}`);
 
@@ -56,9 +56,9 @@ function AssignUserPage({seminarOID, seminarname, onClose}: Props) {
         setSelectedRole(rollen[2].value);
     }, [])
 
-    let usersJson = [];
+    let usersJson: { name: string; comment: string; personOID: number }[] = [];
 
-    userList?.data?.map((user: any) => {
+    (userList?.data as any[]).map((user: any) => {
         usersJson.push({name: `${user.lastname}, ${user.firstname}`, comment: user.comment, personOID: user.personOID})
     });
 
