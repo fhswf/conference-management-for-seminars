@@ -1,94 +1,92 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('concept', {
-    conceptOID: {
+  return sequelize.define('roleassignment', {
+    userOID: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true
-    },
-    text: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    },
-    userOIDSupervisor: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+      primaryKey: true,
       references: {
         model: 'user',
         key: 'userOID'
       }
-    },
-    userOIDStudent: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'user',
-        key: 'userOID'
-      }
-    },
-    feedback: {
-      type: DataTypes.TEXT,
-      allowNull: true
     },
     seminarOID: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      primaryKey: true,
       references: {
         model: 'seminar',
         key: 'seminarOID'
       }
     },
-    accepted: {
-      type: DataTypes.BOOLEAN,
+    roleOID: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'roles',
+        key: 'roleOID'
+      }
+    },
+    grade: {
+      type: DataTypes.FLOAT,
       allowNull: true
     },
-    attachmentOID: {
+    phase4paperOID: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'attachment',
-        key: 'attachmentOID'
+        model: 'paper',
+        key: 'paperOID'
+      }
+    },
+    phase7paperOID: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'paper',
+        key: 'paperOID'
       }
     }
   }, {
     sequelize,
-    tableName: 'concept',
-    timestamps: true,
+    tableName: 'roleassignment',
+    timestamps: false,
     indexes: [
       {
         name: "PRIMARY",
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "conceptOID" },
-        ]
-      },
-      {
-        name: "Concept1",
-        using: "BTREE",
-        fields: [
           { name: "seminarOID" },
+          { name: "userOID" },
         ]
       },
       {
-        name: "Concept2",
+        name: "RoleAssignment1",
         using: "BTREE",
         fields: [
-          { name: "userOIDStudent" },
+          { name: "userOID" },
         ]
       },
       {
-        name: "Concept4",
+        name: "RoleAssignment3",
         using: "BTREE",
         fields: [
-          { name: "userOIDSupervisor" },
+          { name: "roleOID" },
         ]
       },
       {
-        name: "Concept3",
+        name: "RoleAssignment4",
         using: "BTREE",
         fields: [
-          { name: "attachmentOID" },
+          { name: "phase4paperOID" },
+        ]
+      },
+      {
+        name: "RoleAssignment5",
+        using: "BTREE",
+        fields: [
+          { name: "phase7paperOID" },
         ]
       },
     ]

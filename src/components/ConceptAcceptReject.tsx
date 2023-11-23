@@ -6,10 +6,10 @@ import React from "react";
 type Concept = {
     conceptOID: number,
     statusOID: number,
-    personOIDSupervisor: number,
+    userOIDSupervisor: number,
     text: string,
     filename: string,
-    //personOIDSupervisor_person
+    //userOIDSupervisor_user
 }
 
 interface Props {
@@ -33,7 +33,7 @@ function ConceptAcceptReject({concept}: Props) {
     return (
         <div>
             <p>Konzept annehmen / ablehnen</p>
-            <p>TODO Person einfügen</p>
+            <p>TODO user einfügen</p>
             <p>Text: {concept.text || "-"}</p>
             <p>Anhang: {concept.filename ? <a
                 href={`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts/get-concept-pdf/${concept.conceptOID}`}>{concept.filename}</a> : "-"}

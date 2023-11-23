@@ -30,7 +30,7 @@ function ConceptUploadPage() {
         const formData = new FormData();
         formData.append('text', text);
         formData.append('file', selectedFile);
-        const oid = (selectedSupervisor === undefined) ? null : selectedSupervisor.personOID;
+        const oid = (selectedSupervisor === undefined) ? null : selectedSupervisor.userOID;
         formData.append('supervisorOID', oid);
 
         console.log(text);
@@ -67,7 +67,7 @@ function ConceptUploadPage() {
         const fetchData = async () => {
             try {
                 // TODO replace with LTI data
-                const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/person/get-supervisor-list/1`,{
+                const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/user/get-supervisor-list/1`,{
                     method: 'GET',
                     credentials: 'include'
                 });
@@ -75,7 +75,7 @@ function ConceptUploadPage() {
                 const availableSupervisor:any = [];
                 const data = await result.json();
                 data.map((supervisor: any) => {
-                    availableSupervisor.push({name: supervisor.lastname+", "+ supervisor.firstname, personOID: supervisor.personOID});
+                    availableSupervisor.push({name: supervisor.lastname+", "+ supervisor.firstname, userOID: supervisor.userOID});
                 } )
                 setAvailableSupervisor(availableSupervisor);
                 console.log(availableSupervisor);

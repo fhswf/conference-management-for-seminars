@@ -1,14 +1,15 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('oidcuser', {
-    subject: {
-      type: DataTypes.CHAR(36),
+  return sequelize.define('ltiuser', {
+    LtiUserOID: {
+      type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    provider: {
-      type: DataTypes.TEXT,
-      allowNull: false
+    consumerURL: {
+      type: DataTypes.STRING(64),
+      allowNull: false,
+      primaryKey: true
     },
     userOID: {
       type: DataTypes.INTEGER,
@@ -20,7 +21,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'oidcuser',
+    tableName: 'ltiuser',
     timestamps: false,
     indexes: [
       {
@@ -28,11 +29,12 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "subject" },
+          { name: "LtiUserOID" },
+          { name: "consumerURL" },
         ]
       },
       {
-        name: "OidcUser1",
+        name: "LtiUser114",
         using: "BTREE",
         fields: [
           { name: "userOID" },

@@ -1,6 +1,6 @@
 const db = require("../models");
 
-const Status = db.status;
+const Review = db.review;
 
 
 

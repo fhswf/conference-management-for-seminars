@@ -1,26 +1,26 @@
 const db = require("../models");
 
 const Op = db.Sequelize.Op;
-const Person = db.person;
+const User = db.user;
 const Concept = db.concept;
 const Status = db.status;
 const RolleAssignment = db.rolleassignment;
 const OidcUser = db.oidcuser;
 
-const getPersonById = async (req, res) => {
+const getUserById = async (req, res) => {
     try {
-        const person = await Person.findAll({
+        const user = await User.findAll({
             include: [{
                 model: Concept,
-                as: 'personOIDStudent_concepts',
+                as: 'userOIDStudent_concepts',
                 include: [{
                     model: Status,
                     as: 'statusO'
                 }]
             }],
-            where: {PersonOID: req.params.id}
+            where: {userOID: req.params.id}
         });
-        res.status(200).json(person);
+        res.status(200).json(user);
     } catch (error) {
         console.error(error);
         res.status(500).json({error: 'Internal Server Error'});
@@ -30,7 +30,7 @@ const getPersonById = async (req, res) => {
 const getSupervisorList = async (req, res) => {
     // TODO check if USer is member of requested Seminar
     try {
-        const supervisors = await Person.findAll({
+        const supervisors = await User.findAll({
             include: [{
                 model: RolleAssignment,
                 as: 'rolleassignments',
@@ -40,7 +40,7 @@ const getSupervisorList = async (req, res) => {
                 },
                 attributes: [],
             }],
-            attributes: ["personOID", "firstname", "lastname"],
+            attributes: ["userOID", "firstname", "lastname"],
         });
         res.status(200).json(supervisors);
     } catch (error) {
@@ -94,7 +94,7 @@ const assignToSeminar = async (req, res) => {
 
 
 module.exports = {
-    getPersonById,
+    getUserById,
     getSupervisorList,
     getAddableUsers,
     assignToSeminar

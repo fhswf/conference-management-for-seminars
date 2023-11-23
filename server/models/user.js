@@ -1,8 +1,7 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('person', {
-    personOID: {
-      autoIncrement: true,
+  return sequelize.define('user', {
+    userOID: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
@@ -23,21 +22,21 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TEXT,
       allowNull: false
     },
-    passwort: {
-      type: DataTypes.TEXT,
+    isAdmin: {
+      type: DataTypes.BOOLEAN,
       allowNull: false
     }
   }, {
     sequelize,
-    tableName: 'person',
-    timestamps: true,
+    tableName: 'user',
+    timestamps: false,
     indexes: [
       {
         name: "PRIMARY",
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "personOID" },
+          { name: "userOID" },
         ]
       },
     ]

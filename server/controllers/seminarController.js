@@ -3,7 +3,7 @@ const db = require("../models");
 
 const Seminar = db.seminar;
 const RolleAssignment = db.rolleassignment;
-const Person = db.person;
+const User = db.user;
 const Concept = db.concept;
 
 const getSeminar = async (req, res) => {
@@ -13,7 +13,7 @@ const getSeminar = async (req, res) => {
                 include: [{
                     model: RolleAssignment,
                     as: "rolleassignments",
-                    where: {personOID: 1}, // TODO req.user.personOID
+                    where: {userOID: 1}, // TODO req.user.userOID
                 }],
                 attributes: ["description", "phase"]
             },
@@ -47,24 +47,24 @@ const setPhase = async (req, res) => {
     }
 }
 
-const getPersonList = async (req, res) => {
+const getUserList = async (req, res) => {
     try{
-        const persons = await Seminar.findByPk(1, // TODO req.user.lti.context_id
+        const users = await Seminar.findByPk(1, // TODO req.user.lti.context_id
              {
             include: [{
                 model: RolleAssignment,
                 as: "rolleassignments",
-                attributes: ["personOID", "roleOID"],
+                attributes: ["userOID", "roleOID"],
                 include: [{
-                    model: Person,
-                    as: "personO",
+                    model: User,
+                    as: "userO",
                     include: [{
                         model: Concept,
-                        as: "personOIDStudent_concepts",
-                        attributes: ["conceptOID", "statusOID", "personOIDSupervisor", "text", "filename"],
+                        as: "userOIDStudent_concepts",
+                        attributes: ["conceptOID", "statusOID", "userOIDSupervisor", "text", "filename"],
                         include: [{
-                            model: Person,
-                            as: "personOIDSupervisor_person",
+                            model: User,
+                            as: "userOIDSupervisor_person",
                             attributes: ["firstname", "lastname", "mail"]
                         }],
                         order: [['submitted', 'DESC']], //Das neueste Concept
@@ -87,7 +87,7 @@ const getPersonList = async (req, res) => {
     }
 }
 
-const updatePersonInSeminar = async (req, res) => {
+const updateUserInSeminar = async (req, res) => {
     const t = await db.sequelize.transaction();
     try{
         const personOid = req.body.personOID;
@@ -182,8 +182,8 @@ const createSeminar = async (req, res) => {
 module.exports = {
     getSeminar,
     setPhase,
-    getPersonList,
-    updatePersonInSeminar,
+    getUserList,
+    updateUserInSeminar,
     evaluateConcept,
     createSeminar
 }

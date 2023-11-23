@@ -8,7 +8,7 @@ import {Button} from "primereact/button";
 import useFetch from "../hooks/useFetch.ts";
 
 type RolleAssignment = {
-    personOID: number;
+    userOID: number;
     seminarOID: number;
     roleOID: number;
 }
@@ -28,8 +28,8 @@ type Concept = {
     conceptOID: number;
     text: string;
     filename: string;
-    personOIDSupervisor_person: {
-        personOID: number;
+    userOIDSupervisor_user: {
+        userOID: number;
         firstname: string;
         lastname: string;
     };
@@ -77,8 +77,8 @@ function SeminarPage() {
                             }
                         </div>
                         <div>
-                            {(concept && concept.personOIDSupervisor_person) ?
-                                <p>{concept.personOIDSupervisor_person.firstname} {concept.personOIDSupervisor_person.lastname}</p> :
+                            {(concept && concept.userOIDSupervisor_user) ?
+                                <p>{concept.userOIDSupervisor_user.firstname} {concept.userOIDSupervisor_person.lastname}</p> :
                                 <p>-</p>
                             }
                         </div>

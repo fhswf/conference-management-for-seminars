@@ -1,6 +1,6 @@
 const db = require("../models");
 
-const Reviewerassignment = db.reviewerassignment;
+const Review = db.review;
 
 
 

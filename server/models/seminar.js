@@ -2,22 +2,22 @@ const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('seminar', {
     seminarOID: {
-      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: true
+      allowNull: false
     },
     phase: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: false
     },
-    key:{
-        type: DataTypes.CHAR(32),
-        allowNull: true
+    assignmentkey: {
+      type: DataTypes.CHAR(32),
+      allowNull: false,
+      unique: "assignmentkey"
     }
   }, {
     sequelize,
@@ -30,6 +30,14 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "seminarOID" },
+        ]
+      },
+      {
+        name: "assignmentkey",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "assignmentkey" },
         ]
       },
     ]

@@ -33,7 +33,7 @@ function SeminarDetailsPage() {
         }
         const fetchSupervisorList = async () => {
             try {
-                const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/person/get-supervisor-list/1`, {
+                const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/user/get-supervisor-list/1`, {
                     method: 'GET',
                     credentials: 'include'
                 }); // TODO replace
@@ -43,7 +43,7 @@ function SeminarDetailsPage() {
                 data.map((supervisor: any) => {
                     availableSupervisor.push({
                         name: supervisor.lastname + ", " + supervisor.firstname,
-                        personOID: supervisor.personOID
+                        userOID: supervisor.userOID
                     });
                 })
                 setAvailableSupervisor(availableSupervisor);
@@ -92,9 +92,9 @@ function SeminarDetailsPage() {
     ];
 
     //TODO edit
-    const tableData = studentList?.rolleassignments.map(person => ({
-        lname: person.personO.lastName || "-",
-        fname: person.personO.firstName || "-",
+    const tableData = studentList?.rolleassignments.map(user => ({
+        lname: user.userO.lastName || "-",
+        fname: user.personO.firstName || "-",
         mail: person.personO.mail || "-",
         comment: person.personO.comment || "-",
         role: person.roleOID,

@@ -1,18 +1,26 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('registrationkeys', {
+  return sequelize.define('mailqueue', {
     id: {
-      type: DataTypes.CHAR(32),
+      type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    mail: {
+    receiver: {
       type: DataTypes.TEXT,
-      allowNull: true
+      allowNull: false
+    },
+    subject: {
+      type: DataTypes.TEXT,
+      allowNull: false
+    },
+    body: {
+      type: DataTypes.TEXT,
+      allowNull: false
     }
   }, {
     sequelize,
-    tableName: 'registrationkeys',
+    tableName: 'mailqueue',
     timestamps: false,
     indexes: [
       {

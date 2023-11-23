@@ -1,19 +1,26 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('rollen', {
-    roleOID: {
-      autoIncrement: true,
+  return sequelize.define('attachment', {
+    attachmentOID: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    description: {
+    file: {
+      type: DataTypes.BLOB,
+      allowNull: false
+    },
+    mimetype: {
+      type: DataTypes.TEXT,
+      allowNull: false
+    },
+    filename: {
       type: DataTypes.TEXT,
       allowNull: false
     }
   }, {
     sequelize,
-    tableName: 'rollen',
+    tableName: 'attachment',
     timestamps: false,
     indexes: [
       {
@@ -21,7 +28,7 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "roleOID" },
+          { name: "attachmentOID" },
         ]
       },
     ]

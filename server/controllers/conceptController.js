@@ -2,7 +2,7 @@ const db = require("../models");
 const path = require("path");
 
 const Concept = db.concept;
-const Person = db.person;
+const User = db.user;
 const Status = db.status;
 
 const getConcept = async (req, res) => {
@@ -10,13 +10,13 @@ const getConcept = async (req, res) => {
     try {
         const concept = await Concept.findOne({
             where: {
-                personOIDStudent: 1, // TODO req.user.personOID
+                userOIDStudent: 1, // TODO req.user.userOID
                 seminarOID: 1 // TODO req.user.lti.context_id
             },
             include: [{
-                model: Person,
-                as: 'personOIDSupervisor_person',
-                attributes: ["personOID", "firstname", "lastname"]
+                model: User,
+                as: 'userOIDSupervisor_user',
+                attributes: ["userOID", "firstname", "lastname"]
             },
             {
                 model: Status,
@@ -74,8 +74,8 @@ const uploadConcept = async (req, res) => {
             pdf: pdfData, // TODO Optimieren
             filename: filename,
             mimetype: mimetype,
-            personOIDSupervisor: null,
-            personOIDStudent: 1, // TODO req.user.personOID
+            userOIDSupervisor: null,
+            userOIDStudent: 1, // TODO req.user.userOID
             seminarOID: 1, // TODO req.user.lti.context_id
             statusOID: 1, // TODO ersetzen
         } );

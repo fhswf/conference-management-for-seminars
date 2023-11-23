@@ -1,26 +1,14 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('paper', {
-    paperOID: {
+  return sequelize.define('chatmessage', {
+    chatmessageOID: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    seminarOID: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'seminar',
-        key: 'seminarOID'
-      }
-    },
-    authorOID: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'user',
-        key: 'userOID'
-      }
+    message: {
+      type: DataTypes.TEXT,
+      allowNull: true
     },
     attachmentOID: {
       type: DataTypes.INTEGER,
@@ -29,10 +17,18 @@ module.exports = function(sequelize, DataTypes) {
         model: 'attachment',
         key: 'attachmentOID'
       }
+    },
+    reviewOID: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'review',
+        key: 'reviewOID'
+      }
     }
   }, {
     sequelize,
-    tableName: 'paper',
+    tableName: 'chatmessage',
     timestamps: true,
     indexes: [
       {
@@ -40,28 +36,21 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "paperOID" },
+          { name: "chatmessageOID" },
         ]
       },
       {
-        name: "Paper2",
-        using: "BTREE",
-        fields: [
-          { name: "seminarOID" },
-        ]
-      },
-      {
-        name: "Paper3",
+        name: "reviewerChat1",
         using: "BTREE",
         fields: [
           { name: "attachmentOID" },
         ]
       },
       {
-        name: "Paper4",
+        name: "chatmessage2",
         using: "BTREE",
         fields: [
-          { name: "authorOID" },
+          { name: "reviewOID" },
         ]
       },
     ]

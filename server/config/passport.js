@@ -3,18 +3,18 @@ const LTIStrategy = require('passport-lti');
 const OpenIDConnectStrategy = require('passport-openidconnect');
 
 const db = require("../models");
-const Person = db.person;
+const User = db.user;
 const RoleAssignment = db.rolleassignment;
 const Seminar = db.seminar;
 const OidcUser = db.oidcuser;
 
-async function addOrUpdatePerson(lti, t) {
-    const [person, created] = await Person.findOrCreate({
+async function addOrUpdateuser(lti, t) {
+    const [user, created] = await User.findOrCreate({
         where: {
-            personOID: lti.user_id
+            userOID: lti.user_id
         },
         defaults: {
-            personOID: lti.user_id,
+            userOID: lti.user_id,
             firstName: lti.lis_person_name_given,
             lastName: lti.lis_person_name_family,
             mail: lti.lis_person_contact_email_primary,
@@ -25,9 +25,9 @@ async function addOrUpdatePerson(lti, t) {
     })
 
     if (!created) {
-        person.firstName = lti.lis_person_name_given;
-        person.lastName = lti.lis_person_name_family;
-        person.mail = lti.lis_person_contact_email_primary;
+        user.firstName = lti.lis_person_name_given;
+        user.lastName = lti.lis_person_name_family;
+        user.mail = lti.lis_person_contact_email_primary;
         person.comment = "updated2";
         person.passwort = "";
         await person.save({transaction: t});

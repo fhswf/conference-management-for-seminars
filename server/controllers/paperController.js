@@ -3,7 +3,7 @@ const db = require("../models");
 const Op = db.Sequelize.Op;
 const Paper = db.paper;
 const ReviewerAssignment = db.reviewerassignment;
-const Person = db.person;
+const User = db.user;
 
 const getPaperPdf = async (req, res) => {
     // TODO check if user is allowed to download this file
@@ -36,7 +36,7 @@ async function uploadPaper(req, res) {
         const mimetype = (pdf) ? pdf.mimetype : null;
 
         await Paper.create({
-            studentOID: 1, // TODO req.user.personOID
+            studentOID: 1, // TODO req.user.userOID
             seminarOID: 1, // TODO req.user.lti.context_id
             pdf: pdfData,
             filename: filename,
@@ -60,8 +60,8 @@ async function getAssignedPaper(req, res) {
                     as: 'reviewerassignments',
                     where: {
                         [Op.or]: [
-                            { reviewerA: 2 },  // TODO req.user.personOID
-                            { reviewerB: 2 }   // TODO req.user.personOID
+                            { reviewerA: 2 },  // TODO req.user.userOID
+                            { reviewerB: 2 }   // TODO req.user.userOID
                         ]
                     },
                     attributes: []
@@ -83,7 +83,7 @@ async function getUploadedPaper(req, res) {
     try {
         const paper = await Paper.findAll({
             where: {
-                studentOID: 1 // TODO req.user.personOID
+                studentOID: 1 // TODO req.user.userOID
             },
             attributes: ["paperOID", "filename"]
         });
