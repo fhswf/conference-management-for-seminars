@@ -81,11 +81,13 @@ const conceptRouter = require('./routes/conceptRouter');
 const paperRouter = require('./routes/paperRouter');
 const userRouter = require('./routes/userRouter');
 const seminarRouter = require('./routes/seminarRouter');
+const attachmentRouter = require('./routes/attachmentRouter');
 
 app.use('/api/concepts', conceptRouter);
 app.use('/api/paper', paperRouter);
 app.use('/api/user', userRouter);
 app.use('/api/seminar', seminarRouter);
+app.use('/api/attachment', attachmentRouter);
 
 /*
 app.use(function (req, res, next) {
@@ -139,7 +141,13 @@ app.get('/', (req, res) => {
 //logout
 app.get('/api/logout', (req, res) => {
     console.log("");
-    const redirectUrl = req.user.lti?.launch_presentation_return_url || process.env.ENDSESSION_ENDPOINT;
+
+    let redirectUrl;
+    if(req.user.authType === "lti") {
+        redirectUrl = req.user.lti?.launch_presentation_return_url;
+    }else if(req.user.authType === "oidc") {
+        redirectUrl = process.env.ENDSESSION_ENDPOINT;
+    }
     req.logout(() => {
         //console.log(req.user);
         //console.log(req.session);

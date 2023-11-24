@@ -8,19 +8,23 @@ import ChatWindowPage from "./ChatWindowPage.tsx";
 import useFetch from "../hooks/useFetch.ts";
 
 type Paper = {
-    paperOid: number;
-    filename: string;
+    paperOID: number;
+    attachmentO: {
+        attachmentOID: number;
+        filename: string;
+    };
 }
 
 function PaperOverviewPage() {
     const [showModal, setShowModal] = useState(false);
     const [showChat, setShowChat] = useState(false);
     //const [uploadedPaper, setUploadedPaper] = useState<AssignedPaper[] | null>(null)
-    const {data: uploadedPaper} = useFetch<Paper[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-uploaded-paper/`);
+    const {data: uploadedPaper} = useFetch<Paper[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-uploaded-paper/2`);
 
     return (
         <div>
             <MainLayout>
+                <p>{JSON.stringify(uploadedPaper)}</p>
                 <p>Ihre eingereichten Paper:</p>
                 <div className={styles.container}>
                     <p>Datei:</p>
@@ -29,7 +33,7 @@ function PaperOverviewPage() {
                     {uploadedPaper && uploadedPaper.length > 0 ? (
                         uploadedPaper.map((paper: Paper, index: number) => (
                             <Fragment key={index}>
-                                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-paper/${paper.paperOid}`}>{paper.filename}</a>
+                                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
                                 <p>JA</p>
                                 <Button onClick={() => setShowChat(true)}>Kommentare</Button>
                             </Fragment>

@@ -1,51 +1,27 @@
 const db = require("../models");
+const attachmentController = require("./attachmentController");
 
 const Op = db.Sequelize.Op;
 const Paper = db.paper;
-const ReviewerAssignment = db.reviewerassignment;
+const Review = db.review;
 const User = db.user;
-
-const getPaperPdf = async (req, res) => {
-    // TODO check if user is allowed to download this file
-    try {
-        const paper = await Paper.findByPk(req.params.id);
-
-        if (paper && paper.pdf) {
-            res.setHeader('Content-Type', 'application/pdf');
-
-            res.setHeader('Content-Type', paper.mimetype);
-            res.setHeader('Content-Disposition', `attachment; filename="${paper.filename}"`);
-            res.send(Buffer.from(paper.pdf, 'utf8'));
-        } else {
-            return res.status(404).json({error: 'Not Found'});
-        }
-    } catch (e) {
-        console.error(e);
-        return res.status(500).json({error: 'Internal Server Error'});
-    }
-}
+const Attachment = db.attachment;
 
 async function uploadPaper(req, res) {
+    const t = await db.sequelize.transaction();
     try {
-        if (!req.files) {
-            return res.status(400).send('No files were uploaded.');
-        }
-        const filename = (req.files) ? req.files.file.name : null;
-        const pdf = (req.files) ? req.files.file : null;
-        const pdfData = (pdf) ? pdf.data : null;
-        const mimetype = (pdf) ? pdf.mimetype : null;
+        let attachment = await attachmentController.createAttachment(req.files?.file, t)
 
         await Paper.create({
-            studentOID: 1, // TODO req.user.userOID
-            seminarOID: 1, // TODO req.user.lti.context_id
-            pdf: pdfData,
-            filename: filename,
-            mimetype: mimetype,
-        });
+            seminarOID: 2, // TODO req.user.lti.context_id
+            authorOID: 11, // TODO req.user.userOID
+            attachmentOID: attachment.attachmentOID
+        }, {transaction: t});
 
-        // TODO send mail to Admin and supervisor
+        await t.commit();
         return res.status(200).end();
     } catch (error) {
+        await t.rollback();
         console.error("Error :" + error);
         return res.status(500).end();
     }
@@ -53,26 +29,37 @@ async function uploadPaper(req, res) {
 
 async function getAssignedPaper(req, res) {
     try {
-        const paper = await Paper.findAll({
-            include: [
-                {
-                    model: ReviewerAssignment,
-                    as: 'reviewerassignments',
-                    where: {
-                        [Op.or]: [
-                            { reviewerA: 2 },  // TODO req.user.userOID
-                            { reviewerB: 2 }   // TODO req.user.userOID
-                        ]
-                    },
-                    attributes: []
-                }
-            ],
-            attributes: ["paperOID", "filename"]
-        });
-        if (!paper) {
-            return res.status(404).json({error: 'Not Found'});
+        //const userOID = req.user.userOID;
+        const userOID = 11; // TODO req.user.userOID
+        const seminarOID = req.params.seminarOID;
+
+        if (!seminarOID) {
+            return res.status(400).json({error: 'Bad Request'});
         }
-        return res.status(200).json(paper);
+
+        const idsToReview = await Review.findAll({
+            where: {
+                reviewerOID: userOID
+            },
+            attributes: ["paperOID"]
+        });
+
+
+        const papersToReview = await Paper.findAll({
+            where: {
+                paperOID: {[Op.in]: idsToReview.map((paper) => paper.paperOID)},
+                seminarOID: seminarOID
+            },
+            include: [{
+                model: Attachment,
+                as: "attachmentO",
+                attributes: ["filename"]
+            },],
+            attributes: ["paperOID"]
+        });
+
+
+        return res.status(200).json(papersToReview);
     } catch (error) {
         console.error(error);
         return res.status(500).json({error: 'Internal Server Error'});
@@ -81,11 +68,18 @@ async function getAssignedPaper(req, res) {
 
 async function getUploadedPaper(req, res) {
     try {
+        const userOID = 11; // TODO req.user.userOID
+        const seminarOID = req.params.seminarOID;
         const paper = await Paper.findAll({
             where: {
-                studentOID: 1 // TODO req.user.userOID
+                authorOID: userOID
             },
-            attributes: ["paperOID", "filename"]
+            include: [{
+                model: Attachment,
+                as: "attachmentO",
+                attributes: ["attachmentOID", "filename"]
+            }],
+            attributes: ["paperOID"]
         });
         if (!paper) {
             return res.status(404).json({error: 'Not Found'});
@@ -98,7 +92,6 @@ async function getUploadedPaper(req, res) {
 }
 
 module.exports = {
-    getPaperPdf,
     uploadPaper,
     getAssignedPaper,
     getUploadedPaper

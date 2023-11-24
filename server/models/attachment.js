@@ -2,12 +2,13 @@ const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('attachment', {
     attachmentOID: {
+      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
     file: {
-      type: DataTypes.BLOB,
+      type: DataTypes.BLOB('medium'),
       allowNull: false
     },
     mimetype: {

@@ -5,7 +5,7 @@ import React from "react";
 
 type Concept = {
     conceptOID: number,
-    statusOID: number,
+    accepted: boolean,
     userOIDSupervisor: number,
     text: string,
     filename: string,
@@ -36,10 +36,10 @@ function ConceptAcceptReject({concept}: Props) {
             <p>TODO user einfügen</p>
             <p>Text: {concept.text || "-"}</p>
             <p>Anhang: {concept.filename ? <a
-                href={`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts/get-concept-pdf/${concept.conceptOID}`}>{concept.filename}</a> : "-"}
+                href={`http://${import.meta.env.VITE_BACKEND_URL}/api/attachment/${concept.conceptOID}`}>{concept.filename}</a> : "-"}
             </p>
-            <p>Status: {concept.statusOID}</p>
-            {(concept.statusOID === 1) && // if evaluation pending
+            <p>Status: {concept.accepted}</p>
+            {(!concept.accepted) && // if evaluation pending
                 <>
                     <InputTextarea style={styles.inputArea} rows={5} cols={40} onChange={(e) => {inputText = e.target.value}}/><br/>
                     <Button label="Annehmen" onClick={()=>onEvaluate(true)}/>

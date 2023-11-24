@@ -2,18 +2,22 @@ const crypto = require('crypto');
 const db = require("../models");
 
 const Seminar = db.seminar;
-const RolleAssignment = db.rolleassignment;
+const RoleAssignment = db.roleassignment;
 const User = db.user;
 const Concept = db.concept;
+const Attachment = db.attachment;
 
 const getSeminar = async (req, res) => {
     try {
-        const seminar = await Seminar.findByPk(1, // TODO req.user.lti.context_id
+        //const userOID = req.user.userOID;
+        const userOID = 11; // TODO req.user.userOID
+        const seminarOID = req.params.seminarOID;
+        const seminar = await Seminar.findByPk(seminarOID, // TODO req.user.lti.context_id
             {
                 include: [{
-                    model: RolleAssignment,
-                    as: "rolleassignments",
-                    where: {userOID: 1}, // TODO req.user.userOID
+                    model: RoleAssignment,
+                    as: "roleassignments",
+                    where: {userOID: userOID},
                 }],
                 attributes: ["description", "phase"]
             },
@@ -48,124 +52,131 @@ const setPhase = async (req, res) => {
 }
 
 const getUserList = async (req, res) => {
-    try{
-        const users = await Seminar.findByPk(1, // TODO req.user.lti.context_id
-             {
-            include: [{
-                model: RolleAssignment,
-                as: "rolleassignments",
-                attributes: ["userOID", "roleOID"],
+    try {
+        const users = await Seminar.findByPk(2, // TODO req.user.lti.context_id
+            {
                 include: [{
-                    model: User,
-                    as: "userO",
+                    model: RoleAssignment,
+                    as: "roleassignments",
+                    attributes: ["userOID", "roleOID"],
                     include: [{
-                        model: Concept,
-                        as: "userOIDStudent_concepts",
-                        attributes: ["conceptOID", "statusOID", "userOIDSupervisor", "text", "filename"],
+                        model: User,
+                        as: "userO",
                         include: [{
-                            model: User,
-                            as: "userOIDSupervisor_person",
-                            attributes: ["firstname", "lastname", "mail"]
-                        }],
-                        order: [['submitted', 'DESC']], //Das neueste Concept
-                        limit: 1
-                    }]
+                            model: Concept,
+                            as: "userOIDStudent_concepts",
+                            attributes: ["conceptOID", "accepted", "userOIDSupervisor", "text"],
+                            include: [{
+                                model: User,
+                                as: "userOIDSupervisor_user",
+                                attributes: ["firstname", "lastname", "mail"],
+
+                            },
+                                {
+                                    model: Attachment,
+                                    as: "attachmentO",
+                                    attributes: ["filename", "mimetype"]
+                                }
+                            ],
+                            order: [['createdAt', 'DESC']], //Das neueste Concept
+                            limit: 1
+                        }]
+                    }],
                 }],
-            }],
-        });
+            });
 
 
-        if (persons) {
-            res.status(200).send(persons);
+        if (users) {
+            res.status(200).send(users);
         } else {
-            res.status(404).send({message: "Persons not found."});
+            res.status(404).send({message: "Users not found."});
         }
 
-    }catch (e){
+    } catch
+        (e) {
         console.log(e);
-        res.status(500).send({message: "Error while retrieving persons."});
+        res.status(500).send({message: "Error while retrieving user."});
     }
 }
 
 const updateUserInSeminar = async (req, res) => {
     const t = await db.sequelize.transaction();
-    try{
-        const personOid = req.body.personOID;
+    try {
+        const userOid = req.body.userOID;
         const roleOid = req.body.roleOID;
         const seminarOid = req.body.seminarOID;
         const supervisorOid = req.body.supervisorOID;
         const comment = req.body.comment;
 
         //change:
-        // 1. rolleassignment
-        const assignment = await RolleAssignment.update(
+        // 1. roleassignment
+        const assignment = await RoleAssignment.update(
             {roleOID: roleOid},
-            {where: {personOID: personOid, seminarOID: seminarOid}},
+            {where: {userOID: userOid, seminarOID: seminarOid}},
             {transaction: t}
         );
-        // 2. person
-        const person = await Person.update(
+        // 2. user
+        const user = await User.update(
             {comment: comment},
-            {where: {personoid: personOid}},
+            {where: {useroid: userOid}},
             {transaction: t}
         );
         //3. concept
         const newestConcept = await Concept.findOne({
-            where: { personOIDStudent: personOid},
+            where: {userOIDStudent: userOid},
             order: [['createdAt', 'DESC']],
         });
-        if(newestConcept && supervisorOid){
+        if (newestConcept && supervisorOid) {
             const concept = await Concept.update(
-                {personOIDSupervisor: supervisorOid},
+                {userOIDSupervisor: supervisorOid},
                 {where: {conceptoid: newestConcept.conceptoid}},
                 {transaction: t}
             );
         }
 
         await t.commit();
-        res.status(200).send({message: "Person successfully changed."});
-    }catch (e){
+        res.status(200).send({message: "user successfully changed."});
+    } catch (e) {
         await t.rollback();
         console.log(e);
-        res.status(500).send({message: "Error while changing person."});
+        res.status(500).send({message: "Error while changing user."});
     }
 }
 
 const evaluateConcept = async (req, res) => {
     // TODO check permissions
-    try{
+    try {
         const conceptoid = req.body.conceptOID;
         const accepted = req.body.accepted;
-        const statusoid = accepted ? 2 : 3;
         // TODO set note
         const note = req.body.note;
         const concept = await Concept.update(
-            {statusOID: statusoid},
+            {accepted: accepted},
             {where: {conceptoid: conceptoid}}
         );
-        if(concept[0] === 1){
+        if (concept[0] === 1) {
             res.status(200).send({message: "Concept successfully evaluated."});
-        }else{
+        } else {
             res.status(500).send({message: "Error while evaluating concept."});
         }
-    }catch (e){
+    } catch (e) {
         console.log(e);
         res.status(500).send({message: "Error while evaluating concept."});
     }
 }
 
 const createSeminar = async (req, res) => {
-    try{
+    try {
         let existingSeminar = null;
         let key = null;
-        do{
+        do {
             key = crypto.randomUUID()
 
             //check if seminar already exists with this key
             existingSeminar = await Seminar.findOne({
                 where: {key: key}
             });
-        }while(existingSeminar)
+        } while (existingSeminar)
 
         const seminar = await Seminar.create({
             description: req.body.name,
@@ -173,7 +184,7 @@ const createSeminar = async (req, res) => {
             key: key.toString()
         });
         res.status(200).send({message: "Seminar successfully created."});
-    }catch (e){
+    } catch (e) {
         console.log(e);
         res.status(500).send({message: "Error while creating seminar."});
     }

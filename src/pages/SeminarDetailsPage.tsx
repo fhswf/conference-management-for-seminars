@@ -7,9 +7,7 @@ import {InputText} from "primereact/inputtext";
 import {Dropdown} from "primereact/dropdown";
 import {Button} from "primereact/button";
 import HiddenLabel from "../components/ToggleLabel.tsx";
-import {Password} from "primereact/password";
 import AddUserForm from "../components/AddUserForm.tsx";
-import useFetch from "../hooks/useFetch.ts";
 
 function SeminarDetailsPage() {
     const [isEditMode, setIsEditMode] = useState(0);
@@ -92,45 +90,45 @@ function SeminarDetailsPage() {
     ];
 
     //TODO edit
-    const tableData = studentList?.rolleassignments.map(user => ({
+    const tableData = studentList?.roleassignments.map(user => ({
         lname: user.userO.lastName || "-",
-        fname: user.personO.firstName || "-",
-        mail: person.personO.mail || "-",
-        comment: person.personO.comment || "-",
-        role: person.roleOID,
-        supervisor: person.personO.personOIDStudent_concepts[0]?.personOIDSupervisor_person?.firstname + " " + person.personO.personOIDStudent_concepts[0]?.personOIDSupervisor_person?.lastname || '-',
-        concept: person.personO.personOIDStudent_concepts[0]?.statusOID || '-',
+        fname: user.userO.firstName || "-",
+        mail: user.userO.mail || "-",
+        comment: user.userO.comment || "-",
+        role: user.roleOID,
+        supervisor: user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.firstname + " " + user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.lastname || '-',
+        concept: user.userO.userOIDStudent_concepts[0]?.accepted || '-',
         btnEdit: <Button onClick={() => {
-            setIsEditMode(person.personOID)
+            setIsEditMode(user.userOID)
             //set data
-            setComment(person.personO.comment)
-            setSelectedRole(person.roleOID)
-            setSelectedSupervisor(person.personO.personOIDStudent_concepts[0]?.personOIDSupervisor_person?.personOID)
+            setComment(user.userO.comment)
+            setSelectedRole(user.roleOID)
+            setSelectedSupervisor(user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.userOID)
         }}>Edit</Button>,
-        btnGoto: <Button onClick={() => setShowUserConcept(person.personO.personOIDStudent_concepts[0])}>➡</Button>
+        btnGoto: <Button onClick={() => setShowUserConcept(user.userO.userOIDStudent_concepts[0])}>➡</Button>
     }));
 
-    function onDeleteClicked(personOID: number) {
+    function onDeleteClicked(userOID: number) {
         // TODO
-        console.log(personOID);
+        console.log(userOID);
     }
 
-    const tableDataEdit = studentList?.rolleassignments.map(person => ({
-        lname: person.personO.lastName,
-        fname: person.personO.firstName,
-        mail: person.personO.mail,
-        comment: isEditMode === person.personOID ? <InputText defaultValue={person.personO.comment}
-                                                              onChange={(e) => setComment(e.target.value)}/> : person.personO.comment,
-        role: isEditMode === person.personOID ?
+    const tableDataEdit = studentList?.roleassignments.map(user => ({
+        lname: user.userO.lastName,
+        fname: user.userO.firstName,
+        mail: user.userO.mail,
+        comment: isEditMode === user.userOID ? <InputText defaultValue={user.userO.comment}
+                                                              onChange={(e) => setComment(e.target.value)}/> : user.userO.comment,
+        role: isEditMode === user.userOID ?
             <Dropdown value={selectedRole} options={roles} optionLabel="name" placeholder="Rolle wählen"
-                      onChange={(e) => setSelectedRole(e.value)}/> : person.roleOID,
-        supervisor: isEditMode === person.personOID && person.roleOID === 3 ?
+                      onChange={(e) => setSelectedRole(e.value)}/> : user.roleOID,
+        supervisor: isEditMode === user.userOID && user.roleOID === 3 ?
             <Dropdown showClear value={selectedSupervisor} options={availableSupervisor} optionLabel="name"
                       placeholder="Betreuer wählen"
-                      onChange={(e) => setSelectedSupervisor(e.value)}/> : person.personO.personOIDStudent_concepts[0]?.personOIDSupervisor_person?.firstname + " " + person.personO.personOIDStudent_concepts[0]?.personOIDSupervisor_person?.lastname,
-        concept: person.personO.personOIDStudent_concepts[0]?.statusOID || "-",
-        btnDelete: isEditMode === person.personOID ?
-            <Button onClick={() => onDeleteClicked(person.personOID)}>Delete</Button> : null
+                      onChange={(e) => setSelectedSupervisor(e.value)}/> : user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.firstname + " " + user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.lastname,
+        concept: user.userO.userOIDStudent_concepts[0]?.accepted || "-",
+        btnDelete: isEditMode === user.userOID ?
+            <Button onClick={() => onDeleteClicked(user.userOID)}>Delete</Button> : null
     }));
 
     return (
@@ -143,8 +141,9 @@ function SeminarDetailsPage() {
                             // In nächste Phase wechseln
                         }
                     }}>Review-Phase 🖊</p>
+                    <p>{JSON.stringify(studentList)}</p>
                     {/* TODO Suchleiste einfügen */}
-                    <HiddenLabel text={studentList?.key}/>
+                    <HiddenLabel text={studentList?.assignmentkey}/>
                     {!isEditMode ?
                         <Table header={header} data={tableData}/> :
                         <Table header={headerEdit} data={tableDataEdit}/>
@@ -160,13 +159,13 @@ function SeminarDetailsPage() {
                                 console.log("----------------------------------")
 
                                 //TODO send changes
-                                const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/update-person`, {
+                                const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/update-user`, {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json'
                                     },
                                     body: JSON.stringify({
-                                        personOID: isEditMode,
+                                        userOID: isEditMode,
                                         roleOID: roles.find(role => role.value === selectedRole)?.value,
                                         supervisorOID: selectedSupervisor || null,
                                         comment: comment,

@@ -3,48 +3,73 @@ const LTIStrategy = require('passport-lti');
 const OpenIDConnectStrategy = require('passport-openidconnect');
 
 const db = require("../models");
+const crypto = require("crypto");
 const User = db.user;
-const RoleAssignment = db.rolleassignment;
+const RoleAssignment = db.roleassignment;
 const Seminar = db.seminar;
 const OidcUser = db.oidcuser;
+const LtiUser = db.ltiuser
 
-async function addOrUpdateuser(lti, t) {
-    const [user, created] = await User.findOrCreate({
+async function addOrUpdateUser(lti, t) {
+    let ltiUser = await LtiUser.findOne({
         where: {
-            userOID: lti.user_id
-        },
-        defaults: {
-            userOID: lti.user_id,
+            LtiUserOID: lti.user_id
+        }
+    });
+
+    if (!ltiUser) {
+        // Create a new User
+        const user = await User.create({
             firstName: lti.lis_person_name_given,
             lastName: lti.lis_person_name_family,
             mail: lti.lis_person_contact_email_primary,
             comment: null,
-            passwort: ""
+            isAdmin: false,
+        }, {transaction: t});
+
+        // Create LtiUser
+        ltiUser = await LtiUser.create({
+            LtiUserOID: lti.user_id,
+            consumerURL: lti.tool_consumer_instance_guid,
+            userOID: user.userOID,
+        }, {transaction: t});
+    }
+    // only the User table should be updated
+    const [user, created] = await User.findOrCreate({
+        where: {
+            userOID: ltiUser.userOID
         },
-        transaction: t
-    })
+        defaults: {
+            firstName: lti.lis_person_name_given,
+            lastName: lti.lis_person_name_family,
+            mail: lti.lis_person_contact_email_primary,
+            comment: null,
+            isAdmin: false,
+        }, transaction: t
+    });
 
     if (!created) {
+        // update user
         user.firstName = lti.lis_person_name_given;
         user.lastName = lti.lis_person_name_family;
         user.mail = lti.lis_person_contact_email_primary;
-        person.comment = "updated2";
-        person.passwort = "";
-        await person.save({transaction: t});
+        await user.save({transaction: t});
     }
 
-    return person;
+    return user;
 }
 
 async function addSeminar(lti, t) {
+    const key = crypto.randomUUID()
     const [seminar, created] = await Seminar.findOrCreate({
         where: {
             seminarOID: lti.context_id
         },
         defaults: {
-            seminarOID: lti.context_id,
+            seminarOID: lti.context_id,     // TODO bei mehreren Tool Consumern kann es zu Konflikten kommen
             description: lti.context_title,
-            phase: 1
+            phase: 1,
+            assignmentkey: key
         },
         transaction: t
     });
@@ -63,14 +88,14 @@ function getUserIdfromLti(lti) {
 
 }
 
-async function addRoleAssignment(lti, seminar, t) {
+async function addRoleAssignment(lti, user, seminar, t) {
     const [assignment, created] = await RoleAssignment.findOrCreate({
         where: {
-            personOID: lti.user_id, //TODO replace with UserId
+            userOID: user.userOID, //TODO replace with UserId
             seminarOID: seminar.seminarOID
         },
         defaults: {
-            personOID: lti.user_id,
+            userOID: user.userOID,
             seminarOID: seminar.seminarOID,
             roleOID: mapLtiRoles(lti.roles)
         },
@@ -91,36 +116,36 @@ const ltiVerifyCallback = async (username, lti, done) => {
     const t = await db.sequelize.transaction();
 
     try {
-        const person = await addOrUpdatePerson(lti, t);
+        const user = await addOrUpdateUser(lti, t);
 
         let seminar = null;
-        if(lti.custom_seminar_key){
+        if (lti.custom_seminar_key) {
             //join seminar
             seminar = await Seminar.findOne({
                 where: {
                     key: lti.custom_seminar_key
                 }
             });
-            if(!seminar){
+            if (!seminar) {
                 console.log("invalid seminar key")
                 return done(null, false);
             }
-        }else{
+        } else {
             //create seminar
             seminar = await addSeminar(lti, t);
         }
 
-        await addRoleAssignment(lti, seminar, t);
+        await addRoleAssignment(lti, user, seminar, t);
 
-        var user = {
-            id: person.personOID,
+        var userJson = {
+            id: user.userOID,
             lti: lti,
             authtype: "lti"
         };
 
         await t.commit();
 
-        return done(null, user);
+        return done(null, userJson);
     } catch (e) {
         console.log(e);
         await t.rollback();
@@ -140,60 +165,58 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
     try {
         let cred = await OidcUser.findOne({
             where: {
-                provider: issuer,
                 subject: profile.id
             }
         });
 
         if (!cred) {
-            // Create a new person
-            const person = await Person.create({
+            // Create a new User
+            const user = await User.create({
                 firstName: profile.name?.givenName || "",
                 lastName: profile.name?.familyName || "",
                 mail: profile.emails && profile.emails[0]?.value || "",
                 comment: null,
-                passwort: ""
+                isAdmin: false,
             }, {transaction: t});
 
             // Create OidcUser
             cred = await OidcUser.create({
                 subject: profile.id,
                 provider: issuer,
-                personOID: person.personOID,
+                userOID: user.userOID,
                 idToken: idToken,
             }, {transaction: t});
         }
-        // only the person table should be updated
-        const [person, created] = await Person.findOrCreate({
+        // only the User table should be updated
+        const [user, created] = await User.findOrCreate({
             where: {
-                personOID: db.sequelize.literal(`(SELECT personOID FROM oidcuser WHERE subject = '${cred.subject}' AND provider = '${cred.provider}')`)
+                userOID: cred.userOID
             },
             defaults: {
                 firstName: profile.name?.givenName || "",
                 lastName: profile.name?.familyName || "",
                 mail: profile.emails && profile.emails[0]?.value || "",
                 comment: null,
-                passwort: ""
-            }, transaction: t});
+                isAdmin: false,
+            }, transaction: t
+        });
 
         if (!created) {
-            // update person
-            person.firstName = profile.name?.givenName || "";
-            person.lastName = profile.name?.familyName || "";
-            person.mail = profile.emails && profile.emails[0]?.value || "";
-            person.comment = null;
-            person.passwort = "";
-            await person.save({transaction: t});
+            // update user
+            user.firstName = profile.name?.givenName || "";
+            user.lastName = profile.name?.familyName || "";
+            user.mail = profile.emails && profile.emails[0]?.value || "";
+            await user.save({transaction: t});
         }
 
-        if (!person) {
+        if (!user) {
             return done(null, false);
         }
 
         await t.commit();
 
         return done(null, {
-            id: person.personOID,
+            id: user.userOID,
             lti: null,
             authtype: "oidc",
             accessToken: accessToken,
@@ -205,7 +228,6 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
         return done(err);
     }
 }
-
 
 
 passport.use(ltiStrategy);
@@ -223,7 +245,7 @@ passport.use(new OpenIDConnectStrategy({
 
 passport.serializeUser((user, done) => {
     done(null, {
-        personOID: user.id,
+        userOID: user.id,
         lti: user.lti,
         authtype: user.authtype,
         accessToken: user.accessToken,
@@ -233,7 +255,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((serializedUser, done) => {
-    Person.findByPk(serializedUser.personOID)
+    User.findByPk(serializedUser.userOID)
         .then((user) => {
             if (user) {
                 user.lti = serializedUser.lti;

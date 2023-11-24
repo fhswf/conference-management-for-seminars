@@ -2,6 +2,7 @@ const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('concept', {
     conceptOID: {
+      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
@@ -12,7 +13,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     userOIDSupervisor: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'user',
         key: 'userOID'

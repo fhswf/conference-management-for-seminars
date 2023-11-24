@@ -1,6 +1,6 @@
 const db = require("../models");
 
-const Rolleassignment = db.rolleassignment;
+const Roleassignment = db.roleassignment;
 
 
 

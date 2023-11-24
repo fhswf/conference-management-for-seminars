@@ -26,12 +26,12 @@ function ConceptUploadPage() {
             return;
         }
 
-        //TODO replace formdata with body json
         const formData = new FormData();
         formData.append('text', text);
         formData.append('file', selectedFile);
         const oid = (selectedSupervisor === undefined) ? null : selectedSupervisor.userOID;
         formData.append('supervisorOID', oid);
+        formData.append('seminarOID', 2); //TODO change
 
         console.log(text);
         console.log(selectedFile);
@@ -39,7 +39,7 @@ function ConceptUploadPage() {
         console.log(formData);
 
         try {
-            const res = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts/upload-concept`, {
+            const res = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts`, {
                 method: 'POST',
                 credentials: 'include',
                 body: formData,

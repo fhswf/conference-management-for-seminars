@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 
-function useFetch<T>(url: string, method: string = "GET", body?: string | FormData) {
+function useFetch<T>(url: string,  body?: string | FormData) {
     const [data, setData] = useState<T | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<unknown | null>(null);
@@ -14,7 +14,7 @@ function useFetch<T>(url: string, method: string = "GET", body?: string | FormDa
             await new Promise(resolve => setTimeout(resolve, 1000));
             try {
                 const response = await fetch(url, {
-                    method: method,
+                    method: "GET",
                     credentials: 'include',
                     body: body,
                 });
@@ -31,7 +31,7 @@ function useFetch<T>(url: string, method: string = "GET", body?: string | FormDa
             }
         };
         fetchData();
-    }, [url, method, body]);
+    }, [url, body]);
     return {data, loading, error};
 }
 

@@ -1,4 +1,4 @@
-const rolleassignmentController = require('../controllers/reviewController');
+const reviewController = require('../controllers/reviewController');
 
 const router = require('express').Router();
 

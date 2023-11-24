@@ -7,7 +7,7 @@ import MainLayout from "../components/layout/MainLayout.tsx";
 import {Button} from "primereact/button";
 import useFetch from "../hooks/useFetch.ts";
 
-type RolleAssignment = {
+type RoleAssignment = {
     userOID: number;
     seminarOID: number;
     roleOID: number;
@@ -16,27 +16,30 @@ type RolleAssignment = {
 type Seminar = {
     description: string;
     phase: string;
-    rolleassignments: RolleAssignment[];
+    roleassignments: RoleAssignment[];
 }
 
 type Paper = {
-    paperOid: number;
-    filename: string;
+    paperOID: number;
+    attachmentO: {
+        filename: string;
+    }
 }
 
 type Concept = {
     conceptOID: number;
     text: string;
     filename: string;
+    attachmentOID: number;
     userOIDSupervisor_user: {
         userOID: number;
         firstname: string;
         lastname: string;
     };
-    statusO: {
-        statusOID: number;
-        description: string;
+    attachmentO: {
+        filename: string;
     };
+    accepted: boolean | null;
 }
 
 function SeminarPage() {
@@ -45,9 +48,9 @@ function SeminarPage() {
     const [showCommentsOwnPaper, setShowCommentsOwnPaper] = useState(false);
     //const [showCommentsStrangerPaper, setShowCommentsStrangerPaper] = useState(false);
     const [showChat, setShowChat] = useState(false);
-    const {data: concept} = useFetch<Concept>(`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts/get-concept/`);
-    const {data: seminar} = useFetch<Seminar>(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-seminar`);
-    const {data: assignedPaper} = useFetch<Paper[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-assigned-paper`);
+    const {data: concept} = useFetch<Concept>(`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts`);
+    const {data: seminar} = useFetch<Seminar>(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-seminar/2`, );
+    const {data: assignedPaper} = useFetch<Paper[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-assigned-paper/2`);
 
 
 
@@ -55,10 +58,15 @@ function SeminarPage() {
         <div>
             <MainLayout>
                 <div>
+                    <p>{JSON.stringify(concept)}</p>
+                    <p>{JSON.stringify(seminar)}</p>
+                    <p>{JSON.stringify(assignedPaper)}</p>
+                </div>
+                <div>
                     <p>Übersicht</p>
                     <p>Seminarname: {seminar?.description || "-"}</p>
                     <p>Phase: {seminar?.phase}</p>
-                    <p>Rolle: {seminar?.rolleassignments[0].roleOID}</p>
+                    <p>Rolle:  {seminar?.roleassignments[0]?.roleOID}</p>
                 </div>
                 <br/>
                 {isStudent && <> <p>Konzept:</p>
@@ -71,23 +79,19 @@ function SeminarPage() {
                         <div><p>{(concept) ? concept.text : "-"}</p></div>
                         {/**/}
                         <div>
-                            {(concept?.filename) ? //if filename exists pdf exists
-                                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts/get-concept-pdf/${concept.conceptOID}`}>{concept.filename}</a> :
+                            {(concept?.attachmentO?.filename) ? //if filename exists pdf exists
+                                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/attachment/${concept.attachmentOID}`}>{concept.attachmentO.filename}</a> :
                                 <p>-</p>
                             }
                         </div>
                         <div>
                             {(concept && concept.userOIDSupervisor_user) ?
-                                <p>{concept.userOIDSupervisor_user.firstname} {concept.userOIDSupervisor_person.lastname}</p> :
+                                <p>{concept.userOIDSupervisor_user.firstname} {concept.userOIDSupervisor_user.lastname}</p> :
                                 <p>-</p>
                             }
                         </div>
                         <div>
-                            {(concept && concept.statusO) ?
-                                // TODO evtl mappen
-                                <p>{concept.statusO.description}</p> :
-                                <p>-</p>
-                            }
+                                <p>{concept?.accepted || "Bewertung ausstehend"}</p>
                         </div>
                         <div>
                             <Button onClick={() => {
@@ -109,10 +113,10 @@ function SeminarPage() {
                 }
                 <p>Sie sind dem folgenden {assignedPaper?.length} Paper als Reviewer zugeordnet:</p>
                 <div className={styles.assignedPaperContainer}>
-                    {assignedPaper && assignedPaper.map((paper: Paper, index: number) => {
+                    {assignedPaper && assignedPaper.length > 0 && assignedPaper.map((paper: Paper, index: number) => {
                         return (
                             <Fragment key={index}>
-                                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-paper/${paper.paperOid}`}>{paper.filename}</a>
+                                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/attachment/${paper.paperOID}`}>{paper.attachmentO.filename}</a>
                                 <Button onClick={() => setShowChat(true)}>Kommentieren</Button>
                             </Fragment>
                         )

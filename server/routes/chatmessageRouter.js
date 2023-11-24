@@ -1,4 +1,4 @@
-const rolleassignmentController = require('../controllers/reviewController');
+const chatmessageController = require('../controllers/chatmessageController');
 
 const router = require('express').Router();
 
