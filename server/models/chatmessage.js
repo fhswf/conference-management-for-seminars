@@ -26,7 +26,23 @@ module.exports = function(sequelize, DataTypes) {
         model: 'review',
         key: 'reviewOID'
       }
-    }
+    },
+    sender: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: 'user',
+            key: 'userOID'
+        }
+    },
+    receiver: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: 'user',
+            key: 'userOID'
+        }
+    },
   }, {
     sequelize,
     tableName: 'chatmessage',

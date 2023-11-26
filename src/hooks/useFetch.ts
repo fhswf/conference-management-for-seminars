@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 
-function useFetch<T>(url: string,  body?: string | FormData) {
+function useFetch<T>(url: string) {
     const [data, setData] = useState<T | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<unknown | null>(null);
@@ -16,7 +16,6 @@ function useFetch<T>(url: string,  body?: string | FormData) {
                 const response = await fetch(url, {
                     method: "GET",
                     credentials: 'include',
-                    body: body,
                 });
                 if (!response.ok) {
                     new Error(`Error: ${response.status}`);
@@ -31,7 +30,7 @@ function useFetch<T>(url: string,  body?: string | FormData) {
             }
         };
         fetchData();
-    }, [url, body]);
+    }, [url]);
     return {data, loading, error};
 }
 

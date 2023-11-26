@@ -1,22 +1,49 @@
 import {Button} from "primereact/button";
 import {InputTextarea} from "primereact/inputtextarea";
-import React from "react";
-
+import React, {useState} from "react";
+import {Dropdown} from "primereact/dropdown";
 
 type Concept = {
     conceptOID: number,
     accepted: boolean,
-    userOIDSupervisor: number,
     text: string,
-    filename: string,
-    //userOIDSupervisor_user
+    userOIDSupervisor_user: {
+        userOID: number,
+        firstName: string,
+        lastName: string,
+        mail: string
+    },
+    attachmentO: {
+        attachmentOID: number,
+        filename: string,
+    },
+}
+
+type UserO = {
+    userOID: number,
+    roleOID: number,
+    firstName: string,
+    lastName: string,
+    mail: string,
+    comment: string,
+    isAdmin: boolean,
+    userOIDStudent_concepts: Concept[]
+}
+
+type AvailableSupervisor = {
+    userOID: number,
+    firstName: string,
+    lastName: string,
 }
 
 interface Props {
-    concept: any;
+    user0: UserO;
+    availableSupervisors: AvailableSupervisor[];
+    onClose?: () => void;
 }
 
-function ConceptAcceptReject({concept}: Props) {
+function ConceptAcceptReject({user0, availableSupervisors, onClose}: Props) {
+    const [selectedSupervisor, setSelectedSupervisor] = useState<AvailableSupervisor | null>(null)
     let inputText: string = "";
     const styles = {
         inputArea: {
@@ -25,28 +52,81 @@ function ConceptAcceptReject({concept}: Props) {
         }
     };
 
-    function onEvaluate(accepted: boolean) {
+    //const supervisor = [
+    //    {name: "Betreuer A"},
+    //    {name: "Betreuer B"},
+    //    {name: "Betreuer C"},
+    //];
+
+    const supervisor = availableSupervisors.map((supervisor) => {
+        return {
+            ...supervisor,
+            name: supervisor.firstName + " " + supervisor.lastName,
+        }
+    });
+
+    async function onEvaluate(accepted: boolean) {
         //print text area
-        alert(inputText + " " + accepted);
+        //alert(inputText + " " + accepted);
+        if(accepted && !selectedSupervisor) {
+            alert("Bitte wählen Sie einen Betreuer aus.");
+            return;
+        }
+
+        const body = {
+            conceptOID: user0.userOIDStudent_concepts[0].conceptOID,
+            accepted: accepted,
+            feedback: inputText,
+            userOIDSupervisor: selectedSupervisor?.userOID || null,
+        }
+
+        const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/evaluate-concept`, {// TODO to concept route
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+        });
+
+        if(response.ok) {
+            alert("Erfolgreich");
+        } else {
+            alert("Fehler");
+        }
+        //alert(JSON.stringify(body, null, 2));
+
+        //onClose && onClose();
     }
 
     return (
         <div>
+            <p><pre>{JSON.stringify(user0, null, 2)}</pre></p>
+            {/*<p>
+                <pre>{JSON.stringify(concept, null, 2)}</pre>
+                <pre>{JSON.stringify(availableSupervisors, null, 2)}</pre>
+            </p><br/>*/}
+            
             <p>Konzept annehmen / ablehnen</p>
             <p>TODO user einfügen</p>
-            <p>Text: {concept.text || "-"}</p>
-            <p>Anhang: {concept.filename ? <a
-                href={`http://${import.meta.env.VITE_BACKEND_URL}/api/attachment/${concept.conceptOID}`}>{concept.filename}</a> : "-"}
+            <p>Eingereicht von {user0.firstName}</p>
+            <p>Text: {user0.userOIDStudent_concepts[0].text || "-"}</p>
+            <p>Anhang: {user0.userOIDStudent_concepts[0].attachmentO ? <a
+                href={`http://${import.meta.env.VITE_BACKEND_URL}/api/attachment/${user0.userOIDStudent_concepts[0].attachmentO.attachmentOID}`}>{user0.userOIDStudent_concepts[0].attachmentO.filename}</a> : "-"}
             </p>
-            <p>Status: {concept.accepted}</p>
-            {(!concept.accepted) && // if evaluation pending
+            <p>Status: {user0.userOIDStudent_concepts[0].accepted && "Angenommen" || "Bewertung ausstehend"}</p>
+
+            {(!user0.userOIDStudent_concepts[0].accepted) && // if evaluation pending
                 <>
-                    <InputTextarea style={styles.inputArea} rows={5} cols={40} onChange={(e) => {inputText = e.target.value}}/><br/>
-                    <Button label="Annehmen" onClick={()=>onEvaluate(true)}/>
-                    <Button label="Ablehnen" onClick={()=>onEvaluate(false)}/>
+                    Betreuer: <Dropdown value={selectedSupervisor} options={supervisor} optionLabel="name"
+                                        placeholder="Betreuer wählen"
+                                        onChange={(e) => setSelectedSupervisor(e.value)}/><br/>
+                    <InputTextarea style={styles.inputArea} rows={5} cols={40} onChange={(e) => {
+                        inputText = e.target.value
+                    }}/><br/>
+                    <Button label="Annehmen" onClick={() => onEvaluate(true)}/>
+                    <Button label="Ablehnen" onClick={() => onEvaluate(false)}/>
                 </>
             }
-            <p>{JSON.stringify(concept, null, 2)}</p>
         </div>
     )
 }

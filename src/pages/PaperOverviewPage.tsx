@@ -42,7 +42,7 @@ function PaperOverviewPage() {
                         <p>Keine Paper vorhanden.</p>
                     )}
                     <p></p>
-                    <Button onClick={() => setShowModal(true)}>Hochladen</Button>
+                    <Button onClick={() => setShowModal(true)}>Hochladen</Button> {/* TODO if phase = 7 or if User has not uploaded a paper yet */}
                     <p></p>
                 </div>
                 <Modal isOpen={showModal} onClose={() => setShowModal(false)}><PaperUploadPage/></Modal>

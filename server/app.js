@@ -82,12 +82,14 @@ const paperRouter = require('./routes/paperRouter');
 const userRouter = require('./routes/userRouter');
 const seminarRouter = require('./routes/seminarRouter');
 const attachmentRouter = require('./routes/attachmentRouter');
+const chatRouter = require('./routes/chatmessageRouter');
 
 app.use('/api/concepts', conceptRouter);
 app.use('/api/paper', paperRouter);
 app.use('/api/user', userRouter);
 app.use('/api/seminar', seminarRouter);
 app.use('/api/attachment', attachmentRouter);
+app.use('/api/chat', chatRouter);
 
 /*
 app.use(function (req, res, next) {

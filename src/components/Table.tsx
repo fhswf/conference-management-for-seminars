@@ -12,15 +12,15 @@ interface RowData {
 
 
 interface Props {
-    header: HeaderData[];
-    data: RowData[];
+    header: HeaderData[] | undefined;
+    data: RowData[] | undefined;
 }
 
 function Table({header, data}: Props) {
     return (
         <div className="card">
             <DataTable value={data} showGridlines tableStyle={{ minWidth: '50rem' }}>
-                {header.map((h) => {
+                {header && header.map((h) => {
                     return <Column field={h.field} header={h.header}></Column>
                 })}
             </DataTable>

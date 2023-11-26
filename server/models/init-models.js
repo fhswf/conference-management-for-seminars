@@ -41,6 +41,8 @@ function initModels(sequelize) {
   roleassignment.belongsTo(paper, { as: "phase7paperO", foreignKey: "phase7paperOID"});
   paper.hasMany(roleassignment, { as: "phase7paperO_roleassignments", foreignKey: "phase7paperOID"});
   chatmessage.belongsTo(review, { as: "reviewO", foreignKey: "reviewOID"});
+  chatmessage.belongsTo(user, { as: "sender_user", foreignKey: "sender"});
+  chatmessage.belongsTo(user, { as: "receiver_user", foreignKey: "receiver"});
   review.hasMany(chatmessage, { as: "chatmessages", foreignKey: "reviewOID"});
   roleassignment.belongsTo(roles, { as: "roleO", foreignKey: "roleOID"});
   roles.hasMany(roleassignment, { as: "roleassignments", foreignKey: "roleOID"});

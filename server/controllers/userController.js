@@ -40,7 +40,7 @@ const getSupervisorList = async (req, res) => {
                 },
                 attributes: [],
             }],
-            attributes: ["userOID", "firstname", "lastname"],
+            attributes: ["userOID", "firstName", "lastName"],
         });
         res.status(200).json(supervisors);
     } catch (error) {

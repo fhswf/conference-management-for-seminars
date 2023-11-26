@@ -8,7 +8,7 @@ import useFetch from "../hooks/useFetch.ts";
 interface Props {
     seminarOID: number;
     seminarname: string;
-    onClose: () => void;
+    onClose?: () => void;
 }
 
 function AssignUserPage({seminarOID, seminarname, onClose}: Props) {
