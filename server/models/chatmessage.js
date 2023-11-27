@@ -28,21 +28,21 @@ module.exports = function(sequelize, DataTypes) {
       }
     },
     sender: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: 'user',
-            key: 'userOID'
-        }
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'user',
+        key: 'userOID'
+      }
     },
     receiver: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: 'user',
-            key: 'userOID'
-        }
-    },
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'user',
+        key: 'userOID'
+      }
+    }
   }, {
     sequelize,
     tableName: 'chatmessage',
@@ -68,6 +68,20 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "reviewOID" },
+        ]
+      },
+      {
+        name: "sender",
+        using: "BTREE",
+        fields: [
+          { name: "sender" },
+        ]
+      },
+      {
+        name: "receiver",
+        using: "BTREE",
+        fields: [
+          { name: "receiver" },
         ]
       },
     ]

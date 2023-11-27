@@ -71,7 +71,7 @@ const getUserList = async (req, res) => {
                         include: [{
                             model: Concept,
                             as: "userOIDStudent_concepts",
-                            attributes: ["conceptOID", "accepted", "userOIDSupervisor", "text"],
+                            attributes: ["conceptOID", "accepted", "userOIDSupervisor", "text", "attachmentOID"],
                             include: [{
                                 model: User,
                                 as: "userOIDSupervisor_user",

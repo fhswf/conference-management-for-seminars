@@ -41,8 +41,6 @@ function initModels(sequelize) {
   roleassignment.belongsTo(paper, { as: "phase7paperO", foreignKey: "phase7paperOID"});
   paper.hasMany(roleassignment, { as: "phase7paperO_roleassignments", foreignKey: "phase7paperOID"});
   chatmessage.belongsTo(review, { as: "reviewO", foreignKey: "reviewOID"});
-  chatmessage.belongsTo(user, { as: "sender_user", foreignKey: "sender"});
-  chatmessage.belongsTo(user, { as: "receiver_user", foreignKey: "receiver"});
   review.hasMany(chatmessage, { as: "chatmessages", foreignKey: "reviewOID"});
   roleassignment.belongsTo(roles, { as: "roleO", foreignKey: "roleOID"});
   roles.hasMany(roleassignment, { as: "roleassignments", foreignKey: "roleOID"});
@@ -52,6 +50,10 @@ function initModels(sequelize) {
   seminar.hasMany(paper, { as: "papers", foreignKey: "seminarOID"});
   roleassignment.belongsTo(seminar, { as: "seminarO", foreignKey: "seminarOID"});
   seminar.hasMany(roleassignment, { as: "roleassignments", foreignKey: "seminarOID"});
+  chatmessage.belongsTo(user, { as: "sender_user", foreignKey: "sender"});
+  user.hasMany(chatmessage, { as: "chatmessages", foreignKey: "sender"});
+  chatmessage.belongsTo(user, { as: "receiver_user", foreignKey: "receiver"});
+  user.hasMany(chatmessage, { as: "receiver_chatmessages", foreignKey: "receiver"});
   concept.belongsTo(user, { as: "userOIDSupervisor_user", foreignKey: "userOIDSupervisor"});
   user.hasMany(concept, { as: "concepts", foreignKey: "userOIDSupervisor"});
   concept.belongsTo(user, { as: "userOIDStudent_user", foreignKey: "userOIDStudent"});

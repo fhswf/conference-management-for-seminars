@@ -57,8 +57,24 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "seminarOID" },
           { name: "userOID" },
+          { name: "seminarOID" },
+        ]
+      },
+      {
+        name: "roleassignment_userOID_seminarOID_unique",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "userOID" },
+          { name: "seminarOID" },
+        ]
+      },
+      {
+        name: "seminarOID",
+        using: "BTREE",
+        fields: [
+          { name: "seminarOID" },
         ]
       },
       {
