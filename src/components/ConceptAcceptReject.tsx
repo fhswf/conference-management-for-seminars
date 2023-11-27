@@ -113,7 +113,7 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose}: Props) {
             <p>Anhang: {user0.userOIDStudent_concepts[0].attachmentO ? <a
                 href={`http://${import.meta.env.VITE_BACKEND_URL}/api/attachment/${user0.userOIDStudent_concepts[0].attachmentO.attachmentOID}`}>{user0.userOIDStudent_concepts[0].attachmentO.filename}</a> : "-"}
             </p>
-            <p>Status: {user0.userOIDStudent_concepts[0].accepted && "Angenommen" || "Bewertung ausstehend"}</p>
+            <p>Status: {user0.userOIDStudent_concepts[0].accepted === null ? "Bewertung ausstehend" : user0.userOIDStudent_concepts[0].accepted ? "Angenommen" : "Abgelehnt"}</p>
 
             {(!user0.userOIDStudent_concepts[0].accepted) && // if evaluation pending
                 <>

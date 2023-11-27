@@ -35,6 +35,11 @@ function HomePage() {
 
         //send data to backend
         const seminarName = e.currentTarget.seminarName.value;
+
+        if(!seminarName) {
+            return
+        }
+
         const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/seminar`, {
             method: "POST",
             credentials: 'include',
@@ -67,7 +72,7 @@ function HomePage() {
         btnSeminarDetails: //(seminar.roleassignments[0].roleOID === 1) ?
             <Button onClick={() => {
             navigate(`/seminar-details/${seminar.seminarOID}`)
-        }}>Verwalten</Button>
+        }}>Verwalten</Button> /* TODO check if user is Admin */
             //: null
     }));
     /*const tableData = [

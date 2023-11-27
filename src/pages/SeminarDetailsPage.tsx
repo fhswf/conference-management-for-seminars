@@ -108,7 +108,7 @@ function SeminarDetailsPage() {
         comment: user.userO.comment || "-",
         role: user.roleOID,
         supervisor: user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.firstName + " " + user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.lastName || '-',
-        concept: user.userO.userOIDStudent_concepts[0]?.accepted === null ? 'Bewertung ausstehend' : user.userO.userOIDStudent_concepts[0]?.accepted === false ? 'Abgelehnt' : 'Angenommen',
+        concept: user.userO.userOIDStudent_concepts[0]?.accepted === null ? 'Bewertung ausstehend' : user.userO.userOIDStudent_concepts[0]?.accepted ? 'Angenommen' : 'Abgelehnt',
         btnEdit: <Button onClick={() => {
             setIsEditMode(user.userOID)
             //set data

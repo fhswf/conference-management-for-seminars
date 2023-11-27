@@ -20,8 +20,8 @@ function Table({header, data}: Props) {
     return (
         <div className="card">
             <DataTable value={data} showGridlines tableStyle={{ minWidth: '50rem' }}>
-                {header && header.map((h) => {
-                    return <Column field={h.field} header={h.header}></Column>
+                {header && header.map((h, index) => {
+                    return <Column field={h.field} header={h.header} key={index}></Column>
                 })}
             </DataTable>
         </div>
