@@ -1,6 +1,7 @@
 import {FormEvent, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import styles from './LoginPage.module.css';
+import {Button} from "primereact/button";
 
 //import 'bootstrap/dist/css/bootstrap.css'
 
@@ -38,24 +39,9 @@ function LoginPage() {
     return (
         <div className={styles.loginform}>
             <h1>Login</h1>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Benutzername:</label>
-                    <input disabled={isSubmitting} type="text" value={username}
-                           onChange={(event) => setUsername(event.target.value)}/>
-                </div>
-                <div>
-                    <label>Passwort:</label>
-                    <input disabled={isSubmitting} type="password" value={password}
-                           onChange={(event) => setPassword(event.target.value)}/>
-                </div>
-                <button type="submit">Einloggen</button>
-            </form>
-            {isSubmitting &&
-                <div className="spinner-border" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </div>
-            }
+            <Button label="Einloggen mit Keycloak" onClick={() => {
+                window.location.href = `http://${import.meta.env.VITE_BACKEND_URL}/login`;
+            }}/>
         </div>
     );
 }

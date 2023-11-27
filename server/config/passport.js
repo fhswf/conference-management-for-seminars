@@ -25,7 +25,7 @@ async function addOrUpdateUser(lti, t) {
             mail: lti.lis_person_contact_email_primary,
             comment: null,
             isAdmin: false,
-        }, {transaction: t});
+        }, {transaction: t}); // TODO remove comment
 
         // Create LtiUser
         ltiUser = await LtiUser.create({
@@ -135,7 +135,7 @@ const ltiVerifyCallback = async (username, lti, done) => {
             seminar = await addSeminar(lti, t);
         }
 
-        await addRoleAssignment(lti, user, seminar, t);
+        await addRoleAssignment(lti, user, seminar, t); // TODO only if phase 1 ?
 
         var userJson = {
             id: user.userOID,

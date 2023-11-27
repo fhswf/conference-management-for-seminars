@@ -88,7 +88,7 @@ function HomePage() {
                     <form onSubmit={(e: FormEvent<HTMLFormElement>) => onCreateSeminar(e)}>
                         <label htmlFor="seminarName">Seminarname:</label>
                         <InputText id="seminarName" name="seminarName" placeholder="name"/>
-                        <Button label="Seminar erstellen" type="submit"/>
+                        <Button label="Seminar erstellen" type="submit"/> {/* TODO check if user is Admin */}
                     </form>
                 </div>
                 <Button onClick={async () => {

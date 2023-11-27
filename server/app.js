@@ -132,8 +132,14 @@ app.get('/error-login', function (req, res) {
     res.status(401).send('Error during OIDC Login');
 });
 
-app.get('/api/authstatus', isAuthenticated, (req, res) => {
-    res.json({isAuthenticated: req.isAuthenticated(), user: req.user});
+app.get('/api/authstatus', (req, res) => {
+    console.log("APP CHCECK AUTH");
+    if (req.isAuthenticated()) {
+        return res.status(200).json({
+            user: req.user
+        });
+    }
+    return res.status(401).json({msg: "Not authenticated"});
 });
 
 app.get('/', (req, res) => {
@@ -145,9 +151,9 @@ app.get('/api/logout', (req, res) => {
     console.log("");
 
     let redirectUrl;
-    if(req.user.authType === "lti") {
+    if (req.user.authtype === "lti") {
         redirectUrl = req.user.lti?.launch_presentation_return_url;
-    }else if(req.user.authType === "oidc") {
+    } else if (req.user.authtype === "oidc") {
         redirectUrl = process.env.ENDSESSION_ENDPOINT;
     }
     req.logout(() => {

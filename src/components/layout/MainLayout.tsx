@@ -1,13 +1,16 @@
 import {Menubar} from "primereact/menubar";
 import {useNavigate} from "react-router-dom";
 import {PrimeIcons} from "primereact/api";
+import React, {ReactNode, useContext} from "react";
+import {AuthContext} from "../../context/AuthContext.ts";
 
 interface Props {
-    children: React.ReactNode;
+    children: ReactNode;
 }
 
 function MainLayout({children}: Props) {
     const navigate = useNavigate();
+    const { user, setUser } = useContext(AuthContext);
 
     const items = [
         {label: 'Startseite', icon: PrimeIcons.HOME, command: () => {navigate("/")}},
@@ -20,6 +23,7 @@ function MainLayout({children}: Props) {
                     }).then(response => response.json())
                         .then((data) => {
                             if (data.url) {
+                                setUser(null);
                                 window.location.replace(data.url);
                             }
                         })
@@ -28,6 +32,8 @@ function MainLayout({children}: Props) {
                         });
                 }
             }},
+        {label: `${user?.firstName} ${user?.lastName}` },
+        {label: `delete`, command: () => {setUser(null)}},
     ];
 
     const start = <img alt="logo" src="https://www.fh-swf.de/media/_tech__fhswf/layout__fhswf/images__fhswf/Logo.png" height="40" className="mr-2"></img>;

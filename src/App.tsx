@@ -2,56 +2,76 @@ import './index.css'
 
 import {PrimeReactProvider} from 'primereact/api';
 
-import {
-    createBrowserRouter,
-    RouterProvider,
-} from "react-router-dom";
+import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
 import LoginPage from "./pages/LoginPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import SeminarDetailsPage from "./pages/SeminarDetailsPage.tsx";
 import SeminarPage from "./pages/SeminarPage.tsx";
 import ConceptUploadPage from "./pages/ConceptUploadPage.tsx";
-import PaperOverviewPage from "./pages/PaperOverviewPage.tsx";
 
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
+import React, {useEffect, useState} from "react";
+import PaperUploadPage from "./pages/PaperUploadPage.tsx";
+import CurrentUser from "./entities/CurrentUser";
+import {AuthContext} from "./context/AuthContext.ts";
 
-const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <HomePage/>,
-    },
-    {
-        path: "/login",
-        element: <LoginPage/>,
-    },
-    {
-        path: "/seminar-details/:id",
-        element: <SeminarDetailsPage/>,
-    },
-    {
-        path: "/seminar/:id",
-        element: <SeminarPage/>,
-    },
-    {
-        path: "/concept-upload",
-        element: <ConceptUploadPage/>,
-    },
-    {
-        path: "/paper-upload",
-        element: <PaperOverviewPage/>,
-    },
-]);
 
 function App() {
+    //const [user, setUser] = useState(null);
+    const [isLoading, setIsLoading] = useState(true)
+    const [user, setUser] = useState<CurrentUser | null>(null);
+
+    // TODO replace with useFetch
+    useEffect(() => {
+        const getUser = () => {
+            console.log("fetching user");
+            fetch("http://192.168.0.206:3000/api/authstatus", {
+                method: "GET",
+                credentials: "include",
+            })
+                .then((response) => {
+                    if (response.status === 200) return response.json();
+                    throw new Error("authentication has been failed!");
+                })
+                .then((resObject) => {
+                    console.log(resObject.user)
+                    setUser(resObject.user);
+                    setIsLoading(false);
+                })
+                .catch((err) => {
+                    console.log(err);
+                    setIsLoading(false);
+                });
+        };
+        getUser();
+    }, []);
+
+    if (isLoading) {
+        return null;
+    }
+
     return (
-        <>
-            <PrimeReactProvider>
-                <RouterProvider router={router}/>
-            </PrimeReactProvider>
-        </>
+        <PrimeReactProvider>
+            <AuthContext.Provider value={{ user, setUser }}>
+                <BrowserRouter>
+                    <div>
+                        <Routes>
+                            <Route path="/login" element={user ? <Navigate to="/"/> : <LoginPage/>}/>
+                            <Route path="/" element={user ? <HomePage/> : <Navigate to="/login"/>}/>
+                            <Route path="/seminar-details/:id"
+                                   element={user ? <SeminarDetailsPage/> : <Navigate to="/login"/>}/>
+                            <Route path="/seminar/:id" element={user ? <SeminarPage/> : <Navigate to="/login"/>}/>
+                            <Route path="/concept-upload"
+                                   element={user ? <ConceptUploadPage/> : <Navigate to="/login"/>}/>
+                            <Route path="/paper-upload" element={user ? <PaperUploadPage/> : <Navigate to="/login"/>}/>
+                        </Routes>
+                    </div>
+                </BrowserRouter>
+            </AuthContext.Provider>
+        </PrimeReactProvider>
     )
 }
 
