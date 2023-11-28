@@ -92,12 +92,12 @@ const attachmentRouter = require('./routes/attachmentRouter');
 const chatRouter = require('./routes/chatmessageRouter');
 
 
-app.use('/api/concepts', isAuthenticated, conceptRouter);
-app.use('/api/paper', isAuthenticated, paperRouter);
-app.use('/api/user', isAuthenticated, userRouter);
-app.use('/api/seminar', isAuthenticated, seminarRouter);
-app.use('/api/attachment', isAuthenticated, attachmentRouter);
-app.use('/api/chat', isAuthenticated, chatRouter);
+app.use('/conference/api/concepts', isAuthenticated, conceptRouter);
+app.use('/conference/api/paper', isAuthenticated, paperRouter);
+app.use('/conference/api/user', isAuthenticated, userRouter);
+app.use('/conference/api/seminar', isAuthenticated, seminarRouter);
+app.use('/conference/api/attachment', isAuthenticated, attachmentRouter);
+app.use('/conference/api/chat', isAuthenticated, chatRouter);
 
 /*
 app.use(function (req, res, next) {
@@ -110,7 +110,7 @@ app.use(function (req, res, next) {
 } );
  */
 
-app.post('/lti/launch', passport.authenticate('lti', {
+app.post('/conference/lti/launch', passport.authenticate('lti', {
     failureRedirect: '/error',
     successRedirect: '/success',
     session: true
@@ -127,22 +127,22 @@ app.get('/login/callback', passport.authenticate('openidconnect', {failureRedire
 );
  */
 
-app.get('/success', function (req, res) {
+app.get('/conference/success', function (req, res) {
     console.log(req.user);
     console.log(req.session);
-    res.redirect('http://192.168.0.206:5173/');
+    res.redirect('http://' + process.env.FRONTEND_URL);
 });
 
-app.get('/error', function (req, res) {
+app.get('/conference/error', function (req, res) {
     console.log('Error during LTI launch.');
     res.status(401).send('Error during LTI launch.');
 });
-app.get('/error-login', function (req, res) {
+app.get('/conference/error-login', function (req, res) {
     console.log('Error during Login');
     res.status(401).send('Error during OIDC Login');
 });
 
-app.get('/api/authstatus', (req, res) => {
+app.get('/conference/api/authstatus', (req, res) => {
     console.log("APP CHCECK AUTH");
     if (req.isAuthenticated()) {
         return res.status(200).json({
@@ -152,12 +152,12 @@ app.get('/api/authstatus', (req, res) => {
     return res.status(401).json({msg: "Not authenticated"});
 });
 
-app.get('/', (req, res) => {
+app.get('/conference/api', (req, res) => {
     res.send('Hello World!');
 });
 
 //logout
-app.get('/api/logout', isAuthenticated, (req, res) => {
+app.get('/conference/api/logout', isAuthenticated, (req, res) => {
     console.log("");
 
     let redirectUrl;

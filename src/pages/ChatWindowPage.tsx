@@ -13,7 +13,7 @@ function ChatWindowPage(){
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [messages, setMessages] = useState<Message[]>([])
     const [text, setText] = useState<string>("")
-    const {data: messages2} = useFetch<Message[]>("http://192.168.0.206:3000/api/chat/1") // TODO replace
+    const {data: messages2} = useFetch<Message[]>(`https://${import.meta.env.VITE_BACKEND_URL}/chat/1`) // TODO replace
 
     useEffect(() => {
         setMessages(messages2 || [])
@@ -39,7 +39,7 @@ function ChatWindowPage(){
         formData.append('paperOID', 1); // TODO
         formData.append('reviewOID', 1); // TODO replace with review id
 
-        const response = await fetch("http://192.168.0.206:3000/api/chat", {
+        const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/chat`, {
             method: "POST",
             credentials: "include",
             body: formData

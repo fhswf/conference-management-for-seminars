@@ -41,7 +41,7 @@ function ConceptUploadPage() {
         console.log(formData);
 
         try {
-            const res = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts`, {
+            const res = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/concepts`, {
                 method: 'POST',
                 credentials: 'include',
                 body: formData,
@@ -69,7 +69,7 @@ function ConceptUploadPage() {
         const fetchData = async () => {
             try {
                 // TODO replace with LTI data
-                const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/user/get-supervisor-list/1`,{
+                const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/user/get-supervisor-list/1`,{
                     method: 'GET',
                     credentials: 'include'
                 });

@@ -1,6 +1,6 @@
 import {Menubar} from "primereact/menubar";
 import {useNavigate} from "react-router-dom";
-import {PrimeIcons} from "primereact/api";
+import {PrimeIcons} from "primereact";
 import React, {ReactNode, useContext} from "react";
 import {AuthContext} from "../../context/AuthContext.ts";
 
@@ -17,7 +17,7 @@ function MainLayout({children}: Props) {
         {label: 'Abmelden', icon: PrimeIcons.SIGN_OUT, command: () => {
                 const leave = window.confirm("Wollen Sie sich wirklich abmelden?");
                 if (leave) {
-                    fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/logout`, {
+                    fetch(`https://${import.meta.env.VITE_BACKEND_URL}/logout`, {
                         method: 'GET',
                         credentials: 'include',
                     }).then(response => response.json())

@@ -21,7 +21,7 @@ type AssignedSeminar = {
 function HomePage() {
     const navigate = useNavigate();
     const { user, setUser } = useContext(AuthContext);
-    const {data: assignedSeminars} = useFetch<AssignedSeminar[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-assigned-seminars`);
+    const {data: assignedSeminars} = useFetch<AssignedSeminar[]>(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/get-assigned-seminars`);
     const header = [
         {field: "name", header: "Bezeichnung"},
         {field: "role", header: "Ihre Rolle"},
@@ -42,7 +42,7 @@ function HomePage() {
             return
         }
 
-        const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/seminar`, {
+        const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/seminar`, {
             method: "POST",
             credentials: 'include',
             headers: {
@@ -99,7 +99,7 @@ function HomePage() {
                     </form>
                 </div>
                 <Button onClick={async () => {
-                    const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/authstatus`, {
+                    const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/authstatus`, {
                         method: "GET",
                         credentials: 'include',
                     });

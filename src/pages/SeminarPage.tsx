@@ -49,10 +49,10 @@ function SeminarPage() {
     const [showCommentsOwnPaper, setShowCommentsOwnPaper] = useState(false);
     //const [showCommentsStrangerPaper, setShowCommentsStrangerPaper] = useState(false);
     const [showChat, setShowChat] = useState(false);
-    const {data: seminar} = useFetch<Seminar>(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-seminar/${seminarOID}`, );
+    const {data: seminar} = useFetch<Seminar>(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminar/${seminarOID}`, );
     // TODO only fetch if phase >= 2 and phase >= 5
-    const {data: concept, loading: loadingConcept, error: errorConcept} = useFetch<Concept>(`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts/newest/${seminarOID}`);
-    const {data: assignedPaper,loading: loadingPaper, error: errorPaper} = useFetch<Paper[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-assigned-paper/${seminarOID}`);
+    const {data: concept, loading: loadingConcept, error: errorConcept} = useFetch<Concept>(`https://${import.meta.env.VITE_BACKEND_URL}/concepts/newest/${seminarOID}`);
+    const {data: assignedPaper,loading: loadingPaper, error: errorPaper} = useFetch<Paper[]>(`https://${import.meta.env.VITE_BACKEND_URL}/paper/get-assigned-paper/${seminarOID}`);
 
     //const [concept, setConcept] = useState<Concept | null>(null)
     //const [assignedPaper, setAssignedPaper] = useState<Paper[] | null>(null)
@@ -86,7 +86,7 @@ function SeminarPage() {
                         {/**/}
                         <div>
                             {(concept?.attachmentO?.filename) ? //if filename exists pdf exists
-                                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/attachment/${concept.attachmentOID}`}>{concept.attachmentO.filename}</a> :
+                                <a href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${concept.attachmentOID}`}>{concept.attachmentO.filename}</a> :
                                 <p>-</p>
                             }
                         </div>
@@ -121,7 +121,7 @@ function SeminarPage() {
                     {assignedPaper && assignedPaper.length > 0 && assignedPaper.map((paper: Paper, index: number) => {
                         return (
                             <Fragment key={index}>
-                                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/attachment/${paper.paperOID}`}>{paper.attachmentO.filename}</a>
+                                <a href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.paperOID}`}>{paper.attachmentO.filename}</a>
                                 <Button onClick={() => setShowChat(true)}>Kommentieren</Button>
                             </Fragment>
                         )

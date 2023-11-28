@@ -2,30 +2,74 @@ version: '3.1'
 
 services:
   dbserver:
+    container_name: conference-db
     image: mariadb
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: example
-      MYSQL_DATABASE: konferenz-management
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    networks:
+      - nginx-proxy_default
 
   phpmyadmin:
+    container_name: conference-phpmyadmin
     image: phpmyadmin
     restart: always
     ports:
-      - 8080:80
+      - "127.0.0.1:1234:80"
     environment:
       - PMA_ARBITRARY=1
 
   express-server:
+    container_name: conference-api
     build: ./server
     restart: always
-    ports:
-      - 3000:3000
     depends_on:
       - dbserver
+    environment:
+      - EXPRESS_IP=${EXPRESS_IP}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - FRONTEND_PORT=${FRONTEND_PORT}
+      - EXPRESS_PORT_HTTP=${EXPRESS_PORT_HTTP}
+      - DB_TYPE=${DB_TYPE}
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=${DB_PORT}
+      - CONSUMER_KEY=${CONSUMER_KEY}
+      - CONSUMER_SECRET=${CONSUMER_SECRET}
+      - FRONTEND_IP=${FRONTEND_IP}
+      - #OIDC
+      - CLIENT_ID=${CLIENT_ID}
+      - CLIENT_SECRET=${CLIENT_SECRET}
+      - ISSUER=${ISSUER}
+      - AUTHORIZATION_URL=${AUTHORIZATION_URL}
+      - TOKEN_URL=${TOKEN_URL}
+      - USERINFO_URL=${USERINFO_URL}
+      - CALLBACK_URL=${CALLBACK_URL}
+      - INTROSPECT_URL=${INTROSPECT_URL}
+      - ENDSESSION_ENDPOINT=${ENDSESSION_ENDPOINT}
+      - KEYCLOAK_PUBLIC_KEY=${KEYCLOAK_PUBLIC_KEY}
+    #ports:
+    #  - "127.0.0.1:11000:11000"
+    networks:
+      - nginx-proxy_default
+    volumes:
+      - ./server/certificates:/usr/src/app/certificates
 
   frontend:
+    container_name: conference-frontend
     build: .
     restart: always
-    ports:
-      - 1234:80
+    environment:
+      - VITE_BACKEND_URL=${VITE_BACKEND_URL}
+    #ports:
+    #  - "127.0.0.1:11001:11001"
+    networks:
+      - nginx-proxy_default
+
+networks:
+  nginx-proxy_default:
+    external: true
+

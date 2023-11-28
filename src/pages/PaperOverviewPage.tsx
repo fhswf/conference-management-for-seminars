@@ -33,8 +33,8 @@ function PaperOverviewPage() {
     const [showModal, setShowModal] = useState(false);
     const [showChat, setShowChat] = useState(false);
     //const [uploadedPaper, setUploadedPaper] = useState<AssignedPaper[] | null>(null)
-    const {data: uploadedPaper} = useFetch<Paper[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-uploaded-paper/${seminarOID}`);
-    const {data: seminar} = useFetch<Seminar>(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-seminar/${seminarOID}`);
+    const {data: uploadedPaper} = useFetch<Paper[]>(`https://${import.meta.env.VITE_BACKEND_URL}/paper/get-uploaded-paper/${seminarOID}`);
+    const {data: seminar} = useFetch<Seminar>(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminar/${seminarOID}`);
 
     return (
         <div>
@@ -49,7 +49,7 @@ function PaperOverviewPage() {
                     {uploadedPaper && uploadedPaper.length > 0 ? (
                         uploadedPaper.map((paper: Paper, index: number) => (
                             <Fragment key={index}>
-                                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
+                                <a href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
                                 <p>JA</p>
                                 <Button onClick={() => setShowChat(true)}>Kommentare</Button>
                             </Fragment>
