@@ -57,10 +57,8 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-        //erstmal auskommentiert wegen Keycloak Login
-        //secure: false,
-        //sameSite: true,
-
+        secure: false,
+        sameSite: true,
         //secure: true,
         //sameSite: 'none',
     }
@@ -180,16 +178,13 @@ app.get('/api/logout', isAuthenticated, (req, res) => {
 
 try {
     const https = require('https');
-
-    const key = fs.readFileSync(__dirname + '/../../certs/selfsigned.key');
-    const cert = fs.readFileSync(__dirname + '/../../certs/selfsigned.crt');
+    const key = fs.readFileSync('./certificates/key.pem', 'utf8');
+    const cert = fs.readFileSync('./certificates/cert.pem', 'utf8');
     const optionsHttps = {
         key: key,
         cert: cert
     };
-
     const serverHttps = https.createServer(optionsHttps, app);
-
     serverHttps.listen(PORT_HTTPS, () => {
         console.log('App listening at https://localhost:' + PORT_HTTPS);
     });
