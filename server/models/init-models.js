@@ -2,6 +2,7 @@ var DataTypes = require("sequelize").DataTypes;
 var _attachment = require("./attachment");
 var _chatmessage = require("./chatmessage");
 var _concept = require("./concept");
+var _contexttoseminar = require("./contexttoseminar");
 var _ltiuser = require("./ltiuser");
 var _mailqueue = require("./mailqueue");
 var _oidcuser = require("./oidcuser");
@@ -16,6 +17,7 @@ function initModels(sequelize) {
   var attachment = _attachment(sequelize, DataTypes);
   var chatmessage = _chatmessage(sequelize, DataTypes);
   var concept = _concept(sequelize, DataTypes);
+  var contexttoseminar = _contexttoseminar(sequelize, DataTypes);
   var ltiuser = _ltiuser(sequelize, DataTypes);
   var mailqueue = _mailqueue(sequelize, DataTypes);
   var oidcuser = _oidcuser(sequelize, DataTypes);
@@ -46,6 +48,8 @@ function initModels(sequelize) {
   roles.hasMany(roleassignment, { as: "roleassignments", foreignKey: "roleOID"});
   concept.belongsTo(seminar, { as: "seminarO", foreignKey: "seminarOID"});
   seminar.hasMany(concept, { as: "concepts", foreignKey: "seminarOID"});
+  contexttoseminar.belongsTo(seminar, { as: "seminarO", foreignKey: "seminarOID"});
+  seminar.hasMany(contexttoseminar, { as: "contexttoseminars", foreignKey: "seminarOID"});
   paper.belongsTo(seminar, { as: "seminarO", foreignKey: "seminarOID"});
   seminar.hasMany(paper, { as: "papers", foreignKey: "seminarOID"});
   roleassignment.belongsTo(seminar, { as: "seminarO", foreignKey: "seminarOID"});
@@ -73,6 +77,7 @@ function initModels(sequelize) {
     attachment,
     chatmessage,
     concept,
+    contexttoseminar,
     ltiuser,
     mailqueue,
     oidcuser,

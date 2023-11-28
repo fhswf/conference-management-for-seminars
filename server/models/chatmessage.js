@@ -57,20 +57,6 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
       {
-        name: "reviewerChat1",
-        using: "BTREE",
-        fields: [
-          { name: "attachmentOID" },
-        ]
-      },
-      {
-        name: "chatmessage2",
-        using: "BTREE",
-        fields: [
-          { name: "reviewOID" },
-        ]
-      },
-      {
         name: "sender",
         using: "BTREE",
         fields: [
@@ -82,6 +68,20 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "receiver" },
+        ]
+      },
+      {
+        name: "reviewerChat1",
+        using: "BTREE",
+        fields: [
+          { name: "attachmentOID" },
+        ]
+      },
+      {
+        name: "chatmessage2",
+        using: "BTREE",
+        fields: [
+          { name: "reviewOID" },
         ]
       },
     ]

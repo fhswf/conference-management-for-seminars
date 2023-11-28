@@ -9,11 +9,13 @@ const RoleAssignment = db.roleassignment;
 const Seminar = db.seminar;
 const OidcUser = db.oidcuser;
 const LtiUser = db.ltiuser
+const ContextToSeminar = db.contexttoseminar;
 
 async function addOrUpdateUser(lti, t) {
     let ltiUser = await LtiUser.findOne({
         where: {
-            LtiUserOID: lti.user_id
+            LtiUserOID: lti.user_id,
+            consumerURL: lti.tool_consumer_instance_guid
         }
     });
 
@@ -60,25 +62,43 @@ async function addOrUpdateUser(lti, t) {
 
 async function addSeminar(lti, t) {
     const key = crypto.randomUUID()
-    const [seminar, created] = await Seminar.findOrCreate({
+
+    const map = await ContextToSeminar.findOne({
         where: {
-            seminarOID: lti.context_id
-        },
-        defaults: {
-            seminarOID: lti.context_id,     // TODO bei mehreren Tool Consumern kann es zu Konflikten kommen
+            LtiContextId: lti.context_id,
+            consumerURL: lti.tool_consumer_instance_guid
+        }
+    });
+
+    if(!map){
+        //1. erstelle seminar
+        const seminar = await Seminar.create({
             description: lti.context_title,
             phase: 1,
             assignmentkey: key
-        },
-        transaction: t
+        } , {transaction: t});
+
+        //2. erstelle mapping
+        const mapping = await ContextToSeminar.create({
+            LtiContextId: lti.context_id,
+            consumerURL: lti.tool_consumer_instance_guid,
+            seminarOID: seminar.seminarOID
+        }, {transaction: t});
+
+        return seminar;
+    }
+
+    const seminar = await Seminar.findOne({
+        where: {
+            seminarOID: map.seminarOID
+        }
     });
 
     // TODO delete
-    //if (!created) {
-    //    seminar.description = lti.context_title;
-    //    //seminar.phase = 1;
-    //    await seminar.save({transaction: t});
-    //}
+    // seminar.description = lti.context_title;
+    // //seminar.phase = 1;
+    // await seminar.save({transaction: t});
+
     return seminar;
 }
 
