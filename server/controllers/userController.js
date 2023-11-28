@@ -62,6 +62,7 @@ const getAddableUsers = async (req, res) => {
                 model: OidcUser,
                 as: 'oidcusers',
                 attributes: [],
+                required: true
             }],
             attributes: ["userOID", "firstname", "lastname", "mail", "comment"],
         });

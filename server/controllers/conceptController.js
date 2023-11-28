@@ -11,10 +11,12 @@ const Attachment = db.attachment;
 const getNewestConcept = async (req, res) => {
     // TODO ggf anpassen
     try {
+        const seminarOID = req.params.seminarOID;
+        const userOID = req.user.userOID;
         const concept = await Concept.findOne({
             where: {
-                userOIDStudent: 11, // TODO req.user.userOID
-                seminarOID: 2 // TODO req.user.lti.context_id
+                userOIDStudent: userOID,
+                seminarOID: seminarOID
             },
             include: [{
                 model: Attachment,
@@ -26,9 +28,11 @@ const getNewestConcept = async (req, res) => {
                     as: 'userOIDSupervisor_user',
                     attributes: ["userOID", "firstname", "lastname"]
                 }],
+            order: [['createdAt', 'DESC']], //Das neueste Concept
+            limit: 1
         });
         if(!concept) {
-            return res.status(404).json({ error: 'Not Found' });
+            return res.status(200).json({})
         }
         return res.status(200).json(concept);
     } catch (error) {
@@ -41,6 +45,7 @@ const uploadConcept = async (req, res) => {
     // TODO move
     const t = await db.sequelize.transaction();
     try {
+        const userOID = req.user.userOID;
         const seminarOID = req.body.seminarOID
         const text = req.body.text || null;
 
@@ -49,11 +54,11 @@ const uploadConcept = async (req, res) => {
 
         await Concept.create({
             text: text,
-            userOIDSupervisor: null,
-            userOIDStudent: 11, // TODO req.user.userOID
+            userOIDSupervisor: supervisorOID,
+            userOIDStudent: userOID,
             feedback: null,
             seminarOID: seminarOID,
-            accepted: null, // TODO ersetzen
+            accepted: null,
             attachmentOID: attachment?.attachmentOID,
         }, {transaction: t});
 

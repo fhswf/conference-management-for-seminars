@@ -18,6 +18,8 @@ function ConceptUploadPage() {
         {name: "Betreuer C"},
     ];
 
+    // TODO check if user is allowed to upload concept: if last one was rejected or if no concept was uploaded yet
+
     async function onSubmit(event: any) {
         event.preventDefault();
 

@@ -1,7 +1,7 @@
 import Modal from "../components/Modal.tsx";
 import styles from "./SeminarPage.module.css"
-import {useNavigate} from "react-router-dom";
-import {Fragment, useState} from "react";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
+import {Fragment, useEffect, useState} from "react";
 import ChatWindowPage from "./ChatWindowPage.tsx";
 import MainLayout from "../components/layout/MainLayout.tsx";
 import {Button} from "primereact/button";
@@ -15,7 +15,7 @@ type RoleAssignment = {
 
 type Seminar = {
     description: string;
-    phase: string;
+    phase: number;
     roleassignments: RoleAssignment[];
 }
 
@@ -43,21 +43,27 @@ type Concept = {
 }
 
 function SeminarPage() {
-    const isStudent = true; // TODO replace
+    const { seminarOID } = useParams();
+    let isStudent = null; // TODO replace
     const navigate = useNavigate();
     const [showCommentsOwnPaper, setShowCommentsOwnPaper] = useState(false);
     //const [showCommentsStrangerPaper, setShowCommentsStrangerPaper] = useState(false);
     const [showChat, setShowChat] = useState(false);
-    const {data: concept} = useFetch<Concept>(`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts`);
-    const {data: seminar} = useFetch<Seminar>(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-seminar/2`, );
-    const {data: assignedPaper} = useFetch<Paper[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-assigned-paper/2`);
+    const {data: seminar} = useFetch<Seminar>(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-seminar/${seminarOID}`, );
+    // TODO only fetch if phase >= 2 and phase >= 5
+    const {data: concept, loading: loadingConcept, error: errorConcept} = useFetch<Concept>(`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts/newest/${seminarOID}`);
+    const {data: assignedPaper,loading: loadingPaper, error: errorPaper} = useFetch<Paper[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-assigned-paper/${seminarOID}`);
 
+    //const [concept, setConcept] = useState<Concept | null>(null)
+    //const [assignedPaper, setAssignedPaper] = useState<Paper[] | null>(null)
 
+    isStudent = seminar?.roleassignments && seminar?.roleassignments[0]?.roleOID === 3;
 
     return (
         <div>
             <MainLayout>
                 <div>
+                    <p>{seminarOID}</p>
                     <p>{JSON.stringify(concept)}</p>
                     <p>{JSON.stringify(seminar)}</p>
                     <p>{JSON.stringify(assignedPaper)}</p>
@@ -66,7 +72,7 @@ function SeminarPage() {
                     <p>Übersicht</p>
                     <p>Seminarname: {seminar?.description || "-"}</p>
                     <p>Phase: {seminar?.phase}</p>
-                    <p>Rolle:  {seminar?.roleassignments[0]?.roleOID}</p>
+                    <p>Rolle:  {seminar?.roleassignments && seminar?.roleassignments[0]?.roleOID}</p>
                 </div>
                 <br/>
                 {isStudent && <> <p>Konzept:</p>
@@ -91,21 +97,20 @@ function SeminarPage() {
                             }
                         </div>
                         <div>
-                                <p>{concept?.accepted || "Bewertung ausstehend"}</p>
+                                <p>{concept?.accepted === null ? "Bewertung ausstehend" : concept?.accepted ? "Angenommen" : "Abgelehnt"}</p>
                         </div>
                         <div>
-                            <Button onClick={() => {
-                                navigate("/concept-upload")
-                            }}>➡
-                            </Button>
+                            <Button onClick={() => {navigate("/concept-upload")}}
+                                    disabled={concept?.accepted === null || concept?.accepted || seminar?.phase !== 2 }
+                            >➡</Button>
                         </div>
                     </div>
                     <hr/>
                     <div className={styles.paperContainer}>
                         <p>Paper</p>
                         <Button onClick={() => {
-                            navigate("/paper-upload")
-                        }}>➡
+                            navigate(`/paper-overview/${seminarOID}`)
+                        }} disabled={seminar?.phase < 3}>➡
                         </Button>
                     </div>
                     <hr/>

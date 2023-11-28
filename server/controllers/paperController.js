@@ -10,11 +10,13 @@ const Attachment = db.attachment;
 async function uploadPaper(req, res) {
     const t = await db.sequelize.transaction();
     try {
+        const userOID = req.user.userOID;
+        const seminarOID = req.body.seminarOID;
         let attachment = await attachmentController.createAttachment(req.files?.file, t)
 
         await Paper.create({
-            seminarOID: 2, // TODO req.user.lti.context_id
-            authorOID: 11, // TODO req.user.userOID
+            seminarOID: seminarOID, // TODO req.user.lti.context_id
+            authorOID: userOID, // TODO req.user.userOID
             attachmentOID: attachment.attachmentOID
         }, {transaction: t});
 
@@ -68,7 +70,7 @@ async function getAssignedPaper(req, res) {
 
 async function getUploadedPaper(req, res) {
     try {
-        const userOID = 11; // TODO req.user.userOID
+        const userOID = req.user.userOID;
         const seminarOID = req.params.seminarOID;
         const paper = await Paper.findAll({
             where: {

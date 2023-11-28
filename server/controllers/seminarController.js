@@ -10,7 +10,7 @@ const Attachment = db.attachment;
 const getSeminar = async (req, res) => {
     try {
         //const userOID = req.user.userOID;
-        const userOID = 11; // TODO req.user.userOID
+        const userOID = req.user.userOID;
         const seminarOID = req.params.seminarOID;
         const seminar = await Seminar.findByPk(seminarOID, // TODO req.user.lti.context_id
             {
@@ -71,7 +71,7 @@ const getUserList = async (req, res) => {
                         include: [{
                             model: Concept,
                             as: "userOIDStudent_concepts",
-                            attributes: ["conceptOID", "accepted", "userOIDSupervisor", "text", "attachmentOID"],
+                            attributes: ["conceptOID", "accepted", "userOIDSupervisor", "text", "attachmentOID", "feedback"],
                             include: [{
                                 model: User,
                                 as: "userOIDSupervisor_user",
@@ -171,6 +171,7 @@ const evaluateConcept = async (req, res) => {
             {where: {conceptOID: conceptOID}}
         );
         if (concept[0] === 1) {
+            // TODO send mail to author
             return res.status(200).send({message: "Concept successfully evaluated."});
         } else {
             return res.status(500).send({message: "Error while evaluating concept."});
@@ -208,7 +209,7 @@ const createSeminar = async (req, res) => {
 
 const getAssignedSeminars = async (req, res) => {
     try {
-        const userOID = 11; // TODO req.user.userOID
+        const userOID = req.user.userOID;
         const seminars = await Seminar.findAll({
             include: [{
                 model: RoleAssignment,

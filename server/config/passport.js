@@ -23,9 +23,8 @@ async function addOrUpdateUser(lti, t) {
             firstName: lti.lis_person_name_given,
             lastName: lti.lis_person_name_family,
             mail: lti.lis_person_contact_email_primary,
-            comment: null,
             isAdmin: false,
-        }, {transaction: t}); // TODO remove comment
+        }, {transaction: t});
 
         // Create LtiUser
         ltiUser = await LtiUser.create({
@@ -91,7 +90,7 @@ function getUserIdfromLti(lti) {
 async function addRoleAssignment(lti, user, seminar, t) {
     const [assignment, created] = await RoleAssignment.findOrCreate({
         where: {
-            userOID: user.userOID, //TODO replace with UserId
+            userOID: user.userOID,
             seminarOID: seminar.seminarOID
         },
         defaults: {
@@ -258,12 +257,18 @@ passport.deserializeUser((serializedUser, done) => {
     User.findByPk(serializedUser.userOID)
         .then((user) => {
             if (user) {
-                user.lti = serializedUser.lti;
-                user.authtype = serializedUser.authtype;
-                user.accessToken = serializedUser.accessToken;
-                user.refreshToken = serializedUser.refreshToken;
-                user.idToken = serializedUser.idToken;
-                done(null, user);
+                const userJson = {}
+                userJson.userOID = serializedUser.userOID;
+                userJson.lti = serializedUser.lti;
+                userJson.authtype = serializedUser.authtype;
+                userJson.accessToken = serializedUser.accessToken;
+                userJson.refreshToken = serializedUser.refreshToken;
+                userJson.idToken = serializedUser.idToken;
+
+                userJson.isAdmin = user.isAdmin;
+                userJson.firstName = user.firstName;
+                userJson.lastName = user.lastName;
+                done(null, userJson);
             } else {
                 done(null, false);
             }

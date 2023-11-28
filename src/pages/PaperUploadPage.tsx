@@ -3,7 +3,11 @@ import {FileUpload, FileUploadSelectEvent} from "primereact/fileupload";
 import {Button} from "primereact/button";
 import {useState} from "react";
 
-function PaperUploadPage() {
+interface Props {
+    seminarOID: string;
+}
+
+function PaperUploadPage({seminarOID}: Props) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     async function onClick(event: any) {
@@ -13,6 +17,7 @@ function PaperUploadPage() {
         }
 
         const formData = new FormData();
+        formData.append('seminarOID', seminarOID);
         formData.append('file', selectedFile);
 
         console.log(selectedFile);

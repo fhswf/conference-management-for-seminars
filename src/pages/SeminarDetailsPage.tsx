@@ -9,6 +9,7 @@ import {Button} from "primereact/button";
 import HiddenLabel from "../components/ToggleLabel.tsx";
 import AddUserForm from "../components/AddUserForm.tsx";
 import useFetch from "../hooks/useFetch.ts";
+import {useParams} from "react-router-dom";
 
 type Concept = {
     conceptOID: number,
@@ -59,6 +60,7 @@ type AvailableSupervisorResponse = {
 }
 
 function SeminarDetailsPage() {
+    const { seminarOID } = useParams();
     const [isEditMode, setIsEditMode] = useState(0);
     const [showUserConcept, setShowUserConcept] = useState<UserO | null>(null);
     const [selectedRole, setSelectedRole] = useState<number | null>(null);
@@ -107,8 +109,8 @@ function SeminarDetailsPage() {
         mail: user.userO.mail || "-",
         comment: user.userO.comment || "-",
         role: user.roleOID,
-        supervisor: user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.firstName + " " + user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.lastName || '-',
-        concept: user.userO.userOIDStudent_concepts[0]?.accepted === null ? 'Bewertung ausstehend' : user.userO.userOIDStudent_concepts[0]?.accepted ? 'Angenommen' : 'Abgelehnt',
+        supervisor: !user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user ? "-" : user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.firstName + " " + user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.lastName || '-',
+        concept: !user.userO.userOIDStudent_concepts[0] ? "-" : user.userO.userOIDStudent_concepts[0]?.accepted === null ? 'Bewertung ausstehend' : user.userO.userOIDStudent_concepts[0]?.accepted ? 'Angenommen' : 'Abgelehnt',
         btnEdit: <Button onClick={() => {
             setIsEditMode(user.userOID)
             //set data
@@ -116,7 +118,7 @@ function SeminarDetailsPage() {
             setSelectedRole(user.roleOID)
             //setSelectedSupervisor(user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.userOID)
         }}>Edit</Button>,
-        btnGoto: <Button onClick={() => setShowUserConcept(user. userO)}>➡</Button>
+        btnGoto: <Button onClick={() => setShowUserConcept(user. userO)} disabled={!user.userO.userOIDStudent_concepts[0]}>➡</Button>
     }));
 
     function onDeleteClicked(userOID: number) {
@@ -127,7 +129,7 @@ function SeminarDetailsPage() {
     async function onNextPhaseClicked() {
         // TODO
         console.log("next phase");
-        const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/go-to-next-phase/2`, {
+        const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/go-to-next-phase/${seminarOID}`, {
             method: 'POST',
             credentials: 'include'
         });

@@ -6,6 +6,7 @@ import MainLayout from "../components/layout/MainLayout.tsx";
 import {Button} from "primereact/button";
 import ChatWindowPage from "./ChatWindowPage.tsx";
 import useFetch from "../hooks/useFetch.ts";
+import {useParams} from "react-router-dom";
 
 type Paper = {
     paperOID: number;
@@ -15,16 +16,31 @@ type Paper = {
     };
 }
 
+type RoleAssignment = {
+    userOID: number;
+    seminarOID: number;
+    roleOID: number;
+}
+
+type Seminar = {
+    description: string;
+    phase: number;
+    roleassignments: RoleAssignment[];
+}
+
 function PaperOverviewPage() {
+    const { seminarOID } = useParams();
     const [showModal, setShowModal] = useState(false);
     const [showChat, setShowChat] = useState(false);
     //const [uploadedPaper, setUploadedPaper] = useState<AssignedPaper[] | null>(null)
-    const {data: uploadedPaper} = useFetch<Paper[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-uploaded-paper/2`);
+    const {data: uploadedPaper} = useFetch<Paper[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-uploaded-paper/${seminarOID}`);
+    const {data: seminar} = useFetch<Seminar>(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-seminar/${seminarOID}`);
 
     return (
         <div>
             <MainLayout>
                 <p>{JSON.stringify(uploadedPaper)}</p>
+                <p>{JSON.stringify(seminar)}</p>
                 <p>Ihre eingereichten Paper:</p>
                 <div className={styles.container}>
                     <p>Datei:</p>
@@ -42,10 +58,10 @@ function PaperOverviewPage() {
                         <p>Keine Paper vorhanden.</p>
                     )}
                     <p></p>
-                    <Button onClick={() => setShowModal(true)}>Hochladen</Button> {/* TODO if phase = 7 or if User has not uploaded a paper yet */}
+                    <Button onClick={() => setShowModal(true)} disabled={seminar?.phase !== 3}>Hochladen</Button> {/* TODO if phase = 7 or if User has not uploaded a paper yet */}
                     <p></p>
                 </div>
-                <Modal isOpen={showModal} onClose={() => setShowModal(false)}><PaperUploadPage/></Modal>
+                <Modal isOpen={showModal} onClose={() => setShowModal(false)}><PaperUploadPage seminarOID={seminarOID}/></Modal>
                 <Modal isOpen={showChat} onClose={() => setShowChat(false)}><ChatWindowPage/></Modal>
             </MainLayout>
         </div>

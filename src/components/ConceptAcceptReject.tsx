@@ -1,12 +1,13 @@
 import {Button} from "primereact/button";
 import {InputTextarea} from "primereact/inputtextarea";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Dropdown} from "primereact/dropdown";
 
 type Concept = {
     conceptOID: number,
     accepted: boolean,
     text: string,
+    feedback: string,
     userOIDSupervisor_user: {
         userOID: number,
         firstName: string,
@@ -44,7 +45,7 @@ interface Props {
 
 function ConceptAcceptReject({user0, availableSupervisors, onClose}: Props) {
     const [selectedSupervisor, setSelectedSupervisor] = useState<AvailableSupervisor | null>(null)
-    let inputText: string = "";
+    const [inputText, setInputText] = useState("")
     const styles = {
         inputArea: {
             maxWidth: "65vw",
@@ -65,6 +66,10 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose}: Props) {
         }
     });
 
+    useEffect(() => {
+        setSelectedSupervisor(supervisor.find((supervisor) => supervisor?.userOID === user0.userOIDStudent_concepts[0].userOIDSupervisor_user?.userOID) || null);
+    }, [availableSupervisors]);
+
     async function onEvaluate(accepted: boolean) {
         //print text area
         //alert(inputText + " " + accepted);
@@ -80,7 +85,7 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose}: Props) {
             userOIDSupervisor: selectedSupervisor?.userOID || null,
         }
 
-        const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/evaluate-concept`, {// TODO to concept route
+        const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/evaluate-concept`, {// TODO change to concept route
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -101,30 +106,37 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose}: Props) {
     return (
         <div>
             <p><pre>{JSON.stringify(user0, null, 2)}</pre></p>
+            <p><pre>{JSON.stringify(availableSupervisors, null, 2)}</pre></p>
             {/*<p>
                 <pre>{JSON.stringify(concept, null, 2)}</pre>
                 <pre>{JSON.stringify(availableSupervisors, null, 2)}</pre>
             </p><br/>*/}
             
-            <p>Konzept annehmen / ablehnen</p>
-            <p>TODO user einfügen</p>
-            <p>Eingereicht von {user0.firstName}</p>
+            <h2>Konzept annehmen / ablehnen</h2>
+            <h3>Autor:</h3>
+            <p>Name: {user0.firstName} {user0.lastName}</p>
+            <p>Kommentar: {user0.comment || "-"}</p>
+            <p>Mail: {user0.mail}</p>
+            <hr/>
+            <h3>Konzept:</h3>
             <p>Text: {user0.userOIDStudent_concepts[0].text || "-"}</p>
             <p>Anhang: {user0.userOIDStudent_concepts[0].attachmentO ? <a
                 href={`http://${import.meta.env.VITE_BACKEND_URL}/api/attachment/${user0.userOIDStudent_concepts[0].attachmentO.attachmentOID}`}>{user0.userOIDStudent_concepts[0].attachmentO.filename}</a> : "-"}
             </p>
             <p>Status: {user0.userOIDStudent_concepts[0].accepted === null ? "Bewertung ausstehend" : user0.userOIDStudent_concepts[0].accepted ? "Angenommen" : "Abgelehnt"}</p>
+            <p>Feedback: {user0.userOIDStudent_concepts[0].feedback || "-"}</p>
 
             {(!user0.userOIDStudent_concepts[0].accepted) && // if evaluation pending
                 <>
+                    <h4>TODO Beurteilung auf Kurs-Admin beschränken</h4>
                     Betreuer: <Dropdown value={selectedSupervisor} options={supervisor} optionLabel="name"
                                         placeholder="Betreuer wählen"
                                         onChange={(e) => setSelectedSupervisor(e.value)}/><br/>
                     <InputTextarea style={styles.inputArea} rows={5} cols={40} onChange={(e) => {
-                        inputText = e.target.value
+                        setInputText(e.target.value)
                     }}/><br/>
                     <Button label="Annehmen" onClick={() => onEvaluate(true)}/>
-                    <Button label="Ablehnen" onClick={() => onEvaluate(false)}/>
+                    <Button label="Ablehnen" onClick={() => onEvaluate(false)} disabled={user0.userOIDStudent_concepts[0].accepted === false}/>
                 </>
             }
         </div>

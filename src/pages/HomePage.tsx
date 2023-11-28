@@ -4,9 +4,10 @@ import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import {InputText} from "primereact/inputtext";
 import {Button} from "primereact/button";
-import {FormEvent} from "react";
+import {FormEvent, useContext} from "react";
 import useFetch from "../hooks/useFetch.ts";
 import Table from "../components/Table.tsx";
+import {AuthContext} from "../context/AuthContext.ts";
 
 type AssignedSeminar = {
     seminarOID: number,
@@ -19,6 +20,7 @@ type AssignedSeminar = {
 
 function HomePage() {
     const navigate = useNavigate();
+    const { user, setUser } = useContext(AuthContext);
     const {data: assignedSeminars} = useFetch<AssignedSeminar[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-assigned-seminars`);
     const header = [
         {field: "name", header: "Bezeichnung"},
@@ -72,7 +74,7 @@ function HomePage() {
         btnSeminarDetails: //(seminar.roleassignments[0].roleOID === 1) ?
             <Button onClick={() => {
             navigate(`/seminar-details/${seminar.seminarOID}`)
-        }}>Verwalten</Button> /* TODO check if user is Admin */
+        }} disabled={seminar.roleassignments[0].roleOID === 3} tooltip="Nur für Kurs-Admins/Betreuer" tooltipOptions={{ showOnDisabled: true }}>Verwalten</Button> /* TODO check if user is Admin */
             //: null
     }));
     /*const tableData = [
@@ -93,7 +95,7 @@ function HomePage() {
                     <form onSubmit={(e: FormEvent<HTMLFormElement>) => onCreateSeminar(e)}>
                         <label htmlFor="seminarName">Seminarname:</label>
                         <InputText id="seminarName" name="seminarName" placeholder="name"/>
-                        <Button label="Seminar erstellen" type="submit"/> {/* TODO check if user is Admin */}
+                        <Button label="Seminar erstellen" type="submit" disabled={!user?.isAdmin} tooltip="Nur für System-Admins" tooltipOptions={{ showOnDisabled: true }}/> {/* TODO check if user is Admin */}
                     </form>
                 </div>
                 <Button onClick={async () => {

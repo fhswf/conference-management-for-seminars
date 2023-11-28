@@ -17,6 +17,7 @@ import React, {useEffect, useState} from "react";
 import PaperUploadPage from "./pages/PaperUploadPage.tsx";
 import CurrentUser from "./entities/CurrentUser";
 import {AuthContext} from "./context/AuthContext.ts";
+import PaperOverviewPage from "./pages/PaperOverviewPage.tsx";
 
 
 function App() {
@@ -61,12 +62,12 @@ function App() {
                         <Routes>
                             <Route path="/login" element={user ? <Navigate to="/"/> : <LoginPage/>}/>
                             <Route path="/" element={user ? <HomePage/> : <Navigate to="/login"/>}/>
-                            <Route path="/seminar-details/:id"
+                            <Route path="/seminar-details/:seminarOID"
                                    element={user ? <SeminarDetailsPage/> : <Navigate to="/login"/>}/>
-                            <Route path="/seminar/:id" element={user ? <SeminarPage/> : <Navigate to="/login"/>}/>
+                            <Route path="/seminar/:seminarOID" element={user ? <SeminarPage/> : <Navigate to="/login"/>}/>
                             <Route path="/concept-upload"
                                    element={user ? <ConceptUploadPage/> : <Navigate to="/login"/>}/>
-                            <Route path="/paper-upload" element={user ? <PaperUploadPage/> : <Navigate to="/login"/>}/>
+                            <Route path="/paper-overview/:seminarOID" element={user ? <PaperOverviewPage/> : <Navigate to="/login"/>}/>
                         </Routes>
                     </div>
                 </BrowserRouter>
