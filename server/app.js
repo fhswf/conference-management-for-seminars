@@ -10,7 +10,7 @@ const fs = require('fs');
 
 
 const app = express();
-
+app.set('trust proxy', true);
 // ------------------------------ middleware ------------------------------
 app.use(cors({
     origin: process.env.FRONTEND_URL,
