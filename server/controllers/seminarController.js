@@ -59,7 +59,8 @@ const gotoNextPhase = async (req, res) => {
 
 const getUserList = async (req, res) => {
     try {
-        const users = await Seminar.findByPk(2, // TODO req.user.lti.context_id
+        const seminarOID = req.params.seminarOID;
+        const users = await Seminar.findByPk(seminarOID,
             {
                 include: [{
                     model: RoleAssignment,
@@ -95,7 +96,7 @@ const getUserList = async (req, res) => {
         if (users) {
             return res.status(200).send(users);
         } else {
-            return res.status(404).send({message: "Users not found."});
+            return res.status(404).send({message: "Seminar not found."});
         }
 
     } catch

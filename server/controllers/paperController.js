@@ -1,5 +1,7 @@
 const db = require("../models");
 const attachmentController = require("./attachmentController");
+const pdf = require('pdf-parse');
+const {isValidPdf, replaceInFilename} = require("../util/PdfUtils");
 
 const Op = db.Sequelize.Op;
 const Paper = db.paper;
@@ -12,11 +14,23 @@ async function uploadPaper(req, res) {
     try {
         const userOID = req.user.userOID;
         const seminarOID = req.body.seminarOID;
-        let attachment = await attachmentController.createAttachment(req.files?.file, t)
+
+        const file = req.files?.file
+
+
+
+        if(!await isValidPdf(file.data)){
+            return res.status(415).json({error: 'Unsupported Media Type; Only PDF files are allowed'});
+        }
+
+        // TODO
+        //file.name = replaceInFilename(file.name, ["xyz", "abc"]);
+
+        let attachment = await attachmentController.createAttachment(file, t)
 
         await Paper.create({
-            seminarOID: seminarOID, // TODO req.user.lti.context_id
-            authorOID: userOID, // TODO req.user.userOID
+            seminarOID: seminarOID,
+            authorOID: userOID,
             attachmentOID: attachment.attachmentOID
         }, {transaction: t});
 
@@ -25,7 +39,7 @@ async function uploadPaper(req, res) {
     } catch (error) {
         await t.rollback();
         console.error("Error :" + error);
-        return res.status(500).end();
+        return res.status(500).json({error: 'Internal Server Error'});
     }
 }
 

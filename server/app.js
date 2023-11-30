@@ -31,10 +31,10 @@ app.use(fileUpload());
 
 // ------------------------------ session setup ------------------------------
 
-var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
-
-app.use(morgan('combined', { stream: accessLogStream }))
+//var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
+//app.use(morgan('combined', { stream: accessLogStream }))
 app.use(morgan('dev'))
+
 
 // ------------------------------ session setup ------------------------------
 const session = require('express-session');
@@ -72,7 +72,6 @@ sessionStore.onReady().then(() => {
 
 
 app.use(helmet());
-
 // ------------------------------ passport setup ------------------------------
 
 const passport = require('passport');
@@ -116,7 +115,7 @@ app.post('/conference/lti/launch', passport.authenticate('lti', {
     session: true
 }));
 
-/* Erstmal ausskommentiert
+
 
 app.get('/login', passport.authenticate('openidconnect'));
 
@@ -125,7 +124,7 @@ app.get('/login/callback', passport.authenticate('openidconnect', {failureRedire
         res.redirect('/success');
     }
 );
- */
+
 
 app.get('/conference/success', function (req, res) {
     console.log(req.user);

@@ -65,7 +65,7 @@ function App() {
                             <Route path="/seminar-details/:seminarOID"
                                    element={user ? <SeminarDetailsPage/> : <Navigate to="/login"/>}/>
                             <Route path="/seminar/:seminarOID" element={user ? <SeminarPage/> : <Navigate to="/login"/>}/>
-                            <Route path="/concept-upload"
+                            <Route path="/concept-upload/:seminarOID"
                                    element={user ? <ConceptUploadPage/> : <Navigate to="/login"/>}/>
                             <Route path="/paper-overview/:seminarOID" element={user ? <PaperOverviewPage/> : <Navigate to="/login"/>}/>
                         </Routes>

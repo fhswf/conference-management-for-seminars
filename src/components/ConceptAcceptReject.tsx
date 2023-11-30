@@ -105,12 +105,12 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose}: Props) {
 
     return (
         <div>
-            <p><pre>{JSON.stringify(user0, null, 2)}</pre></p>
-            <p><pre>{JSON.stringify(availableSupervisors, null, 2)}</pre></p>
-            {/*<p>
+            <pre>{JSON.stringify(user0, null, 2)}</pre>
+            <pre>{JSON.stringify(availableSupervisors, null, 2)}</pre>
+            {/*
                 <pre>{JSON.stringify(concept, null, 2)}</pre>
                 <pre>{JSON.stringify(availableSupervisors, null, 2)}</pre>
-            </p><br/>*/}
+            <br/>*/}
             
             <h2>Konzept annehmen / ablehnen</h2>
             <h3>Autor:</h3>

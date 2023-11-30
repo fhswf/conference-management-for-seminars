@@ -10,11 +10,13 @@ import HiddenLabel from "../components/ToggleLabel.tsx";
 import AddUserForm from "../components/AddUserForm.tsx";
 import useFetch from "../hooks/useFetch.ts";
 import {useParams} from "react-router-dom";
+import {mapRoleToString} from "../utils/helpers.ts";
 
 type Concept = {
     conceptOID: number,
     accepted: boolean,
     text: string,
+    feedback: string,
     userOIDSupervisor_user: {
         userOID: number,
         firstName: string,
@@ -60,15 +62,15 @@ type AvailableSupervisorResponse = {
 }
 
 function SeminarDetailsPage() {
-    const { seminarOID } = useParams();
+    const {seminarOID} = useParams();
     const [isEditMode, setIsEditMode] = useState(0);
-    const [showUserConcept, setShowUserConcept] = useState<UserO | null>(null);
+    const [showUserConcept, setShowUserConcept] = useState<UserO>();
     const [selectedRole, setSelectedRole] = useState<number | null>(null);
     //const [selectedSupervisor, setSelectedSupervisor] = useState<number | null>(null);
     const [comment, setComment] = useState("");
     const [showAddUser, setShowAddUser] = useState(false);
-    const {data: studentList} = useFetch<StudentListResponse>(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/get-students-list`);
-    const {data: availableSupervisor} = useFetch<AvailableSupervisorResponse[]>(`https://${import.meta.env.VITE_BACKEND_URL}/user/get-supervisor-list/2`);
+    const {data: studentList} = useFetch<StudentListResponse>(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-students-list/${seminarOID}`);
+    const {data: availableSupervisor} = useFetch<AvailableSupervisorResponse[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/user/get-supervisor-list/${seminarOID}`);
 
     const roles = [
         {name: "Kurs-Admin", value: 1},
@@ -99,16 +101,12 @@ function SeminarDetailsPage() {
         {field: "btnDelete", header: ""},
     ];
 
-    studentList?.roleassignments.forEach(user => {
-        console.log(user)
-    } )
-
     const tableData = studentList?.roleassignments.map(user => ({
         lname: user.userO.lastName || "-",
         fname: user.userO.firstName || "-",
         mail: user.userO.mail || "-",
         comment: user.userO.comment || "-",
-        role: user.roleOID,
+        role: mapRoleToString(user.roleOID),
         supervisor: !user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user ? "-" : user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.firstName + " " + user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.lastName || '-',
         concept: !user.userO.userOIDStudent_concepts[0] ? "-" : user.userO.userOIDStudent_concepts[0]?.accepted === null ? 'Bewertung ausstehend' : user.userO.userOIDStudent_concepts[0]?.accepted ? 'Angenommen' : 'Abgelehnt',
         btnEdit: <Button onClick={() => {
@@ -118,7 +116,8 @@ function SeminarDetailsPage() {
             setSelectedRole(user.roleOID)
             //setSelectedSupervisor(user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.userOID)
         }}>Edit</Button>,
-        btnGoto: <Button onClick={() => setShowUserConcept(user. userO)} disabled={!user.userO.userOIDStudent_concepts[0]}>➡</Button>
+        btnGoto: <Button onClick={() => setShowUserConcept(user.userO)}
+                         disabled={!user.userO.userOIDStudent_concepts[0]}>➡</Button>
     }));
 
     function onDeleteClicked(userOID: number) {
@@ -129,7 +128,7 @@ function SeminarDetailsPage() {
     async function onNextPhaseClicked() {
         // TODO
         console.log("next phase");
-        const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/go-to-next-phase/${seminarOID}`, {
+        const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/go-to-next-phase/${seminarOID}`, {
             method: 'POST',
             credentials: 'include'
         });
@@ -170,7 +169,7 @@ function SeminarDetailsPage() {
                             onNextPhaseClicked();
                         }
                     }}>Review-Phase 🖊</p>
-                    <p><pre>{JSON.stringify(studentList, null, 2)}</pre></p>
+                    <pre>{JSON.stringify(studentList, null, 2)}</pre>
                     {/* TODO Suchleiste einfügen */}
                     <HiddenLabel text={studentList?.assignmentkey || ""}/>
                     {!isEditMode ?
@@ -188,7 +187,7 @@ function SeminarDetailsPage() {
                                 console.log("----------------------------------")
 
                                 //TODO send changes
-                                const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/update-user`, {
+                                const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/update-user`, {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json'
@@ -218,13 +217,16 @@ function SeminarDetailsPage() {
                             setShowAddUser(true)
                         }}>Add User</Button>
                     }
-                    <Modal isOpen={showUserConcept} onClose={() => {
-                        setShowUserConcept(null)
-                    }}><ConceptAcceptReject user0={showUserConcept} availableSupervisors={availableSupervisor}/></Modal>
-                    <Modal isOpen={showAddUser} onClose={() => {
+
+                    {showUserConcept && availableSupervisor &&
+                        <Modal isOpen={!!showUserConcept} onClose={() => setShowUserConcept(undefined)}>
+                            <ConceptAcceptReject user0={showUserConcept} availableSupervisors={availableSupervisor}/>
+                        </Modal>}
+                    {/* TODO verbessern */}
+                    {studentList?.description && studentList.seminarOID && <Modal isOpen={showAddUser} onClose={() => {
                         setShowAddUser(false)
-                    }}><AddUserForm seminarname={studentList?.description} seminarOID={studentList?.seminarOID}
-                                    onClose={() => setShowAddUser(false)}/></Modal>
+                    }}><AddUserForm seminarname={studentList.description} seminarOID={studentList.seminarOID}
+                                    onClose={() => setShowAddUser(false)}/></Modal>}
                 </div>
             </MainLayout>
         </div>
