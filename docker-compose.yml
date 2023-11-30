@@ -55,8 +55,6 @@ services:
     #  - "127.0.0.1:11000:11000"
     networks:
       - nginx-proxy_default
-    volumes:
-      - ./server/certificates:/usr/src/app/certificates
 
   frontend:
     container_name: conference-frontend

@@ -174,7 +174,7 @@ app.get('/conference/api/logout', isAuthenticated, (req, res) => {
 
 
 // ------------------------------ server setup ------------------------------
-
+/*
 try {
     const https = require('https');
     const key = fs.readFileSync('./certificates/key.pem', 'utf8');
@@ -190,7 +190,7 @@ try {
 } catch (e) {
     console.log('HTTPS server not started: ' + e);
 }
-
+*/
 const serverHttp = app.listen(PORT_HTTP, function () {
     console.log('App listening at http://localhost:' + PORT_HTTP);
 });
