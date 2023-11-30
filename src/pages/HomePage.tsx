@@ -62,7 +62,6 @@ function HomePage() {
         }
     }
 
-
     const tableData = assignedSeminars?.map(seminar => ({
         seminarOID: seminar.seminarOID,
         name: seminar.description,

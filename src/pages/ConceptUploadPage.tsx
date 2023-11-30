@@ -5,12 +5,20 @@ import {Dropdown} from "primereact/dropdown";
 import {useEffect, useState} from "react";
 import {InputTextarea} from "primereact/inputtextarea";
 import {Button} from "primereact/button";
+import {useParams} from "react-router-dom";
+
+type Supervisor = {
+    userOID: number;
+    firstName: string;
+    lastName: string;
+}
 
 function ConceptUploadPage() {
+    const { seminarOID } = useParams();
     const [text, setText] = useState<string>("")
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [availableSupervisor, setAvailableSupervisor] = useState([])
-    const [selectedSupervisor, setSelectedSupervisor] = useState(undefined)
+    const [availableSupervisor, setAvailableSupervisor] = useState<Supervisor[]>([])
+    const [selectedSupervisor, setSelectedSupervisor] = useState<Supervisor>()
 
     const supervisor = [
         {name: "Betreuer A"},
@@ -30,10 +38,11 @@ function ConceptUploadPage() {
 
         const formData = new FormData();
         formData.append('text', text);
-        formData.append('file', selectedFile);
-        const oid = (selectedSupervisor === undefined) ? null : selectedSupervisor.userOID;
-        formData.append('supervisorOID', oid);
-        formData.append('seminarOID', 2); //TODO change
+        selectedFile && formData.append('file', selectedFile);
+        const oid = selectedSupervisor?.userOID;
+
+        oid && formData.append('supervisorOID', oid.toString());
+        seminarOID && formData.append('seminarOID', seminarOID.toString()); //TODO change
 
         console.log(text);
         console.log(selectedFile);
@@ -68,16 +77,15 @@ function ConceptUploadPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // TODO replace with LTI data
-                const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/user/get-supervisor-list/1`,{
+                const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/user/get-supervisor-list/${seminarOID}`,{
                     method: 'GET',
                     credentials: 'include'
                 });
                 //console.log(result.data);
-                const availableSupervisor:any = [];
+                const availableSupervisor: any = [];
                 const data = await result.json();
                 data.map((supervisor: any) => {
-                    availableSupervisor.push({name: supervisor.lastname+", "+ supervisor.firstname, userOID: supervisor.userOID});
+                    availableSupervisor.push({name: supervisor.lastName+", "+ supervisor.firstName, userOID: supervisor.userOID});
                 } )
                 setAvailableSupervisor(availableSupervisor);
                 console.log(availableSupervisor);

@@ -6,6 +6,7 @@ import ChatWindowPage from "./ChatWindowPage.tsx";
 import MainLayout from "../components/layout/MainLayout.tsx";
 import {Button} from "primereact/button";
 import useFetch from "../hooks/useFetch.ts";
+import {mapPhaseToString, mapRoleToString} from "../utils/helpers.ts";
 
 type RoleAssignment = {
     userOID: number;
@@ -71,8 +72,8 @@ function SeminarPage() {
                 <div>
                     <p>Übersicht</p>
                     <p>Seminarname: {seminar?.description || "-"}</p>
-                    <p>Phase: {seminar?.phase}</p>
-                    <p>Rolle:  {seminar?.roleassignments && seminar?.roleassignments[0]?.roleOID}</p>
+                    <p>Phase: {seminar && mapPhaseToString(seminar.phase) || "-"}</p>
+                    <p>Rolle:  {seminar?.roleassignments[0]?.roleOID && mapRoleToString(seminar?.roleassignments[0]?.roleOID)}</p>
                 </div>
                 <br/>
                 {isStudent && <> <p>Konzept:</p>
@@ -100,7 +101,7 @@ function SeminarPage() {
                                 <p>{concept?.accepted === null ? "Bewertung ausstehend" : concept?.accepted ? "Angenommen" : "Abgelehnt"}</p>
                         </div>
                         <div>
-                            <Button onClick={() => {navigate("/concept-upload")}}
+                            <Button onClick={() => {navigate(`/concept-upload/${seminarOID}`)}}
                                     disabled={concept?.accepted === null || concept?.accepted || seminar?.phase !== 2 }
                             >➡</Button>
                         </div>
@@ -110,7 +111,7 @@ function SeminarPage() {
                         <p>Paper</p>
                         <Button onClick={() => {
                             navigate(`/paper-overview/${seminarOID}`)
-                        }} disabled={seminar?.phase < 3}>➡
+                        }} disabled={seminar ? seminar.phase < 3 : true}>➡
                         </Button>
                     </div>
                     <hr/>

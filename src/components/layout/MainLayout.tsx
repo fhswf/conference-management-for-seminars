@@ -33,11 +33,11 @@ function MainLayout({children}: Props) {
                 }
             }},
         {label: `${user?.firstName} ${user?.lastName}` },
+        {label: `isAdmin: ${user?.isAdmin}` },
         {label: `delete`, command: () => {setUser(null)}},
     ];
 
     const start = <img alt="logo" src="https://www.fh-swf.de/media/_tech__fhswf/layout__fhswf/images__fhswf/Logo.png" height="40" className="mr-2"></img>;
-
 
     return (
         <div>

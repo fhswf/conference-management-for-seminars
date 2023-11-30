@@ -61,7 +61,7 @@ function PaperOverviewPage() {
                     <Button onClick={() => setShowModal(true)} disabled={seminar?.phase !== 3}>Hochladen</Button> {/* TODO if phase = 7 or if User has not uploaded a paper yet */}
                     <p></p>
                 </div>
-                <Modal isOpen={showModal} onClose={() => setShowModal(false)}><PaperUploadPage seminarOID={seminarOID}/></Modal>
+                <Modal isOpen={showModal} onClose={() => setShowModal(false)}><PaperUploadPage seminarOID={seminarOID!}/></Modal>
                 <Modal isOpen={showChat} onClose={() => setShowChat(false)}><ChatWindowPage/></Modal>
             </MainLayout>
         </div>
