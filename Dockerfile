@@ -17,10 +17,9 @@ RUN sed -i 's/#LoadModule rewrite_module/LoadModule rewrite_module/' /usr/local/
 #Create .htaccess file
 RUN echo '<IfModule mod_rewrite.c>' > /usr/local/apache2/htdocs/conference/.htaccess && \
     echo '  RewriteEngine On' >> /usr/local/apache2/htdocs/conference/.htaccess && \
-    echo '  RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f' >> /usr/local/apache2/htdocs/conference/.htaccess && \
-    echo '  RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -d' >> /usr/local/apache2/htdocs/conference/.htaccess && \
-    echo '  RewriteRule ^ - [L]' >> /usr/local/apache2/htdocs/conference/.htaccess && \
-    echo '  RewriteRule ^(.*)$ index.html [L]' >> /usr/local/apache2/htdocs/conference/.htaccess && \
+    echo '  RewriteCond %{REQUEST_FILENAME} !-f' >> /usr/local/apache2/htdocs/conference/.htaccess && \
+    echo '  RewriteCond %{REQUEST_FILENAME} !-d' >> /usr/local/apache2/htdocs/conference/.htaccess && \
+    echo '  RewriteRule ^ /conference/index.html [L]' >> /usr/local/apache2/htdocs/conference/.htaccess && \
     echo '</IfModule>' >> /usr/local/apache2/htdocs/conference/.htaccess
 
 #AllowOverride
