@@ -69,8 +69,8 @@ function SeminarDetailsPage() {
     //const [selectedSupervisor, setSelectedSupervisor] = useState<number | null>(null);
     const [comment, setComment] = useState("");
     const [showAddUser, setShowAddUser] = useState(false);
-    const {data: studentList} = useFetch<StudentListResponse>(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-students-list/${seminarOID}`);
-    const {data: availableSupervisor} = useFetch<AvailableSupervisorResponse[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/user/get-supervisor-list/${seminarOID}`);
+    const {data: studentList} = useFetch<StudentListResponse>(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/get-students-list/${seminarOID}`);
+    const {data: availableSupervisor} = useFetch<AvailableSupervisorResponse[]>(`https://${import.meta.env.VITE_BACKEND_URL}/user/get-supervisor-list/${seminarOID}`);
 
     const roles = [
         {name: "Kurs-Admin", value: 1},
@@ -128,7 +128,7 @@ function SeminarDetailsPage() {
     async function onNextPhaseClicked() {
         // TODO
         console.log("next phase");
-        const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/go-to-next-phase/${seminarOID}`, {
+        const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/go-to-next-phase/${seminarOID}`, {
             method: 'POST',
             credentials: 'include'
         });
@@ -187,7 +187,7 @@ function SeminarDetailsPage() {
                                 console.log("----------------------------------")
 
                                 //TODO send changes
-                                const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/update-user`, {
+                                const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/update-user`, {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json'

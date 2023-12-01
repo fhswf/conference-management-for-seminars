@@ -23,7 +23,7 @@ function AssignUserPage({seminarOID, seminarname, onClose}: Props) {
     const [selectedRole, setSelectedRole] = useState<number>();
     const [selectedUser, setSelectedUser] = useState<any>();
 
-    const userList = useFetch<User[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/user/get-addable-users/${seminarOID}`);
+    const userList = useFetch<User[]>(`https://${import.meta.env.VITE_BACKEND_URL}/user/get-addable-users/${seminarOID}`);
 
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
@@ -32,7 +32,7 @@ function AssignUserPage({seminarOID, seminarname, onClose}: Props) {
             return;
         }
 
-        const res = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/user/assign-to-seminar`, {
+        const res = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/user/assign-to-seminar`, {
             method: 'POST',
             credentials: 'include',
             body: JSON.stringify({

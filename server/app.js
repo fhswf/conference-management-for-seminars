@@ -19,7 +19,7 @@ app.set('trust proxy', true);
 const {isAuthenticated, isInstructor, isStudent} = require("./middleware/authMiddleware");
 
 app.use(cors({
-    origin: `http://${process.env.FRONTEND_URL}`,
+    origin: `https://${process.env.FRONTEND_URL}`,
     credentials: true
 }));
 
@@ -129,7 +129,7 @@ app.get('/conference/api/login/callback', passport.authenticate('openidconnect',
 app.get('/conference/api/success', function (req, res) {
     console.log(req.user);
     console.log(req.session);
-    res.redirect('http://' + process.env.FRONTEND_URL);
+    res.redirect('https://' + process.env.FRONTEND_URL);
 });
 
 app.get('/conference/api/error', function (req, res) {
@@ -196,5 +196,5 @@ try {
 }
 */
 const serverHttp = app.listen(PORT_HTTP, function () {
-    console.log('App listening at http://localhost:' + PORT_HTTP);
+    console.log('App listening at https://localhost:' + PORT_HTTP);
 });
