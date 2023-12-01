@@ -40,7 +40,6 @@ services:
       - CONSUMER_KEY=${CONSUMER_KEY}
       - CONSUMER_SECRET=${CONSUMER_SECRET}
       - FRONTEND_IP=${FRONTEND_IP}
-      - #OIDC
       - CLIENT_ID=${CLIENT_ID}
       - CLIENT_SECRET=${CLIENT_SECRET}
       - ISSUER=${ISSUER}
@@ -58,10 +57,11 @@ services:
 
   frontend:
     container_name: conference-frontend
-    build: .
+    build:
+      context: .
+      args:
+        - VITE_BACKEND_URL=${VITE_BACKEND_URL}
     restart: always
-    environment:
-      - VITE_BACKEND_URL=${VITE_BACKEND_URL}
     #ports:
     #  - "127.0.0.1:11001:11001"
     networks:

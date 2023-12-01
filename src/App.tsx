@@ -15,7 +15,7 @@ import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import React, {useEffect, useState} from "react";
 import PaperUploadPage from "./pages/PaperUploadPage.tsx";
-import CurrentUser from "./entities/CurrentUser";
+import CurrentUser from "./entities/CurrentUser.ts";
 import {AuthContext} from "./context/AuthContext.ts";
 import PaperOverviewPage from "./pages/PaperOverviewPage.tsx";
 
@@ -28,7 +28,7 @@ function App() {
     // TODO replace with useFetch
     useEffect(() => {
         const getUser = () => {
-            console.log("fetching user");
+            console.log("fetching user" + import.meta.env.VITE_BACKEND_URL);
             fetch(`https://${import.meta.env.VITE_BACKEND_URL}/authstatus`, {
                 method: "GET",
                 credentials: "include",
@@ -57,7 +57,7 @@ function App() {
     return (
         <PrimeReactProvider>
             <AuthContext.Provider value={{ user, setUser }}>
-                <BrowserRouter>
+                <BrowserRouter basename='/conference' >
                     <div>
                         <Routes>
                             <Route path="/login" element={user ? <Navigate to="/"/> : <LoginPage/>}/>

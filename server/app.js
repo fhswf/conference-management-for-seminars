@@ -14,7 +14,7 @@ const fileUpload = require('express-fileupload');
 
 
 const app = express();
-
+app.set('trust proxy', true);
 // ------------------------------ middleware ------------------------------
 const {isAuthenticated, isInstructor, isStudent} = require("./middleware/authMiddleware");
 
@@ -57,10 +57,10 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-        secure: false,
-        sameSite: true,
-        //secure: true,
-        //sameSite: 'none',
+        //secure: false,
+        //sameSite: true,
+        secure: true,
+        sameSite: 'none',
     }
 }))
 
@@ -109,34 +109,34 @@ app.use(function (req, res, next) {
 } );
  */
 
-app.post('/conference/lti/launch', passport.authenticate('lti', {
-    failureRedirect: '/error',
-    successRedirect: '/success',
+app.post('/conference/api/lti/launch', passport.authenticate('lti', {
+    failureRedirect: '/conference/api/error',
+    successRedirect: '/conference/api/success',
     session: true
 }));
 
 
 
-app.get('/login', passport.authenticate('openidconnect'));
+app.get('/conference/api/login', passport.authenticate('openidconnect'));
 
 
-app.get('/login/callback', passport.authenticate('openidconnect', {failureRedirect: '/login'}), function (req, res) {
-        res.redirect('/success');
+app.get('/conference/api/login/callback', passport.authenticate('openidconnect', {failureRedirect: '/login'}), function (req, res) {
+        res.redirect('/conference/api/success');
     }
 );
 
 
-app.get('/conference/success', function (req, res) {
+app.get('/conference/api/success', function (req, res) {
     console.log(req.user);
     console.log(req.session);
     res.redirect('http://' + process.env.FRONTEND_URL);
 });
 
-app.get('/conference/error', function (req, res) {
+app.get('/conference/api/error', function (req, res) {
     console.log('Error during LTI launch.');
     res.status(401).send('Error during LTI launch.');
 });
-app.get('/conference/error-login', function (req, res) {
+app.get('/conference/api/error-login', function (req, res) {
     console.log('Error during Login');
     res.status(401).send('Error during OIDC Login');
 });
@@ -153,6 +153,10 @@ app.get('/conference/api/authstatus', (req, res) => {
 
 app.get('/conference/api', (req, res) => {
     res.send('Hello World!');
+});
+
+app.get('/conference/api/test', (req, res) => {
+    res.send(process.env.EXPRESS_PORT_HTTP);
 });
 
 //logout

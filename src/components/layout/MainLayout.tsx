@@ -1,6 +1,5 @@
 import {Menubar} from "primereact/menubar";
 import {useNavigate} from "react-router-dom";
-import {PrimeIcons} from "primereact";
 import React, {ReactNode, useContext} from "react";
 import {AuthContext} from "../../context/AuthContext.ts";
 
@@ -13,8 +12,8 @@ function MainLayout({children}: Props) {
     const { user, setUser } = useContext(AuthContext);
 
     const items = [
-        {label: 'Startseite', icon: PrimeIcons.HOME, command: () => {navigate("/")}},
-        {label: 'Abmelden', icon: PrimeIcons.SIGN_OUT, command: () => {
+        {label: 'Startseite',command: () => {navigate("/")}},
+        {label: 'Abmelden', command: () => {
                 const leave = window.confirm("Wollen Sie sich wirklich abmelden?");
                 if (leave) {
                     fetch(`https://${import.meta.env.VITE_BACKEND_URL}/logout`, {
