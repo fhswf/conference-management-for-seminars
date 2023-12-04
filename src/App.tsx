@@ -14,22 +14,23 @@ import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import React, {useEffect, useState} from "react";
-import PaperUploadPage from "./pages/PaperUploadPage.tsx";
-import CurrentUser from "./entities/CurrentUser";
 import {AuthContext} from "./context/AuthContext.ts";
 import PaperOverviewPage from "./pages/PaperOverviewPage.tsx";
+import StudentDetailPage from "./pages/StudentDetailPage.tsx";
+import User from "./entities/database/User.ts";
+import SeminarAdminPage from "./pages/SeminarAdminPage.tsx";
 
 
 function App() {
     //const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true)
-    const [user, setUser] = useState<CurrentUser | null>(null);
+    const [user, setUser] = useState<User | null>(null);
 
     // TODO replace with useFetch
     useEffect(() => {
         const getUser = () => {
             console.log("fetching user");
-            fetch("http://192.168.0.206:3000/api/authstatus", {
+            fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/authstatus`, {
                 method: "GET",
                 credentials: "include",
             })
@@ -64,10 +65,12 @@ function App() {
                             <Route path="/" element={user ? <HomePage/> : <Navigate to="/login"/>}/>
                             <Route path="/seminar-details/:seminarOID"
                                    element={user ? <SeminarDetailsPage/> : <Navigate to="/login"/>}/>
+                            <Route path="/student-details/:seminarOID/:studentOID" element={user ? <StudentDetailPage/> : <Navigate to="/login"/>}/>
                             <Route path="/seminar/:seminarOID" element={user ? <SeminarPage/> : <Navigate to="/login"/>}/>
-                            <Route path="/concept-upload"
+                            <Route path="/concept-upload/:seminarOID"
                                    element={user ? <ConceptUploadPage/> : <Navigate to="/login"/>}/>
                             <Route path="/paper-overview/:seminarOID" element={user ? <PaperOverviewPage/> : <Navigate to="/login"/>}/>
+                            <Route path="/seminar-administration" element={user?.isAdmin ? <SeminarAdminPage/> : <Navigate to="/"/>}/>
                         </Routes>
                     </div>
                 </BrowserRouter>

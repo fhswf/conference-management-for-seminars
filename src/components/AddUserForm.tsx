@@ -4,6 +4,7 @@ import {InputText} from "primereact/inputtext";
 import styles from "./AddUserForm.module.css";
 import {Button} from "primereact/button";
 import useFetch from "../hooks/useFetch.ts";
+import User from "../entities/database/User.ts";
 
 interface Props {
     seminarOID: number;
@@ -12,10 +13,10 @@ interface Props {
 }
 
 function AssignUserPage({seminarOID, seminarname, onClose}: Props) {
-    const [selectedRole, setSelectedRole] = useState(null);
-    const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedRole, setSelectedRole] = useState<number>();
+    const [selectedUser, setSelectedUser] = useState<any>();
 
-    const userList = useFetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/user/get-addable-users/${seminarOID}`);
+    const userList = useFetch<User[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/user/get-addable-users/${seminarOID}`);
 
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
@@ -40,7 +41,7 @@ function AssignUserPage({seminarOID, seminarname, onClose}: Props) {
 
         if (res.ok) {
             alert("User wurde eingetragen");
-            onClose();
+            onClose && onClose();
         } else {
             alert("User konnte nicht eingetragen werden");
         }
@@ -56,10 +57,10 @@ function AssignUserPage({seminarOID, seminarname, onClose}: Props) {
         setSelectedRole(rollen[2].value);
     }, [])
 
-    let usersJson = [];
+    let usersJson: { name: string, comment: string | null, userOID: number }[] = [];
 
-    userList?.data?.map((user: any) => {
-        usersJson.push({name: `${user.lastname}, ${user.firstname}`, comment: user.comment, userOID: user.userOID})
+    userList?.data?.map((user: User) => {
+        usersJson.push({name: `${user.lastName}, ${user.firstName}`, comment: user.comment, userOID: user.userOID!})
     });
 
 

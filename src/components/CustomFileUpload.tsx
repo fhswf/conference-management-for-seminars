@@ -7,11 +7,11 @@ interface Props {
 }
 
 function CustomFileUpload({onSelectionChanged}: Props) {
-    const fileUploadRef = useRef(null);
+    const fileUploadRef = useRef<FileUpload | null>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     function onClear() {
-        fileUploadRef.current.clear();
+        fileUploadRef.current && fileUploadRef.current.clear();
         setSelectedFile(null);
         onSelectionChanged(null);
     }

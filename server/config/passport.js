@@ -285,6 +285,7 @@ passport.deserializeUser((serializedUser, done) => {
                 userJson.refreshToken = serializedUser.refreshToken;
                 userJson.idToken = serializedUser.idToken;
 
+                userJson.mail = user.mail;
                 userJson.isAdmin = user.isAdmin;
                 userJson.firstName = user.firstName;
                 userJson.lastName = user.lastName;

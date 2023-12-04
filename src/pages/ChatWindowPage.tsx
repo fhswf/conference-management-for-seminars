@@ -35,9 +35,9 @@ function ChatWindowPage(){
 
         const formData = new FormData();
         formData.append('message', text);
-        formData.append('file', selectedFile);
-        formData.append('paperOID', 1); // TODO
-        formData.append('reviewOID', 1); // TODO replace with review id
+        selectedFile && formData.append('file', selectedFile);
+        formData.append('paperOID', "1"); // TODO
+        formData.append('reviewOID', "1"); // TODO replace with review id
 
         const response = await fetch("http://192.168.0.206:3000/api/chat", {
             method: "POST",

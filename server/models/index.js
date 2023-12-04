@@ -13,7 +13,8 @@ const sequelize = new Sequelize(dbConfig.DATABASE, dbConfig.USER, dbConfig.PASSW
         min: dbConfig.pool.min,
         acquire: dbConfig.pool.acquire,
         idle: dbConfig.pool.idle,
-    }
+    },
+    logging: true
 });
 
 sequelize.authenticate().then(() => {

@@ -2,49 +2,27 @@ import {Button} from "primereact/button";
 import {InputTextarea} from "primereact/inputtextarea";
 import React, {useEffect, useState} from "react";
 import {Dropdown} from "primereact/dropdown";
+import User from "../entities/database/User.ts";
+import Attachment from "../entities/database/Attachment.ts";
+import Concept from "../entities/database/Concept.ts";
 
-type Concept = {
-    conceptOID: number,
-    accepted: boolean,
-    text: string,
-    feedback: string,
-    userOIDSupervisor_user: {
-        userOID: number,
-        firstName: string,
-        lastName: string,
-        mail: string
-    },
-    attachmentO: {
-        attachmentOID: number,
-        filename: string,
-    },
+type ConceptType = Concept & {
+    userOIDSupervisor_user: User | null;
+    attachmentO: Attachment | null;
 }
 
-type UserO = {
-    userOID: number,
-    roleOID: number,
-    firstName: string,
-    lastName: string,
-    mail: string,
-    comment: string,
-    isAdmin: boolean,
-    userOIDStudent_concepts: Concept[]
-}
-
-type AvailableSupervisor = {
-    userOID: number,
-    firstName: string,
-    lastName: string,
+type UserType = User & {
+    userOIDStudent_concepts: ConceptType[]
 }
 
 interface Props {
-    user0: UserO;
-    availableSupervisors: AvailableSupervisor[];
+    user0: UserType;
+    availableSupervisors: User[];
     onClose?: () => void;
 }
 
 function ConceptAcceptReject({user0, availableSupervisors, onClose}: Props) {
-    const [selectedSupervisor, setSelectedSupervisor] = useState<AvailableSupervisor | null>(null)
+    const [selectedSupervisor, setSelectedSupervisor] = useState<User | null>(null)
     const [inputText, setInputText] = useState("")
     const styles = {
         inputArea: {
@@ -87,6 +65,7 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose}: Props) {
 
         const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/evaluate-concept`, {// TODO change to concept route
             method: "POST",
+            credentials: 'include',
             headers: {
                 "Content-Type": "application/json",
             },
@@ -105,12 +84,12 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose}: Props) {
 
     return (
         <div>
-            <p><pre>{JSON.stringify(user0, null, 2)}</pre></p>
-            <p><pre>{JSON.stringify(availableSupervisors, null, 2)}</pre></p>
-            {/*<p>
+            <pre>{JSON.stringify(user0, null, 2)}</pre>
+            <pre>{JSON.stringify(availableSupervisors, null, 2)}</pre>
+            {/*
                 <pre>{JSON.stringify(concept, null, 2)}</pre>
                 <pre>{JSON.stringify(availableSupervisors, null, 2)}</pre>
-            </p><br/>*/}
+            <br/>*/}
             
             <h2>Konzept annehmen / ablehnen</h2>
             <h3>Autor:</h3>

@@ -8,15 +8,14 @@ import {FormEvent, useContext} from "react";
 import useFetch from "../hooks/useFetch.ts";
 import Table from "../components/Table.tsx";
 import {AuthContext} from "../context/AuthContext.ts";
+import {mapPhaseToString, mapRoleToString} from "../utils/helpers.ts";
+import RoleAssignment from "../entities/database/RoleAssignment.ts";
+import Seminar from "../entities/database/Seminar.ts";
 
-type AssignedSeminar = {
-    seminarOID: number,
-    description: string,
-    phase: number,
-    roleassignments: [{
-        roleOID: number,
-    }]
-}
+type AssignedSeminar = Seminar & {
+    roleassignments: RoleAssignment[];
+};
+
 
 function HomePage() {
     const navigate = useNavigate();
@@ -29,8 +28,6 @@ function HomePage() {
         {field: "btnSeminar", header: ""},
         {field: "btnSeminarDetails", header: ""},
     ];
-    //let userLoggedIn = localStorage.getItem("accessToken") !== null;
-    let userLoggedIn = true
 
     async function onCreateSeminar(e: FormEvent<HTMLFormElement>) {
         e.preventDefault()
@@ -62,12 +59,11 @@ function HomePage() {
         }
     }
 
-
     const tableData = assignedSeminars?.map(seminar => ({
         seminarOID: seminar.seminarOID,
         name: seminar.description,
-        phase: seminar.phase,
-        role: seminar.roleassignments[0].roleOID,
+        phase: seminar.phase && mapPhaseToString(seminar.phase),
+        role: seminar.roleassignments[0].roleOID && mapRoleToString(seminar.roleassignments[0].roleOID),
         btnSeminar: <Button onClick={() => {
             navigate(`/seminar/${seminar.seminarOID}`)
         }}>➡</Button>,

@@ -31,10 +31,10 @@ app.use(fileUpload());
 
 // ------------------------------ session setup ------------------------------
 
-var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
-
-app.use(morgan('combined', { stream: accessLogStream }))
+//var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
+//app.use(morgan('combined', { stream: accessLogStream }))
 app.use(morgan('dev'))
+
 
 // ------------------------------ session setup ------------------------------
 const session = require('express-session');
@@ -74,7 +74,6 @@ sessionStore.onReady().then(() => {
 
 
 app.use(helmet());
-
 // ------------------------------ passport setup ------------------------------
 
 const passport = require('passport');
@@ -94,13 +93,21 @@ const attachmentRouter = require('./routes/attachmentRouter');
 const chatRouter = require('./routes/chatmessageRouter');
 
 
+app.use('/api/concepts', conceptRouter);
+app.use('/api/paper', paperRouter);
+app.use('/api/user', userRouter);
+app.use('/api/seminar', seminarRouter);
+app.use('/api/attachment', attachmentRouter);
+app.use('/api/chat', chatRouter);
+
+/*
 app.use('/api/concepts', isAuthenticated, conceptRouter);
 app.use('/api/paper', isAuthenticated, paperRouter);
 app.use('/api/user', isAuthenticated, userRouter);
 app.use('/api/seminar', isAuthenticated, seminarRouter);
 app.use('/api/attachment', isAuthenticated, attachmentRouter);
 app.use('/api/chat', isAuthenticated, chatRouter);
-
+*/
 /*
 app.use(function (req, res, next) {
     console.log("------------------");
@@ -118,7 +125,7 @@ app.post('/lti/launch', passport.authenticate('lti', {
     session: true
 }));
 
-/* Erstmal ausskommentiert
+
 
 app.get('/login', passport.authenticate('openidconnect'));
 
@@ -127,7 +134,7 @@ app.get('/login/callback', passport.authenticate('openidconnect', {failureRedire
         res.redirect('/success');
     }
 );
- */
+
 
 app.get('/success', function (req, res) {
     console.log(req.user);

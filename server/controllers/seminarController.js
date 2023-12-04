@@ -1,18 +1,21 @@
 const crypto = require('crypto');
 const db = require("../models");
+const {setPhase4PaperOID} = require("./roleassignmentController");
+const {assignReviewer} = require("./reviewController");
 
 const Seminar = db.seminar;
 const RoleAssignment = db.roleassignment;
 const User = db.user;
 const Concept = db.concept;
 const Attachment = db.attachment;
+const Paper = db.paper;
 
 const getSeminar = async (req, res) => {
     try {
         //const userOID = req.user.userOID;
         const userOID = req.user.userOID;
         const seminarOID = req.params.seminarOID;
-        const seminar = await Seminar.findByPk(seminarOID, // TODO req.user.lti.context_id
+        const seminar = await Seminar.findByPk(seminarOID,
             {
                 include: [{
                     model: RoleAssignment,
@@ -34,24 +37,50 @@ const getSeminar = async (req, res) => {
     }
 }
 
-const gotoNextPhase = async (req, res) => {
+const getSeminars = async (req, res) => {
     try {
-        const seminarOID = req.params.seminarOID; // TODO req.user.lti.context_id
+        const seminars = await Seminar.findAll({
+            attributes: ["seminarOID", "description", "phase", "createdAt"]
+        });
+        if (seminars) {
+            res.status(200).send(seminars);
+        } else {
+            res.status(404).send({message: "Seminar not found."});
+        }
+    } catch (e) {
+        console.log(e);
+        res.status(500).send({message: "Error while retrieving seminar."});
+    }
+}
+
+const gotoNextPhase = async (req, res) => {
+    const t = await db.sequelize.transaction();
+    try {
+        const seminarOID = req.params.seminarOID;
 
         const currentPhase = await Seminar.findByPk(seminarOID, {attributes: ["phase"]});
         if(currentPhase.phase+1 >= 8){
             return res.status(200).send({message: "Seminar is already in the last phase."});
         }
 
+        if(currentPhase.phase+1 === 4){
+            await setPhase4PaperOID(seminarOID, t);
+            await assignReviewer(seminarOID, t);
+            currentPhase.phase++;
+        }
+
         const seminar = await Seminar.update({phase: currentPhase.phase+1}, {where: {seminaroid: seminarOID}});
 
         if (seminar[0] === 1) {
             // TODO handle phase change
+            await t.commit();
             return res.status(200).send({message: "Phase successfully changed."});
         } else {
+            await t.rollback();
             return res.status(500).send({message: "Error while changing phase."});
         }
     } catch (e) {
+        await t.rollback();
         console.log(e);
         return res.status(500).send({message: "Error while changing phase."});
     }
@@ -59,7 +88,8 @@ const gotoNextPhase = async (req, res) => {
 
 const getUserList = async (req, res) => {
     try {
-        const users = await Seminar.findByPk(2, // TODO req.user.lti.context_id
+        const seminarOID = req.params.seminarOID;
+        const users = await Seminar.findByPk(seminarOID,
             {
                 include: [{
                     model: RoleAssignment,
@@ -95,7 +125,7 @@ const getUserList = async (req, res) => {
         if (users) {
             return res.status(200).send(users);
         } else {
-            return res.status(404).send({message: "Users not found."});
+            return res.status(404).send({message: "Seminar not found."});
         }
 
     } catch
@@ -191,14 +221,14 @@ const createSeminar = async (req, res) => {
 
             //check if seminar already exists with this key
             existingSeminar = await Seminar.findOne({
-                where: {key: key}
+                where: {assignmentkey: key}
             });
         } while (existingSeminar)
 
         const seminar = await Seminar.create({
             description: req.body.name,
             phase: 1,
-            key: key.toString()
+            assignmentkey: key.toString()
         });
         return res.status(200).send({message: "Seminar successfully created."});
     } catch (e) {
@@ -230,12 +260,74 @@ const getAssignedSeminars = async (req, res) => {
     }
 }
 
+const getStudent = async (req, res) => {
+    try{
+        // get student in seminar with all uploaded concepts with attachments and paper with attachments
+        const seminarOID = req.params.seminarOID;
+        const userOID = req.params.userOID;
+
+        const user = await User.findByPk(userOID, {
+            include: [{
+                model: Concept,
+                as: "userOIDStudent_concepts",
+                attributes: ["conceptOID", "accepted", "userOIDSupervisor", "text", "attachmentOID", "feedback", "createdAt"],
+                where: {seminarOID: seminarOID},
+                required: false,
+                include: [{
+                    model: User,
+                    as: "userOIDSupervisor_user",
+                    attributes: ["userOID", "firstName", "lastName", "mail"],
+
+                },
+                    {
+                        model: Attachment,
+                        as: "attachmentO",
+                        attributes: ["attachmentOID", "filename"]
+                    }
+                ],
+            },
+                {
+                    model: Paper,
+                    as: "papers",
+                    attributes: ["paperOID", "attachmentOID", "seminarOID", "createdAt"],
+                    where: {seminarOID: seminarOID},
+                    required: false,
+                    include: [{
+                        model: Attachment,
+                        as: "attachmentO",
+                        attributes: ["attachmentOID", "filename"]
+                    }]
+                },
+                {
+                    model: RoleAssignment,
+                    as: "roleassignments",
+                    attributes: ["phase4paperOID", "phase7paperOID"],
+                    where: {seminarOID: seminarOID},
+                    required: false,
+                }
+
+            ]
+        });
+
+        if(user){
+            res.status(200).send(user);
+        }else{
+            res.status(404).send({message: "Student not found."});
+        }
+    }catch(e){
+        console.log(e);
+        res.status(500).send({message: "Error while retrieving student."});
+    }
+}
+
 module.exports = {
     gotoNextPhase,
     getSeminar,
+    getSeminars,
     getUserList,
     updateUserInSeminar,
     evaluateConcept,
     createSeminar,
-    getAssignedSeminars
+    getAssignedSeminars,
+    getStudent
 }

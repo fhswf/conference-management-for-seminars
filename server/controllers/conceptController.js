@@ -46,11 +46,15 @@ const uploadConcept = async (req, res) => {
     const t = await db.sequelize.transaction();
     try {
         const userOID = req.user.userOID;
-        const seminarOID = req.body.seminarOID
+        const seminarOID = req.body.seminarOID;
         const text = req.body.text || null;
 
-        const supervisorOID = req.body?.supervisorOID; // TODO use below
-        let attachment = await attachmentController.createAttachment(req.files?.file, t)
+        const supervisorOID = req.body?.supervisorOID || undefined;
+
+        let attachment = null;
+        if (req.files?.file) {
+            attachment = await attachmentController.createAttachment(req.files?.file, t)
+        }
 
         await Concept.create({
             text: text,

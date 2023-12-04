@@ -16,7 +16,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     assignmentkey: {
-      type: DataTypes.CHAR(32),
+      type: DataTypes.CHAR(36),
       allowNull: false,
       unique: "assignmentkey"
     }
