@@ -2,12 +2,15 @@ const db = require("../models");
 const attachmentController = require("./attachmentController");
 const pdf = require('pdf-parse');
 const {isValidPdf, replaceInFilename} = require("../util/PdfUtils");
+const {setPhase7PaperOID} = require("./roleassignmentController");
 
 const Op = db.Sequelize.Op;
 const Paper = db.paper;
 const Review = db.review;
 const User = db.user;
 const Attachment = db.attachment;
+const Seminar = db.seminar;
+const RoleAssignment = db.roleassignment;
 
 async function uploadPaper(req, res) {
     const t = await db.sequelize.transaction();
@@ -22,17 +25,24 @@ async function uploadPaper(req, res) {
         if(!await isValidPdf(file.data)){
             return res.status(415).json({error: 'Unsupported Media Type; Only PDF files are allowed'});
         }
-
+        const currentPhase = await Seminar.findByPk(seminarOID, {attributes: ["phase"]});
         // TODO
         //file.name = replaceInFilename(file.name, ["xyz", "abc"]);
 
         let attachment = await attachmentController.createAttachment(file, t)
 
-        await Paper.create({
+        const paper = await Paper.create({
             seminarOID: seminarOID,
             authorOID: userOID,
             attachmentOID: attachment.attachmentOID
         }, {transaction: t});
+
+        if(currentPhase.phase === 7){
+            // TODO
+            if(!await setPhase7PaperOID(t, paper.paperOID, userOID, seminarOID)){
+                throw new Error("Phase 7 Paper already set");
+            }
+        }
 
         await t.commit();
         return res.status(200).end();
@@ -46,7 +56,7 @@ async function uploadPaper(req, res) {
 async function getAssignedPaper(req, res) {
     try {
         //const userOID = req.user.userOID;
-        const userOID = 11; // TODO req.user.userOID
+        const userOID = 3; // TODO req.user.userOID;
         const seminarOID = req.params.seminarOID;
 
         if (!seminarOID) {
@@ -69,8 +79,16 @@ async function getAssignedPaper(req, res) {
             include: [{
                 model: Attachment,
                 as: "attachmentO",
-                attributes: ["filename"]
-            },],
+                attributes: ["attachmentOID", "filename"]
+            },
+                {
+                    model: Review,
+                    as: "reviews",
+                    where: {
+                        reviewerOID: userOID
+                    },
+                }
+            ],
             attributes: ["paperOID"]
         });
 
@@ -88,7 +106,8 @@ async function getUploadedPaper(req, res) {
         const seminarOID = req.params.seminarOID;
         const paper = await Paper.findAll({
             where: {
-                authorOID: userOID
+                authorOID: userOID,
+                seminarOID: seminarOID
             },
             include: [{
                 model: Attachment,

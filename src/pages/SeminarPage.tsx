@@ -1,64 +1,67 @@
 import Modal from "../components/Modal.tsx";
 import styles from "./SeminarPage.module.css"
-import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {Fragment, useEffect, useState} from "react";
+import {useNavigate, useParams} from "react-router-dom";
+import {Fragment, useState} from "react";
 import ChatWindowPage from "./ChatWindowPage.tsx";
 import MainLayout from "../components/layout/MainLayout.tsx";
 import {Button} from "primereact/button";
 import useFetch from "../hooks/useFetch.ts";
 import {mapPhaseToString, mapRoleToString} from "../utils/helpers.ts";
+import RoleAssignment from "../entities/database/RoleAssignment.ts";
+import Seminar from "../entities/database/Seminar.ts";
+import Paper from "../entities/database/Paper.ts";
+import Attachment from "../entities/database/Attachment.ts";
+import Concept from "../entities/database/Concept.ts";
+import User from "../entities/database/User.ts";
+import Review from "../entities/database/Review.ts";
 
-type RoleAssignment = {
-    userOID: number;
-    seminarOID: number;
-    roleOID: number;
-}
-
-type Seminar = {
-    description: string;
-    phase: number;
+type SeminarType = Seminar & {
     roleassignments: RoleAssignment[];
 }
 
-type Paper = {
-    paperOID: number;
-    attachmentO: {
-        filename: string;
-    }
+type PaperType = Paper & {
+    attachmentO: Attachment
+    reviews: Review[]
 }
 
-type Concept = {
-    conceptOID: number;
-    text: string;
-    filename: string;
-    attachmentOID: number;
-    userOIDSupervisor_user: {
-        userOID: number;
-        firstname: string;
-        lastname: string;
-    };
-    attachmentO: {
-        filename: string;
-    };
-    accepted: boolean | null;
+type ConceptType = Concept & {
+    userOIDSupervisor_user: User;
+    attachmentO: Attachment;
 }
 
 function SeminarPage() {
-    const { seminarOID } = useParams();
+    const {seminarOID} = useParams();
     let isStudent = null; // TODO replace
     const navigate = useNavigate();
-    const [showCommentsOwnPaper, setShowCommentsOwnPaper] = useState(false);
+    //const [showCommentsOwnPaper, setShowCommentsOwnPaper] = useState(false);
     //const [showCommentsStrangerPaper, setShowCommentsStrangerPaper] = useState(false);
-    const [showChat, setShowChat] = useState(false);
-    const {data: seminar} = useFetch<Seminar>(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminar/${seminarOID}`, );
+    const [showChat, setShowChat] = useState<Paper>();
+    const {data: seminar} = useFetch<SeminarType>(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-seminar/${seminarOID}`,);
     // TODO only fetch if phase >= 2 and phase >= 5
-    const {data: concept, loading: loadingConcept, error: errorConcept} = useFetch<Concept>(`https://${import.meta.env.VITE_BACKEND_URL}/concepts/newest/${seminarOID}`);
-    const {data: assignedPaper,loading: loadingPaper, error: errorPaper} = useFetch<Paper[]>(`https://${import.meta.env.VITE_BACKEND_URL}/paper/get-assigned-paper/${seminarOID}`);
+    const {
+        data: concept,
+        loading: loadingConcept,
+        error: errorConcept
+    } = useFetch<ConceptType>(`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts/newest/${seminarOID}`);
+    const {
+        data: assignedPaper,
+        loading: loadingPaper,
+        error: errorPaper
+    } = useFetch<PaperType[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-assigned-paper/${seminarOID}`);
 
     //const [concept, setConcept] = useState<Concept | null>(null)
     //const [assignedPaper, setAssignedPaper] = useState<Paper[] | null>(null)
 
     isStudent = seminar?.roleassignments && seminar?.roleassignments[0]?.roleOID === 3;
+
+    function isJsonEmpty(json: any) {
+        for (var key in json) {
+            if (json.hasOwnProperty(key)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     return (
         <div>
@@ -72,8 +75,8 @@ function SeminarPage() {
                 <div>
                     <p>Übersicht</p>
                     <p>Seminarname: {seminar?.description || "-"}</p>
-                    <p>Phase: {seminar && mapPhaseToString(seminar.phase) || "-"}</p>
-                    <p>Rolle:  {seminar?.roleassignments[0]?.roleOID && mapRoleToString(seminar?.roleassignments[0]?.roleOID)}</p>
+                    <p>Phase: {seminar && mapPhaseToString(seminar.phase!) || "-"}</p>
+                    <p>Rolle: {seminar?.roleassignments[0]?.roleOID && mapRoleToString(seminar?.roleassignments[0]?.roleOID)}</p>
                 </div>
                 <br/>
                 {isStudent && <> <p>Konzept:</p>
@@ -81,28 +84,38 @@ function SeminarPage() {
                         <div><p>Text</p></div>
                         <div><p>PDF</p></div>
                         <div><p>Betreuer</p></div>
+                        <div><p>Feedback</p></div>
                         <div><p>Status</p></div>
                         <div></div>
                         <div><p>{(concept) ? concept.text : "-"}</p></div>
                         {/**/}
                         <div>
                             {(concept?.attachmentO?.filename) ? //if filename exists pdf exists
-                                <a href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${concept.attachmentOID}`}>{concept.attachmentO.filename}</a> :
+                                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/attachment/${concept.attachmentOID}`}>{concept.attachmentO.filename}</a> :
                                 <p>-</p>
                             }
                         </div>
                         <div>
-                            {(concept && concept.userOIDSupervisor_user) ?
-                                <p>{concept.userOIDSupervisor_user.firstname} {concept.userOIDSupervisor_user.lastname}</p> :
+                            {(concept?.userOIDSupervisor_user) ?
+                                <p>{concept.userOIDSupervisor_user.firstName} {concept.userOIDSupervisor_user.lastName}</p> :
                                 <p>-</p>
                             }
                         </div>
                         <div>
-                                <p>{concept?.accepted === null ? "Bewertung ausstehend" : concept?.accepted ? "Angenommen" : "Abgelehnt"}</p>
+                            {(concept?.feedback) ?
+                                <p>{concept.feedback}</p> :
+                                <p>-</p>
+                            }
                         </div>
                         <div>
-                            <Button onClick={() => {navigate(`/concept-upload/${seminarOID}`)}}
-                                    disabled={concept?.accepted === null || concept?.accepted || seminar?.phase !== 2 }
+                            <p>{concept?.accepted === null ? "Bewertung ausstehend" : concept?.accepted ? "Angenommen" : "Abgelehnt"}</p>
+                        </div>
+                        <div>  {/* TODO edit disabled rule */}
+                            <Button onClick={() => {
+                                navigate(`/concept-upload/${seminarOID}`)
+                            }}
+                                    /*disabled = {(concept && (concept?.accepted === null || concept?.accepted)) || (!concept && (seminar && seminar.phase! <= 3))}*/
+                                    disabled = {!isJsonEmpty(concept) && (concept?.accepted === null || concept?.accepted || seminar?.phase !== 2) && concept?.accepted !== false}
                             >➡</Button>
                         </div>
                     </div>
@@ -111,26 +124,29 @@ function SeminarPage() {
                         <p>Paper</p>
                         <Button onClick={() => {
                             navigate(`/paper-overview/${seminarOID}`)
-                        }} disabled={seminar ? seminar.phase < 3 : true}>➡
+                        }} disabled={seminar ? seminar.phase! < 3 : true}>➡
                         </Button>
                     </div>
                     <hr/>
                 </>
                 }
-                <p>Sie sind dem folgenden {assignedPaper?.length} Paper als Reviewer zugeordnet:</p>
+                <p>Sie sind den folgenden {assignedPaper?.length} Paper als Reviewer zugeordnet:</p>
                 <div className={styles.assignedPaperContainer}>
-                    {assignedPaper && assignedPaper.length > 0 && assignedPaper.map((paper: Paper, index: number) => {
-                        return (
-                            <Fragment key={index}>
-                                <a href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.paperOID}`}>{paper.attachmentO.filename}</a>
-                                <Button onClick={() => setShowChat(true)}>Kommentieren</Button>
-                            </Fragment>
-                        )
+                    {assignedPaper && assignedPaper.length > 0 && assignedPaper.map((paper: PaperType, index: number) => {
+                        // müsste eigentlich immer vorhanden sein
+                            if (paper.attachmentO) {
+                                return (
+                                    <Fragment key={index}>
+                                        <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
+                                        <Button onClick={() => setShowChat(paper)}>Kommentieren</Button>
+                                    </Fragment>
+                                )
+                            }
                     })}
                 </div>
-                <Modal isOpen={showCommentsOwnPaper}
-                       onClose={() => setShowCommentsOwnPaper(false)}><ChatWindowPage/></Modal>
-                <Modal isOpen={showChat} onClose={() => setShowChat(false)}><ChatWindowPage/></Modal>
+                {/*<Modal isOpen={showCommentsOwnPaper} onClose={() => setShowCommentsOwnPaper(false)}><ChatWindowPage paper={s}/></Modal>*/}
+                {showChat && <Modal isOpen={!!showChat} onClose={() => setShowChat(undefined)}><ChatWindowPage
+                    paper={showChat} /*reviewOID={showChat}*//></Modal>}
             </MainLayout>
         </div>
     )

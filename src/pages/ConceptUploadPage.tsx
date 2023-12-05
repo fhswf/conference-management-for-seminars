@@ -6,19 +6,15 @@ import {useEffect, useState} from "react";
 import {InputTextarea} from "primereact/inputtextarea";
 import {Button} from "primereact/button";
 import {useParams} from "react-router-dom";
+import User from "../entities/database/User.ts";
 
-type Supervisor = {
-    userOID: number;
-    firstName: string;
-    lastName: string;
-}
 
 function ConceptUploadPage() {
     const { seminarOID } = useParams();
     const [text, setText] = useState<string>("")
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [availableSupervisor, setAvailableSupervisor] = useState<Supervisor[]>([])
-    const [selectedSupervisor, setSelectedSupervisor] = useState<Supervisor>()
+    const [availableSupervisor, setAvailableSupervisor] = useState<User[]>([])
+    const [selectedSupervisor, setSelectedSupervisor] = useState<User>()
 
     const supervisor = [
         {name: "Betreuer A"},
@@ -50,7 +46,7 @@ function ConceptUploadPage() {
         console.log(formData);
 
         try {
-            const res = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/concepts`, {
+            const res = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/concepts`, {
                 method: 'POST',
                 credentials: 'include',
                 body: formData,
@@ -77,7 +73,7 @@ function ConceptUploadPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/user/get-supervisor-list/${seminarOID}`,{
+                const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/user/get-supervisor-list/${seminarOID}`,{
                     method: 'GET',
                     credentials: 'include'
                 });

@@ -4,6 +4,7 @@ import {InputText} from "primereact/inputtext";
 import styles from "./AddUserForm.module.css";
 import {Button} from "primereact/button";
 import useFetch from "../hooks/useFetch.ts";
+import User from "../entities/database/User.ts";
 
 interface Props {
     seminarOID: number;
@@ -11,19 +12,11 @@ interface Props {
     onClose?: () => void;
 }
 
-type User = {
-    userOID: number;
-    lastname: string;
-    firstname: string;
-    mail: string;
-    comment: string;
-}
-
 function AssignUserPage({seminarOID, seminarname, onClose}: Props) {
     const [selectedRole, setSelectedRole] = useState<number>();
     const [selectedUser, setSelectedUser] = useState<any>();
 
-    const userList = useFetch<User[]>(`https://${import.meta.env.VITE_BACKEND_URL}/user/get-addable-users/${seminarOID}`);
+    const userList = useFetch<User[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/user/get-addable-users/${seminarOID}`);
 
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
@@ -32,7 +25,7 @@ function AssignUserPage({seminarOID, seminarname, onClose}: Props) {
             return;
         }
 
-        const res = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/user/assign-to-seminar`, {
+        const res = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/user/assign-to-seminar`, {
             method: 'POST',
             credentials: 'include',
             body: JSON.stringify({
@@ -64,10 +57,10 @@ function AssignUserPage({seminarOID, seminarname, onClose}: Props) {
         setSelectedRole(rollen[2].value);
     }, [])
 
-    let usersJson: { name: string, comment: string, userOID: string }[] = [];
+    let usersJson: { name: string, comment: string | null, userOID: number }[] = [];
 
-    userList?.data?.map((user: any) => {
-        usersJson.push({name: `${user.lastname}, ${user.firstname}`, comment: user.comment, userOID: user.userOID})
+    userList?.data?.map((user: User) => {
+        usersJson.push({name: `${user.lastName}, ${user.firstName}`, comment: user.comment, userOID: user.userOID!})
     });
 
 

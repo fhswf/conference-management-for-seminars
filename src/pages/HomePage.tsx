@@ -4,24 +4,33 @@ import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import {InputText} from "primereact/inputtext";
 import {Button} from "primereact/button";
-import {FormEvent, useContext} from "react";
+import {FormEvent, useContext, useRef} from "react";
 import useFetch from "../hooks/useFetch.ts";
 import Table from "../components/Table.tsx";
 import {AuthContext} from "../context/AuthContext.ts";
+import {mapPhaseToString, mapRoleToString} from "../utils/helpers.ts";
+import RoleAssignment from "../entities/database/RoleAssignment.ts";
+import Seminar from "../entities/database/Seminar.ts";
 
-type AssignedSeminar = {
-    seminarOID: number,
-    description: string,
-    phase: number,
-    roleassignments: [{
-        roleOID: number,
-    }]
-}
+type AssignedSeminar = Seminar & {
+    roleassignments: RoleAssignment[];
+};
+
 
 function HomePage() {
     const navigate = useNavigate();
     const { user, setUser } = useContext(AuthContext);
-    const {data: assignedSeminars} = useFetch<AssignedSeminar[]>(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/get-assigned-seminars`);
+    const {data: assignedSeminars} = useFetch<AssignedSeminar[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-assigned-seminars`);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const styles = {
+        enterSeminar: {
+            display: "flex",
+            columnGap: "10px",
+            margin: "10px"
+        },
+    };
+
     const header = [
         {field: "name", header: "Bezeichnung"},
         {field: "role", header: "Ihre Rolle"},
@@ -29,44 +38,12 @@ function HomePage() {
         {field: "btnSeminar", header: ""},
         {field: "btnSeminarDetails", header: ""},
     ];
-    //let userLoggedIn = localStorage.getItem("accessToken") !== null;
-    let userLoggedIn = true
-
-    async function onCreateSeminar(e: FormEvent<HTMLFormElement>) {
-        e.preventDefault()
-
-        //send data to backend
-        const seminarName = e.currentTarget.seminarName.value;
-
-        if(!seminarName) {
-            return
-        }
-
-        const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/seminar`, {
-            method: "POST",
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({name: seminarName})
-        });
-        const data = await result.json();
-        console.log(data);
-
-        if (result.ok) {
-            //navigate to seminar page
-            //navigate("/seminar/1");
-            alert("Seminar erstellt")
-        } else {
-            alert("Seminar konnte nicht erstellt werden")
-        }
-    }
 
     const tableData = assignedSeminars?.map(seminar => ({
         seminarOID: seminar.seminarOID,
         name: seminar.description,
-        phase: seminar.phase,
-        role: seminar.roleassignments[0].roleOID,
+        phase: seminar.phase && mapPhaseToString(seminar.phase),
+        role: seminar.roleassignments[0].roleOID && mapRoleToString(seminar.roleassignments[0].roleOID),
         btnSeminar: <Button onClick={() => {
             navigate(`/seminar/${seminar.seminarOID}`)
         }}>➡</Button>,
@@ -81,31 +58,55 @@ function HomePage() {
         {name: "Bachelor WS 2024/25", role: "Betreuer", stage: "Review-Phase", btnSeminar: <Button onClick={()=>{navigate("/seminar/1")}}>➡</Button>, btnSeminarDetails: <Button onClick={() => {navigate("/seminar-details/1")}}>Verwalten</Button>}
     ];*/
 
+    async function onEnterSeminar() {
+        const seminarKey = inputRef.current?.value;
+
+        if(!seminarKey) {
+            return;
+        }
+
+        const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/enter-seminar/${seminarKey}`, {
+            method: "POST",
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        if(result.ok) {
+            const data = await result.json();
+            console.log(data);
+            navigate(`/seminar/${data}`);
+        } else if (result.status === 404){
+            alert("Seminar nicht gefunden");
+        } else if(result.status === 400) {
+            alert("Sie sind bereits in diesem Seminar eingeschrieben");
+        }
+    }
+
     return (
         <>
             <MainLayout>
                 <p>{JSON.stringify(assignedSeminars)}</p>
                 <div>
                     <h1>Sie sind in folgenden Seminaren eingeschrieben:</h1>
+                    <div style={styles.enterSeminar}>
+                        <InputText id="seminarkey" name="seminarkey" placeholder="Einschreibeschlüssel" ref={inputRef}/>
+                        <Button label="Seminar beitreten" onClick={onEnterSeminar}/>
+                    </div>
                     <div>
                         <Table header={header} data={tableData}/>
                     </div>
-                    <br/>
-                    <form onSubmit={(e: FormEvent<HTMLFormElement>) => onCreateSeminar(e)}>
-                        <label htmlFor="seminarName">Seminarname:</label>
-                        <InputText id="seminarName" name="seminarName" placeholder="name"/>
-                        <Button label="Seminar erstellen" type="submit" disabled={!user?.isAdmin} tooltip="Nur für System-Admins" tooltipOptions={{ showOnDisabled: true }}/> {/* TODO check if user is Admin */}
-                    </form>
                 </div>
                 <Button onClick={async () => {
-                    const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/authstatus`, {
+                    const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/authstatus`, {
                         method: "GET",
                         credentials: 'include',
                     });
                     const data = await result.json();
                     console.log(data);
                 }}>Check Auth</Button>
-                {/* <ChatWindowPage/> */}
+
             </MainLayout>
         </>
     );

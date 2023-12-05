@@ -5,9 +5,10 @@ import {useState} from "react";
 
 interface Props {
     seminarOID: string;
+    phase: number;
 }
 
-function PaperUploadPage({seminarOID}: Props) {
+function PaperUploadPage({seminarOID, phase}: Props) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     async function onClick(event: any) {
@@ -58,7 +59,8 @@ function PaperUploadPage({seminarOID}: Props) {
                 </div>
             </div>
             <div className={styles.buttonDiv}>
-                <Button onClick={onClick}>Paper anonym einreichen!</Button>
+                {phase === 3 && <Button onClick={onClick}>Paper anonym einreichen!</Button>}
+                {phase === 7 && <Button onClick={onClick}>Paper einreichen!</Button>}
             </div>
         </div>
     );

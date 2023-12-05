@@ -64,7 +64,7 @@ const getAddableUsers = async (req, res) => {
                 attributes: [],
                 required: true
             }],
-            attributes: ["userOID", "firstname", "lastname", "mail", "comment"],
+            attributes: ["userOID", "firstName", "lastName", "mail", "comment"],
         });
         res.status(200).json(users);
     } catch (error) {
@@ -92,7 +92,6 @@ const assignToSeminar = async (req, res) => {
         res.status(500).json({error: 'Internal Server Error'});
     }
 }
-
 
 module.exports = {
     getUserById,

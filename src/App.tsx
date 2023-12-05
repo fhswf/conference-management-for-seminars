@@ -14,22 +14,23 @@ import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import React, {useEffect, useState} from "react";
-import PaperUploadPage from "./pages/PaperUploadPage.tsx";
-import CurrentUser from "./entities/CurrentUser.ts";
 import {AuthContext} from "./context/AuthContext.ts";
 import PaperOverviewPage from "./pages/PaperOverviewPage.tsx";
+import StudentDetailPage from "./pages/StudentDetailPage.tsx";
+import User from "./entities/database/User.ts";
+import SeminarAdminPage from "./pages/SeminarAdminPage.tsx";
 
 
 function App() {
     //const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true)
-    const [user, setUser] = useState<CurrentUser | null>(null);
+    const [user, setUser] = useState<User | null>(null);
 
     // TODO replace with useFetch
     useEffect(() => {
         const getUser = () => {
-            console.log("fetching user" + import.meta.env.VITE_BACKEND_URL);
-            fetch(`https://${import.meta.env.VITE_BACKEND_URL}/authstatus`, {
+            console.log("fetching user");
+            fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/authstatus`, {
                 method: "GET",
                 credentials: "include",
             })
@@ -57,17 +58,19 @@ function App() {
     return (
         <PrimeReactProvider>
             <AuthContext.Provider value={{ user, setUser }}>
-                <BrowserRouter basename='/conference' >
+                <BrowserRouter>
                     <div>
                         <Routes>
                             <Route path="/login" element={user ? <Navigate to="/"/> : <LoginPage/>}/>
                             <Route path="/" element={user ? <HomePage/> : <Navigate to="/login"/>}/>
                             <Route path="/seminar-details/:seminarOID"
                                    element={user ? <SeminarDetailsPage/> : <Navigate to="/login"/>}/>
+                            <Route path="/student-details/:seminarOID/:studentOID" element={user ? <StudentDetailPage/> : <Navigate to="/login"/>}/>
                             <Route path="/seminar/:seminarOID" element={user ? <SeminarPage/> : <Navigate to="/login"/>}/>
                             <Route path="/concept-upload/:seminarOID"
                                    element={user ? <ConceptUploadPage/> : <Navigate to="/login"/>}/>
                             <Route path="/paper-overview/:seminarOID" element={user ? <PaperOverviewPage/> : <Navigate to="/login"/>}/>
+                            <Route path="/seminar-administration" element={user?.isAdmin ? <SeminarAdminPage/> : <Navigate to="/"/>}/>
                         </Routes>
                     </div>
                 </BrowserRouter>
