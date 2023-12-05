@@ -42,7 +42,7 @@ function MainLayout({children}: Props) {
     const logout = () => {
         const leave = window.confirm("Wollen Sie sich wirklich abmelden?");
         if (leave) {
-            fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/logout`, {
+            fetch(`https://${import.meta.env.VITE_BACKEND_URL}/logout`, {
                 method: 'GET',
                 credentials: 'include',
             }).then(response => response.json())
