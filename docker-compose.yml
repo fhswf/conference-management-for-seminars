@@ -11,20 +11,6 @@ services:
     networks:
       - conference-management
 
-  phpmyadmin:
-    container_name: conference-phpmyadmin
-    image: phpmyadmin
-    restart: always
-    #    expose:
-    #      - 11012
-    #ports:
-    #  - "127.0.0.1:11012:11012"
-    environment:
-      - PMA_ARBITRARY=1
-      - APACHE_PORT=11012
-    networks:
-      - conference-management
-
   express-server:
     container_name: conference-api
     build: ./server
@@ -44,6 +30,17 @@ services:
       - DB_PORT=${DB_PORT}
       - CONSUMER_KEY=${CONSUMER_KEY}
       - CONSUMER_SECRET=${CONSUMER_SECRET}
+      - FRONTEND_IP=${FRONTEND_IP}
+      - CLIENT_ID=${CLIENT_ID}
+      - CLIENT_SECRET=${CLIENT_SECRET}
+      - ISSUER=${ISSUER}
+      - AUTHORIZATION_URL=${AUTHORIZATION_URL}
+      - TOKEN_URL=${TOKEN_URL}
+      - USERINFO_URL=${USERINFO_URL}
+      - CALLBACK_URL=${CALLBACK_URL}
+      - INTROSPECT_URL=${INTROSPECT_URL}
+      - ENDSESSION_ENDPOINT=${ENDSESSION_ENDPOINT}
+      - KEYCLOAK_PUBLIC_KEY=${KEYCLOAK_PUBLIC_KEY}
     ports:
       - 11000:11000
     networks:
@@ -51,7 +48,10 @@ services:
 
   frontend:
     container_name: conference-frontend
-    build: .
+    build:
+      context: .
+      args:
+        - VITE_BACKEND_URL=${VITE_BACKEND_URL}
     restart: always
     environment:
       - VITE_BACKEND_URL=${VITE_BACKEND_URL}
