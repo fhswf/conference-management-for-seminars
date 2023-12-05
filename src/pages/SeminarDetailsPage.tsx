@@ -135,6 +135,9 @@ function SeminarDetailsPage() {
 
     }));
 
+    const conceptCount = studentList?.roleassignments.filter(user => user.userO.userOIDStudent_concepts[0]?.accepted === true).length;
+    const studentCount = studentList?.roleassignments.filter(user => user.roleOID === 3).length;
+
     return (
         <div>
             <MainLayout>
@@ -145,9 +148,11 @@ function SeminarDetailsPage() {
                             onNextPhaseClicked();
                         }
                     }}>{mapPhaseToString(studentList?.phase)} 🖊</p>}
-                    <pre>{JSON.stringify(studentList, null, 2)}</pre>
-                    {/* TODO Suchleiste einfügen */}
+                    {/* <pre>{JSON.stringify(studentList, null, 2)}</pre> */}
                     <HiddenLabel text={studentList?.assignmentkey || ""}/>
+                    <p>Eingereichte und angenommene Konzepte: {conceptCount}/{studentCount}</p>
+                    <p>Eingereichte Paper Phase 4: TODO</p>
+                    <p>Eingereichte Paper Phase 7: TODO</p>
                     {!isEditMode ?
                         <Table header={header} data={tableData}/> :
                         <Table header={headerEdit} data={tableDataEdit}/>

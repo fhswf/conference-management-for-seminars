@@ -93,7 +93,6 @@ const assignToSeminar = async (req, res) => {
     }
 }
 
-
 module.exports = {
     getUserById,
     getSupervisorList,

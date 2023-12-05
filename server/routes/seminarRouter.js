@@ -11,6 +11,7 @@ router.post('/evaluate-concept', seminarController.evaluateConcept);
 router.post('/seminar', seminarController.createSeminar);
 router.get('/get-assigned-seminars', seminarController.getAssignedSeminars);
 router.get('/get-student/:seminarOID/:userOID', seminarController.getStudent);
+router.post('/enter-seminar/:assignmentkey', seminarController.enterSeminar);
 
 
 module.exports = router;

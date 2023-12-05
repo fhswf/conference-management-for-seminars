@@ -7,6 +7,7 @@ import MainLayout from "../components/layout/MainLayout.tsx";
 import {FormEvent, useRef, useState} from "react";
 import Modal from "../components/Modal.tsx";
 import AddUserForm from "../components/AddUserForm.tsx";
+import HiddenLabel from "../components/ToggleLabel.tsx";
 
 function SeminarAdminPage() {
     const [showAddUser, setShowAddUser] = useState<Seminar>()
@@ -26,7 +27,7 @@ function SeminarAdminPage() {
         {field: 'name', header: 'Bezeichnung'},
         {field: 'phase', header: 'Phase'},
         {field: 'createdAt', header: 'Erstellt am:'},
-        {field: 'createdAt', header: 'Erstellt am:'},
+        {field: 'assignmentkey', header: 'Einschreibeschlüssel:'},
         {field: "btnAdd", header: ""}
     ];
 
@@ -36,6 +37,7 @@ function SeminarAdminPage() {
             name: seminar.description,
             phase: seminar.phase,
             createdAt: seminar.createdAt ? new Date(seminar.createdAt).toLocaleString() : '-',
+            assignmentkey: <HiddenLabel text={seminar.assignmentkey || ""}/>,
             btnAdd: <Button label="OIDC Nutzer hinzufügen" icon="pi pi-plus" onClick={() => {
                 setShowAddUser(seminar)
             }}/>

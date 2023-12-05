@@ -37,10 +37,11 @@ const getSeminar = async (req, res) => {
     }
 }
 
+// TODO check if User isAdmin
 const getSeminars = async (req, res) => {
     try {
         const seminars = await Seminar.findAll({
-            attributes: ["seminarOID", "description", "phase", "createdAt"]
+            attributes: ["seminarOID", "description", "assignmentkey", "phase", "createdAt"]
         });
         if (seminars) {
             res.status(200).send(seminars);
@@ -320,6 +321,50 @@ const getStudent = async (req, res) => {
     }
 }
 
+const enterSeminar = async (req, res) => {
+    try {
+        const userOID = req.user.userOID;
+        const assignmentkey = req.params.assignmentkey;
+
+        const seminar = await Seminar.findOne({
+            where: {
+                assignmentkey: assignmentkey
+            }
+        });
+
+        if (!seminar) {
+            res.status(404).json({error: 'Seminar not found'});
+            return;
+        }
+
+        const [roleassignment, created] = await RoleAssignment.findOrCreate({
+            where: {
+                userOID: userOID,
+                seminarOID: seminar.seminarOID,
+            },
+            defaults: {
+                userOID: userOID,
+                seminarOID: seminar.seminarOID,
+                roleOID: 3,
+            }
+        });
+
+        if(!created){
+            res.status(400).json({error: 'User already in seminar'});
+            return;
+        }
+
+        if (roleassignment) {
+            res.status(200).json(roleassignment.seminarOID);
+        } else {
+            res.status(500).json({error: 'Internal Server Error'});
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({error: 'Internal Server Error'});
+    }
+}
+
 module.exports = {
     gotoNextPhase,
     getSeminar,
@@ -329,5 +374,6 @@ module.exports = {
     evaluateConcept,
     createSeminar,
     getAssignedSeminars,
-    getStudent
+    getStudent,
+    enterSeminar
 }
