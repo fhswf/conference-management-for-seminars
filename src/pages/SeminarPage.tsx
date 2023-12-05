@@ -68,9 +68,9 @@ function SeminarPage() {
             <MainLayout>
                 <div>
                     <p>{seminarOID}</p>
-                    <p>{JSON.stringify(concept)}</p>
-                    <p>{JSON.stringify(seminar)}</p>
-                    <p>{JSON.stringify(assignedPaper)}</p>
+                    {/*<p>{JSON.stringify(concept)}</p>*/}
+                    {/*<p>{JSON.stringify(seminar)}</p>*/}
+                    {/*<p>{JSON.stringify(assignedPaper)}</p>*/}
                 </div>
                 <div>
                     <p>Übersicht</p>

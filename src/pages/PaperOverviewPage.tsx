@@ -31,8 +31,8 @@ function PaperOverviewPage() {
     return (
         <div>
             <MainLayout>
-                <p>{JSON.stringify(uploadedPaper)}</p>
-                <p>{JSON.stringify(seminar)}</p>
+                {/*<p>{JSON.stringify(uploadedPaper)}</p>*/}
+                {/*<p>{JSON.stringify(seminar)}</p>*/}
                 <p>Ihre eingereichten Paper:</p>
                 <div className={styles.container}>
                     <p>Datei:</p>

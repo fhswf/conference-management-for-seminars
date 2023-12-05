@@ -62,7 +62,7 @@ function StudentDetailPage() {
     return (
         <MainLayout>
             <div>
-                <pre>{JSON.stringify(data, null, 2)}</pre>
+                {/*<pre>{JSON.stringify(data, null, 2)}</pre>*/}
                 <h1>Student Detail Page</h1>
                 <p>Seminar: ...</p>
                 <p>Student: ...</p>

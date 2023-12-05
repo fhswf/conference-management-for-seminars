@@ -103,8 +103,8 @@ function ChatWindowPage({paper, reviewOID}: Props){
 
     return(
         <div className={styles.container}>
-            {JSON.stringify(paper)}
-            {JSON.stringify(reviewOIDs)}
+            {/*JSON.stringify(paper)*/}
+            {/*JSON.stringify(reviewOIDs)*/}
             {reviewOIDs && <div className={styles.buttonContainer}>
                 <Button key={reviewOIDs[0].reviewOID} onClick={()=>setSelectedReview(reviewOIDs[0].reviewOID || undefined)}>Reviewer A</Button>
                 <Button key={reviewOIDs[1].reviewOID} onClick={()=>setSelectedReview(reviewOIDs[1].reviewOID || undefined)}>Reviewer B</Button>

@@ -76,7 +76,7 @@ function AssignUserPage({seminarOID, seminarname, onClose}: Props) {
                 <p>Kommentar: {selectedUser?.comment || "-"}</p>
 
                 <Button type="submit" label="Nutzer eintragen"/>
-                <p>{JSON.stringify(userList?.data)}</p>
+                {/*<p>{JSON.stringify(userList?.data)}</p>*/}
             </form>
         </div>
     );
