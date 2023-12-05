@@ -15,8 +15,8 @@ const RoleAssignment = db.roleassignment;
 async function uploadPaper(req, res) {
     const t = await db.sequelize.transaction();
     try {
-        const userOID = 3;
-        const seminarOID = 1;
+        const userOID = req.user.userOID;
+        const seminarOID = req.body.seminarOID;
 
         const file = req.files?.file
 
@@ -80,7 +80,15 @@ async function getAssignedPaper(req, res) {
                 model: Attachment,
                 as: "attachmentO",
                 attributes: ["attachmentOID", "filename"]
-            },],
+            },
+                {
+                    model: Review,
+                    as: "reviews",
+                    where: {
+                        reviewerOID: userOID
+                    },
+                }
+            ],
             attributes: ["paperOID"]
         });
 

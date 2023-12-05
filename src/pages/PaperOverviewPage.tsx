@@ -46,7 +46,7 @@ function PaperOverviewPage() {
                                     paper.paperOID === seminar.roleassignments[0].phase4paperOID ? (
                                         <>
                                             <p>Phase 4</p>
-                                            <Button onClick={() => setShowChat(paper)} disabled={seminar.phase < 6}>Kommentare</Button>
+                                            <Button onClick={() => setShowChat(paper)} disabled={/*seminar.phase < 6*/ false}>Kommentare</Button>
                                         </>
                                     ) : paper.paperOID === seminar.roleassignments[0].phase7paperOID ? (
                                         <>

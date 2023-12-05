@@ -48,7 +48,7 @@ function SeminarAdminPage() {
         //send data to backend
         const seminarName = inputRef.current?.value;
 
-        if(!seminarName) {
+        if (!seminarName) {
             return
         }
 
@@ -82,11 +82,10 @@ function SeminarAdminPage() {
                 </div>
                 <Table header={header} data={tableData}/>
             </div>
-            <Modal isOpen={showAddUser} onClose={() => {
+            {showAddUser?.seminarOID && showAddUser?.description && <Modal isOpen={!!showAddUser} onClose={() => {
                 setShowAddUser(undefined)
-            }}>
-                <AddUserForm seminarname={showAddUser?.description} seminarOID={showAddUser?.seminarOID}
-                             onClose={() => setShowAddUser(undefined)}/></Modal>
+            }}> <AddUserForm seminarname={showAddUser?.description} seminarOID={showAddUser?.seminarOID}
+                             onClose={() => setShowAddUser(undefined)}/></Modal>}
         </MainLayout>
     )
 }

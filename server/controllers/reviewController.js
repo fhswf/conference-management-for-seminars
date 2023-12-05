@@ -40,9 +40,10 @@ async function assignReviewer(seminarOID, t) {
             }],
         }
         ],
+        transaction: t
     });
 
-    for(const user1 of studentsInSeminar) {
+    for (const user1 of studentsInSeminar) {
         reviewerCount.set(user1.userOID, 0);
     }
 

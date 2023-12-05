@@ -13,6 +13,7 @@ import Paper from "../entities/database/Paper.ts";
 import Attachment from "../entities/database/Attachment.ts";
 import Concept from "../entities/database/Concept.ts";
 import User from "../entities/database/User.ts";
+import Review from "../entities/database/Review.ts";
 
 type SeminarType = Seminar & {
     roleassignments: RoleAssignment[];
@@ -20,6 +21,7 @@ type SeminarType = Seminar & {
 
 type PaperType = Paper & {
     attachmentO: Attachment
+    reviews: Review[]
 }
 
 type ConceptType = Concept & {
@@ -51,6 +53,15 @@ function SeminarPage() {
     //const [assignedPaper, setAssignedPaper] = useState<Paper[] | null>(null)
 
     isStudent = seminar?.roleassignments && seminar?.roleassignments[0]?.roleOID === 3;
+
+    function isJsonEmpty(json: any) {
+        for (var key in json) {
+            if (json.hasOwnProperty(key)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     return (
         <div>
@@ -104,7 +115,7 @@ function SeminarPage() {
                                 navigate(`/concept-upload/${seminarOID}`)
                             }}
                                     /*disabled = {(concept && (concept?.accepted === null || concept?.accepted)) || (!concept && (seminar && seminar.phase! <= 3))}*/
-                                    disabled = {concept?.accepted === null || concept?.accepted || seminar?.phase !== 2}
+                                    disabled = {!isJsonEmpty(concept) && (concept?.accepted === null || concept?.accepted || seminar?.phase !== 2) && concept?.accepted !== false}
                             >➡</Button>
                         </div>
                     </div>
@@ -135,7 +146,7 @@ function SeminarPage() {
                 </div>
                 {/*<Modal isOpen={showCommentsOwnPaper} onClose={() => setShowCommentsOwnPaper(false)}><ChatWindowPage paper={s}/></Modal>*/}
                 {showChat && <Modal isOpen={!!showChat} onClose={() => setShowChat(undefined)}><ChatWindowPage
-                    paper={showChat}/></Modal>}
+                    paper={showChat} /*reviewOID={showChat}*//></Modal>}
             </MainLayout>
         </div>
     )

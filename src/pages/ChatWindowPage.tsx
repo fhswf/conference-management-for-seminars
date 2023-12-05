@@ -11,16 +11,17 @@ import {AuthContext} from "../context/AuthContext.ts";
 
 interface Props {
     paper: Paper;
+    reviewOID?: number;
 }
 
-function ChatWindowPage({paper}: Props){
+function ChatWindowPage({paper, reviewOID}: Props){
     const { user, setUser } = useContext(AuthContext);
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [messages, setMessages] = useState<Message[]>([])
     const [text, setText] = useState<string>("")
     //const {data: messages2} = useFetch<Message[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/chat/879`)
     const [messages2, setMessages2] = useState<Message[]>()
-    const {data: reviewOIDs} = useFetch<Review>(`http://${import.meta.env.VITE_BACKEND_URL}/api/review/get-from-paper/${paper.paperOID}`)
+    const {data: reviewOIDs} = useFetch<Review[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/review/get-from-paper/${paper.paperOID}`)
     const [selectedReview, setSelectedReview] = useState<number>()
 
     useEffect(() => {
@@ -54,7 +55,7 @@ function ChatWindowPage({paper}: Props){
 
         console.log("set " + reviewOIDs[0].reviewOID);
 
-        setSelectedReview(reviewOIDs[0].reviewOID)
+        setSelectedReview(reviewOIDs[0].reviewOID || undefined)
     }, [reviewOIDs]);
 
     useEffect(() => {
@@ -105,9 +106,9 @@ function ChatWindowPage({paper}: Props){
             {JSON.stringify(paper)}
             {JSON.stringify(reviewOIDs)}
             {reviewOIDs && <div className={styles.buttonContainer}>
-                <Button key={reviewOIDs[0].reviewOID} onClick={()=>setSelectedReview(reviewOIDs[0].reviewOID)}>Reviewer A</Button>
-                <Button key={reviewOIDs[1].reviewOID} onClick={()=>setSelectedReview(reviewOIDs[1].reviewOID)}>Reviewer B</Button>
-                <Button key={reviewOIDs[2].reviewOID} onClick={()=>setSelectedReview(reviewOIDs[2].reviewOID)}>Betreuer</Button>
+                <Button key={reviewOIDs[0].reviewOID} onClick={()=>setSelectedReview(reviewOIDs[0].reviewOID || undefined)}>Reviewer A</Button>
+                <Button key={reviewOIDs[1].reviewOID} onClick={()=>setSelectedReview(reviewOIDs[1].reviewOID || undefined)}>Reviewer B</Button>
+                <Button key={reviewOIDs[2].reviewOID} onClick={()=>setSelectedReview(reviewOIDs[2].reviewOID || undefined)}>Betreuer</Button>
             </div>}
             <div className={styles.conversation}>
 

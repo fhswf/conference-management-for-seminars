@@ -39,7 +39,7 @@ function Table({header, data}: Props) {
             <div className="flex justify-content-between">
                 <span className="p-input-icon-left">
                     <i className="pi pi-search" />
-                    <InputText value={globalFilter} onChange={onGlobalFilterChange} placeholder="Suche ..." />
+                    <InputText value={globalFilter || ""} onChange={onGlobalFilterChange} placeholder="Suche ..." />
                 </span>
             </div>
         );
