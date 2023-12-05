@@ -58,7 +58,7 @@ function App() {
     return (
         <PrimeReactProvider>
             <AuthContext.Provider value={{ user, setUser }}>
-                <BrowserRouter>
+                <BrowserRouter basename='/conference' >
                     <div>
                         <Routes>
                             <Route path="/login" element={user ? <Navigate to="/"/> : <LoginPage/>}/>
