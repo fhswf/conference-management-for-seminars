@@ -7,24 +7,26 @@ const Chatmessage = db.chatmessage;
 
 const getMessagesOfReview = async (req, res) => {
     try {
+        const userOID = req.user.userOID
         const reviewOID = req.params.reviewOID
 
         const messages = await Chatmessage.findAll({
             where: {
                 reviewOID: reviewOID,
-                [Op.or]: [{ sender: 11 }, { receiver: 11 }] // TODO replace with req.user.userOID
+                [Op.or]: [{ sender: userOID }, { receiver: userOID }]
             },
             include: [{
                 model: Attachment,
                 as: 'attachmentO',
                 attributes: ['attachmentOID', 'filename'],
             }],
-            attributes: ['message', 'createdAt', 'sender', 'receiver']
+            attributes: ['message', 'createdAt', 'sender', 'receiver'],
+            order: [['createdAt', 'ASC']],
         });
 
         const messagesWithUserId = messages.map(message => {
             message = message.get();
-            message.clientUserId = 11; // TODO replace with req.user.userOID // for formatting purposes
+            message.clientUserId = userOID;  // for formatting purposes
             return message;
         });
 
@@ -38,7 +40,7 @@ const getMessagesOfReview = async (req, res) => {
 const createMessage = async (req, res) => {
     const t = await db.sequelize.transaction();
     try {
-        const userOID = 10 // TODO replace with req.user.userOID
+        const userOID = req.user.userOID
         const paperOID = req.body.paperOID
         const message = req.body.message
         const file = req.files?.file

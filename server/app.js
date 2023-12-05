@@ -91,6 +91,7 @@ const userRouter = require('./routes/userRouter');
 const seminarRouter = require('./routes/seminarRouter');
 const attachmentRouter = require('./routes/attachmentRouter');
 const chatRouter = require('./routes/chatmessageRouter');
+const reviewRouter = require('./routes/reviewRouter');
 
 
 app.use('/api/concepts', conceptRouter);
@@ -99,6 +100,7 @@ app.use('/api/user', userRouter);
 app.use('/api/seminar', seminarRouter);
 app.use('/api/attachment', attachmentRouter);
 app.use('/api/chat', chatRouter);
+app.use('/api/review', reviewRouter);
 
 /*
 app.use('/api/concepts', isAuthenticated, conceptRouter);

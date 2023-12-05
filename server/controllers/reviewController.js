@@ -112,6 +112,25 @@ async function assignReviewer(seminarOID, t) {
     console.log("ende");
 }
 
+async function getReviewsOfPaper(req, res) {
+    const paperOID = req.params.paperOID;
+
+    try {
+        const reviews = await Review.findAll({
+            where: {
+                paperOID: paperOID,
+            },
+            attributes: ['reviewOID', 'paperOID'],
+        });
+
+        return res.status(200).json(reviews);
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({error: 'Internal Server Error'});
+    }
+}
+
 module.exports = {
-    assignReviewer
+    assignReviewer,
+    getReviewsOfPaper
 }

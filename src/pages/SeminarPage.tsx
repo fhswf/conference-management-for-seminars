@@ -31,9 +31,9 @@ function SeminarPage() {
     const {seminarOID} = useParams();
     let isStudent = null; // TODO replace
     const navigate = useNavigate();
-    const [showCommentsOwnPaper, setShowCommentsOwnPaper] = useState(false);
+    //const [showCommentsOwnPaper, setShowCommentsOwnPaper] = useState(false);
     //const [showCommentsStrangerPaper, setShowCommentsStrangerPaper] = useState(false);
-    const [showChat, setShowChat] = useState(false);
+    const [showChat, setShowChat] = useState<Paper>();
     const {data: seminar} = useFetch<SeminarType>(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-seminar/${seminarOID}`,);
     // TODO only fetch if phase >= 2 and phase >= 5
     const {
@@ -127,15 +127,15 @@ function SeminarPage() {
                                 return (
                                     <Fragment key={index}>
                                         <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
-                                        <Button onClick={() => setShowChat(true)}>Kommentieren</Button>
+                                        <Button onClick={() => setShowChat(paper)}>Kommentieren</Button>
                                     </Fragment>
                                 )
                             }
                     })}
                 </div>
-                <Modal isOpen={showCommentsOwnPaper}
-                       onClose={() => setShowCommentsOwnPaper(false)}><ChatWindowPage/></Modal>
-                <Modal isOpen={showChat} onClose={() => setShowChat(false)}><ChatWindowPage/></Modal>
+                {/*<Modal isOpen={showCommentsOwnPaper} onClose={() => setShowCommentsOwnPaper(false)}><ChatWindowPage paper={s}/></Modal>*/}
+                {showChat && <Modal isOpen={!!showChat} onClose={() => setShowChat(undefined)}><ChatWindowPage
+                    paper={showChat}/></Modal>}
             </MainLayout>
         </div>
     )
