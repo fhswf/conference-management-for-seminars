@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styles from "./Modal.module.css";
 import {Button} from "primereact/button";
 
@@ -15,7 +15,7 @@ function Modal({ isOpen, onClose, children }: Props) {
                 <div className={styles.modal}>
                     <div onClick={onClose} className={styles.overlay}></div>
                     <div className={styles.modalContent}>
-                        {children}
+                        {React.cloneElement(children as React.ReactElement, { onClose })}
                         <Button className={styles.closeModal} onClick={onClose}>
                             X
                         </Button>

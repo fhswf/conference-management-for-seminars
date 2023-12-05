@@ -1,5 +1,5 @@
 import styles from './ChatMessage.module.css';
-import Message from "../entities/Message.ts";
+import React from "react";
 
 interface Props {
     message: Message;
@@ -8,21 +8,23 @@ interface Props {
 function ChatMessage({message}: Props) {
     return (
         <div className={styles.messageContainer}>
-            {message.sender === 'User' ?
+            {message.sender === 11 ? // TODO replace with user id
                 <>
                     <div>
-                        <p>{message.time}</p>
+                        <p>{new Date(message.createdAt).toLocaleString()}</p>
                     </div>
                     <div className={styles.text}>
-                        <p>{message.text}</p>
+                        <p>{message.message}</p>
+                        {message.attachmentO && <><hr/><a href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${message.attachmentO.attachmentOID}`}>{message.attachmentO.filename}</a></>}
                     </div>
                 </> :
                 <>
                     <div className={styles.text}>
-                        <p>{message.text}</p>
+                        <p>{message.message}</p>
+                        {message.attachmentO && <><hr/><a href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${message.attachmentO.attachmentOID}`}>{message.attachmentO.filename}</a></>}
                     </div>
                     <div>
-                        <p>{message.time}</p>
+                        <p>{new Date(message.createdAt).toLocaleString()}</p>
                     </div>
                 </>
             }

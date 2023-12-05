@@ -1,5 +1,16 @@
 .conceptContainter {
     display: grid;
-    grid-template-columns: 20% 20% 20% 20% 20%;
+    grid-template-columns: 16% 16% 16% 20% 16% 10%;
+    align-items: center;
+}
 
+.paperContainer{
+    display: flex;
+    align-items: center;
+}
+
+.assignedPaperContainer{
+    display: grid;
+    grid-template-columns: 20% 20%;
+    align-items: center;
 }

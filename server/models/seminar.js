@@ -9,16 +9,21 @@ module.exports = function(sequelize, DataTypes) {
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: true
+      allowNull: false
     },
     phase: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: false
+    },
+    assignmentkey: {
+      type: DataTypes.CHAR(36),
+      allowNull: false,
+      unique: "assignmentkey"
     }
   }, {
     sequelize,
     tableName: 'seminar',
-    timestamps: false,
+    timestamps: true,
     indexes: [
       {
         name: "PRIMARY",
@@ -26,6 +31,14 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "seminarOID" },
+        ]
+      },
+      {
+        name: "assignmentkey",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "assignmentkey" },
         ]
       },
     ]

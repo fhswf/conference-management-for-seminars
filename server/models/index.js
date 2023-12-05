@@ -1,6 +1,6 @@
 const dbConfig = require("../config/dbConfig.js");
 
-//create file with: sequelize-auto -h "localhost" -d "konferenz-management" -u "root" -p 3306  --dialect "mariadb" -o .\server\models\
+//create file with: sequelize-auto -h "localhost" -d "konferenz-management" -u "root" -p 3306  --dialect "mariadb" -o .\models\
 const initModels = require("./init-models.js");
 
 const {Sequelize, DataTypes} = require("sequelize");
@@ -13,7 +13,8 @@ const sequelize = new Sequelize(dbConfig.DATABASE, dbConfig.USER, dbConfig.PASSW
         min: dbConfig.pool.min,
         acquire: dbConfig.pool.acquire,
         idle: dbConfig.pool.idle,
-    }
+    },
+    logging: false
 });
 
 sequelize.authenticate().then(() => {
@@ -30,16 +31,16 @@ db.sequelize = sequelize;
 db.sequelize.sync({force: false})
     .then(() => {
         // Default role values
-        db.rollen.findOrCreate({
+        db.roles.findOrCreate({
             where: {
                 roleOID: 1
             },
             defaults: {
                 roleOID: 1,
-                description: 'admin'
+                description: 'course-admin'
             }
         });
-        db.rollen.findOrCreate({
+        db.roles.findOrCreate({
             where: {
                 roleOID: 2
             },
@@ -48,7 +49,7 @@ db.sequelize.sync({force: false})
                 description: 'supervisor'
             }
         });
-        db.rollen.findOrCreate({
+        db.roles.findOrCreate({
             where: {
                 roleOID: 3
             },

@@ -1,35 +1,31 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('rolleassignment', {
-    personOID: {
+  return sequelize.define('review', {
+    reviewOID: {
+      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
-      references: {
-        model: 'person',
-        key: 'personOID'
-      }
+      primaryKey: true
     },
-    seminarOID: {
+    paperOID: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
       references: {
-        model: 'seminar',
-        key: 'seminarOID'
+        model: 'paper',
+        key: 'paperOID'
       }
     },
-    roleOID: {
+    reviewerOID: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       references: {
-        model: 'rollen',
-        key: 'roleOID'
+        model: 'user',
+        key: 'userOID'
       }
     }
   }, {
     sequelize,
-    tableName: 'rolleassignment',
+    tableName: 'review',
     timestamps: false,
     indexes: [
       {
@@ -37,22 +33,21 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "personOID" },
-          { name: "seminarOID" },
+          { name: "reviewOID" },
         ]
       },
       {
-        name: "RolleAssignment2",
+        name: "Review1",
         using: "BTREE",
         fields: [
-          { name: "seminarOID" },
+          { name: "reviewerOID" },
         ]
       },
       {
-        name: "RolleAssignment3",
+        name: "Review3",
         using: "BTREE",
         fields: [
-          { name: "roleOID" },
+          { name: "paperOID" },
         ]
       },
     ]

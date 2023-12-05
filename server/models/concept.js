@@ -11,50 +11,50 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TEXT,
       allowNull: true
     },
-    filename: {
+    userOIDSupervisor: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'user',
+        key: 'userOID'
+      }
+    },
+    userOIDStudent: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'user',
+        key: 'userOID'
+      }
+    },
+    feedback: {
       type: DataTypes.TEXT,
       allowNull: true
     },
-    personOIDSupervisor: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'person',
-        key: 'personOID'
-      }
-    },
-    personOIDStudent: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'person',
-        key: 'personOID'
-      }
-    },
     seminarOID: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       references: {
         model: 'seminar',
         key: 'seminarOID'
       }
     },
-    statusOID: {
+    accepted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
+    },
+    attachmentOID: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'status',
-        key: 'statusOID'
+        model: 'attachment',
+        key: 'attachmentOID'
       }
-    },
-    submitted: {
-      type: DataTypes.DATE,
-      allowNull: true
     }
   }, {
     sequelize,
     tableName: 'concept',
-    timestamps: false,
+    timestamps: true,
     indexes: [
       {
         name: "PRIMARY",
@@ -75,21 +75,21 @@ module.exports = function(sequelize, DataTypes) {
         name: "Concept2",
         using: "BTREE",
         fields: [
-          { name: "personOIDStudent" },
+          { name: "userOIDStudent" },
         ]
       },
       {
         name: "Concept4",
         using: "BTREE",
         fields: [
-          { name: "personOIDSupervisor" },
+          { name: "userOIDSupervisor" },
         ]
       },
       {
         name: "Concept3",
         using: "BTREE",
         fields: [
-          { name: "statusOID" },
+          { name: "attachmentOID" },
         ]
       },
     ]

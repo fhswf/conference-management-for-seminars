@@ -7,34 +7,34 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true
     },
-    studentOID: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'person',
-        key: 'personOID'
-      }
-    },
     seminarOID: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       references: {
         model: 'seminar',
         key: 'seminarOID'
       }
     },
-    filename: {
-      type: DataTypes.TEXT,
-      allowNull: true
+    authorOID: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'user',
+        key: 'userOID'
+      }
     },
-    submitted: {
-      type: DataTypes.DATE,
-      allowNull: true
+    attachmentOID: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'attachment',
+        key: 'attachmentOID'
+      }
     }
   }, {
     sequelize,
     tableName: 'paper',
-    timestamps: false,
+    timestamps: true,
     indexes: [
       {
         name: "PRIMARY",
@@ -45,17 +45,24 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
       {
-        name: "Paper1",
-        using: "BTREE",
-        fields: [
-          { name: "studentOID" },
-        ]
-      },
-      {
         name: "Paper2",
         using: "BTREE",
         fields: [
           { name: "seminarOID" },
+        ]
+      },
+      {
+        name: "Paper3",
+        using: "BTREE",
+        fields: [
+          { name: "attachmentOID" },
+        ]
+      },
+      {
+        name: "Paper4",
+        using: "BTREE",
+        fields: [
+          { name: "authorOID" },
         ]
       },
     ]

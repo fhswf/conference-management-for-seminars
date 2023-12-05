@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('status', {
-    statusOID: {
+  return sequelize.define('roles', {
+    roleOID: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -9,11 +9,11 @@ module.exports = function(sequelize, DataTypes) {
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: true
+      allowNull: false
     }
   }, {
     sequelize,
-    tableName: 'status',
+    tableName: 'roles',
     timestamps: false,
     indexes: [
       {
@@ -21,7 +21,7 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "statusOID" },
+          { name: "roleOID" },
         ]
       },
     ]
