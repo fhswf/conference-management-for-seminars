@@ -31,8 +31,8 @@ app.use(fileUpload());
 
 // ------------------------------ session setup ------------------------------
 
-//var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
-//app.use(morgan('combined', { stream: accessLogStream }))
+var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
+app.use(morgan('combined', { stream: accessLogStream }))
 app.use(morgan('dev'))
 
 
@@ -120,7 +120,7 @@ app.post('/conference/api/lti/launch', passport.authenticate('lti', {
 app.get('/conference/api/login', passport.authenticate('openidconnect'));
 
 
-app.get('/conference/api/login/callback', passport.authenticate('openidconnect', {failureRedirect: '/login'}), function (req, res) {
+app.get('/conference/api/login/callback', passport.authenticate('openidconnect', {failureRedirect: 'https://' + process.env.FRONTEND_URL}), function (req, res) {
         res.redirect('/conference/api/success');
     }
 );
@@ -152,6 +152,7 @@ app.get('/conference/api/authstatus', (req, res) => {
 });
 
 app.get('/conference/api', (req, res) => {
+    console.log(req.protocol)
     res.send('Hello World!');
 });
 
