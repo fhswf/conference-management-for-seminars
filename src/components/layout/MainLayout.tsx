@@ -34,6 +34,7 @@ function MainLayout({children}: Props) {
                        height="40" className="mr-2"></img>;
 
     const itemsSplit = [
+        {label: `${user?.firstName} ${user?.lastName}`},
         {label: `${user?.mail}`},
         user?.isAdmin && {label: `System-Admin`},
     ].filter(Boolean) as MenuItem[];

@@ -1,14 +1,16 @@
 import styles from './ChatMessage.module.css';
-import React from "react";
+import React, {useContext} from "react";
+import {AuthContext} from "../context/AuthContext.ts";
 
 interface Props {
     message: Message;
 }
 
 function ChatMessage({message}: Props) {
+    const {user, setUser} = useContext(AuthContext);
     return (
         <div className={styles.messageContainer}>
-            {message.sender === 11 ? // TODO replace with user id
+            {message.sender === user?.userOID ?
                 <>
                     <div>
                         <p>{new Date(message.createdAt).toLocaleString()}</p>

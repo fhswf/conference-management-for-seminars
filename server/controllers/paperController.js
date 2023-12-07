@@ -56,7 +56,7 @@ async function uploadPaper(req, res) {
 async function getAssignedPaper(req, res) {
     try {
         //const userOID = req.user.userOID;
-        const userOID = 3; // TODO req.user.userOID;
+        const userOID = req.user.userOID;
         const seminarOID = req.params.seminarOID;
 
         if (!seminarOID) {

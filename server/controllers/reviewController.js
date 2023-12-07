@@ -117,14 +117,32 @@ async function getReviewsOfPaper(req, res) {
     const paperOID = req.params.paperOID;
 
     try {
+        //check if user is author of paper
+        const paper = await Paper.findOne({
+            where: {
+                paperOID: paperOID,
+            },
+            attributes: ['authorOID'],
+        });
+
         const reviews = await Review.findAll({
             where: {
                 paperOID: paperOID,
             },
-            attributes: ['reviewOID', 'paperOID'],
+            attributes: ['reviewOID', 'paperOID', 'reviewerOID'],
         });
 
-        return res.status(200).json(reviews);
+        if (paper.authorOID === req.user.userOID) {
+            //return all reviewOIDs of paper
+            return res.status(200).json(reviews);
+        }else{
+            //return return reviewOID where current user is reviewer
+            //filter
+            const filteredReviews = reviews.filter(review => review.reviewerOID === req.user.userOID);
+
+            return res.status(200).json(filteredReviews);
+        }
+
     } catch (e) {
         console.error(e);
         return res.status(500).json({error: 'Internal Server Error'});

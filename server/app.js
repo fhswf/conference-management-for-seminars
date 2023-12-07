@@ -57,10 +57,11 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-        //secure: false,
-        //sameSite: true,
-        secure: true,
-        sameSite: 'none',
+        //TODO
+        secure: false,
+        sameSite: true,
+        //secure: true,
+        //sameSite: 'none',
     }
 }))
 
@@ -89,6 +90,7 @@ const userRouter = require('./routes/userRouter');
 const seminarRouter = require('./routes/seminarRouter');
 const attachmentRouter = require('./routes/attachmentRouter');
 const chatRouter = require('./routes/chatmessageRouter');
+const reviewRouter = require('./routes/reviewRouter');
 
 
 app.use('/conference/api/concepts', isAuthenticated, conceptRouter);
@@ -97,6 +99,7 @@ app.use('/conference/api/user', isAuthenticated, userRouter);
 app.use('/conference/api/seminar', isAuthenticated, seminarRouter);
 app.use('/conference/api/attachment', isAuthenticated, attachmentRouter);
 app.use('/conference/api/chat', isAuthenticated, chatRouter);
+app.use('/conference/api/review', isAuthenticated, reviewRouter);
 
 /*
 app.use(function (req, res, next) {
@@ -150,6 +153,7 @@ app.get('/conference/api/authstatus', (req, res) => {
                 lastName: req.user.lastName,
                 mail: req.user.mail,
                 isAdmin: req.user.isAdmin,
+                userOID: req.user.userOID,
             }
         });
     }
@@ -201,6 +205,10 @@ try {
     console.log('HTTPS server not started: ' + e);
 }
 */
+
+
+
+
 const serverHttp = app.listen(PORT_HTTP, function () {
     console.log('App listening at http://localhost:' + PORT_HTTP);
 });

@@ -4,6 +4,7 @@ const Op = db.Sequelize.Op;
 const Review = db.review;
 const Attachment = db.attachment;
 const Chatmessage = db.chatmessage;
+const Paper = db.paper;
 
 const getMessagesOfReview = async (req, res) => {
     try {
@@ -24,13 +25,19 @@ const getMessagesOfReview = async (req, res) => {
             order: [['createdAt', 'ASC']],
         });
 
-        const messagesWithUserId = messages.map(message => {
+        const messagesWithoutPartnerId = messages.map(message => {
             message = message.get();
-            message.clientUserId = userOID;  // for formatting purposes
+
+            if(message.sender === userOID) {
+                delete message.receiver;
+            }else if(message.receiver === userOID) {
+                delete message.sender;
+            }
+
             return message;
         });
 
-        return res.status(200).json(messagesWithUserId);
+        return res.status(200).json(messagesWithoutPartnerId);
     } catch (e) {
         console.error(e);
         return res.status(500).json({error: 'Internal Server Error'});
@@ -59,9 +66,9 @@ const createMessage = async (req, res) => {
         }
 
         // create attachment if file is present
-        let attachment = null
+        let createdAttachment = null
         if (file) {
-            attachment = await Attachment.create({
+            createdAttachment = await Attachment.create({
                 file: file.data,
                 mimetype: file.mimetype,
                 filename: file.name,
@@ -79,15 +86,17 @@ const createMessage = async (req, res) => {
         // create message
         const createdMessage = await Chatmessage.create({
             message: message,
-            attachmentOID: attachment?.attachmentOID,
+            attachmentOID: createdAttachment?.attachmentOID,
             reviewOID: reviewOID,
             sender: userOID, // TODO
             receiver: receiverId // TODO
         }, {transaction: t});
-
+        delete createdMessage.dataValues.receiver;
         await t.commit();
 
-        return res.status(200).json(createdMessage);
+        createdMessage.attachmentO = createdAttachment;
+
+        return res.status(200).json({createdMessage, createdAttachment});
     } catch (e) {
         await t.rollback();
         console.error(e);
