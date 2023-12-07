@@ -25,14 +25,14 @@ function PaperOverviewPage() {
     const [showModal, setShowModal] = useState(false);
     const [showChat, setShowChat] = useState<Paper>();
     //const [uploadedPaper, setUploadedPaper] = useState<PaperObj[] | null>(null)
-    const {data: uploadedPaper} = useFetch<PaperType[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/paper/get-uploaded-paper/${seminarOID}`);
-    const {data: seminar} = useFetch<SeminarType>(`http://${import.meta.env.VITE_BACKEND_URL}/api/seminar/get-seminar/${seminarOID}`);
+    const {data: uploadedPaper} = useFetch<PaperType[]>(`https://${import.meta.env.VITE_BACKEND_URL}/paper/get-uploaded-paper/${seminarOID}`);
+    const {data: seminar} = useFetch<SeminarType>(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminar/${seminarOID}`);
 
     return (
         <div>
             <MainLayout>
-                <p>{JSON.stringify(uploadedPaper)}</p>
-                <p>{JSON.stringify(seminar)}</p>
+                {/*<p>{JSON.stringify(uploadedPaper)}</p>*/}
+                {/*<p>{JSON.stringify(seminar)}</p>*/}
                 <p>Ihre eingereichten Paper:</p>
                 <div className={styles.container}>
                     <p>Datei:</p>
@@ -41,7 +41,7 @@ function PaperOverviewPage() {
                     {uploadedPaper && uploadedPaper.length > 0 ? (
                         uploadedPaper.map((paper: PaperType, index: number) => (
                             <Fragment key={index}>
-                                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/api/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
+                                <a href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
                                 {seminar && seminar.roleassignments.length > 0 ? (
                                     paper.paperOID === seminar.roleassignments[0].phase4paperOID ? (
                                         <>

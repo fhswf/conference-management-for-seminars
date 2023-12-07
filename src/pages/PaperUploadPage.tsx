@@ -24,7 +24,7 @@ function PaperUploadPage({seminarOID, phase}: Props) {
         console.log(selectedFile);
 
         try {
-            const res = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/paper`, {
+            const res = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/paper`, {
                 method: 'POST',
                 credentials: 'include',
                 body: formData,

@@ -19,9 +19,9 @@ function ChatWindowPage({paper, reviewOID}: Props){
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [messages, setMessages] = useState<Message[]>([])
     const [text, setText] = useState<string>("")
-    //const {data: messages2} = useFetch<Message[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/chat/879`)
+    //const {data: messages2} = useFetch<Message[]>(`https://${import.meta.env.VITE_BACKEND_URL}/chat/879`)
     const [messages2, setMessages2] = useState<Message[]>()
-    const {data: reviewOIDs} = useFetch<Review[]>(`http://${import.meta.env.VITE_BACKEND_URL}/api/review/get-from-paper/${paper.paperOID}`)
+    const {data: reviewOIDs} = useFetch<Review[]>(`https://${import.meta.env.VITE_BACKEND_URL}/review/get-from-paper/${paper.paperOID}`)
     const [selectedReview, setSelectedReview] = useState<number>()
 
     useEffect(() => {
@@ -32,7 +32,7 @@ function ChatWindowPage({paper, reviewOID}: Props){
 
             console.log("fetch " + selectedReview)
 
-            const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/chat/${selectedReview}`, {
+            const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/chat/${selectedReview}`, {
                 credentials: "include"
             });
 
@@ -78,7 +78,7 @@ function ChatWindowPage({paper, reviewOID}: Props){
         paper.paperOID && formData.append('paperOID', paper.paperOID.toString());
         selectedReview && formData.append('reviewOID', selectedReview.toString());
 
-        const response = await fetch("http://192.168.0.206:3000/api/chat", {
+        const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/chat`, {
             method: "POST",
             credentials: "include",
             body: formData
@@ -103,8 +103,8 @@ function ChatWindowPage({paper, reviewOID}: Props){
 
     return(
         <div className={styles.container}>
-            {JSON.stringify(paper)}
-            {JSON.stringify(reviewOIDs)}
+            {/*JSON.stringify(paper)*/}
+            {/*JSON.stringify(reviewOIDs)*/}
             {reviewOIDs && <div className={styles.buttonContainer}>
                 <Button key={reviewOIDs[0].reviewOID} onClick={()=>setSelectedReview(reviewOIDs[0].reviewOID || undefined)}>Reviewer A</Button>
                 <Button key={reviewOIDs[1].reviewOID} onClick={()=>setSelectedReview(reviewOIDs[1].reviewOID || undefined)}>Reviewer B</Button>

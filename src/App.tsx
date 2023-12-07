@@ -30,7 +30,7 @@ function App() {
     useEffect(() => {
         const getUser = () => {
             console.log("fetching user");
-            fetch(`http://${import.meta.env.VITE_BACKEND_URL}/api/authstatus`, {
+            fetch(`https://${import.meta.env.VITE_BACKEND_URL}/authstatus`, {
                 method: "GET",
                 credentials: "include",
             })
@@ -58,7 +58,7 @@ function App() {
     return (
         <PrimeReactProvider>
             <AuthContext.Provider value={{ user, setUser }}>
-                <BrowserRouter>
+                <BrowserRouter basename='/conference' >
                     <div>
                         <Routes>
                             <Route path="/login" element={user ? <Navigate to="/"/> : <LoginPage/>}/>
