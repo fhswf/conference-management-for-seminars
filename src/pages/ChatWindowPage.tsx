@@ -19,9 +19,9 @@ function ChatWindowPage({paper, reviewOID}: Props){
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [messages, setMessages] = useState<Message[]>([])
     const [text, setText] = useState<string>("")
-    //const {data: messages2} = useFetch<Message[]>(`https://${import.meta.env.VITE_BACKEND_URL}/chat/879`)
+    //const {data: messages2} = useFetch<Message[]>(`http://${import.meta.env.VITE_BACKEND_URL}/chat/879`)
     const [messages2, setMessages2] = useState<Message[]>()
-    const {data: reviewOIDs} = useFetch<Review[]>(`https://${import.meta.env.VITE_BACKEND_URL}/review/get-from-paper/${paper.paperOID}`)
+    const {data: reviewOIDs} = useFetch<Review[]>(`http://${import.meta.env.VITE_BACKEND_URL}/review/get-from-paper/${paper.paperOID}`)
     const [selectedReview, setSelectedReview] = useState<number>()
 
     useEffect(() => {
@@ -32,7 +32,7 @@ function ChatWindowPage({paper, reviewOID}: Props){
 
             console.log("fetch " + selectedReview)
 
-            const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/chat/${selectedReview}`, {
+            const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/chat/${selectedReview}`, {
                 credentials: "include"
             });
 
@@ -78,7 +78,7 @@ function ChatWindowPage({paper, reviewOID}: Props){
         paper.paperOID && formData.append('paperOID', paper.paperOID.toString());
         selectedReview && formData.append('reviewOID', selectedReview.toString());
 
-        const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/chat`, {
+        const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/chat`, {
             method: "POST",
             credentials: "include",
             body: formData

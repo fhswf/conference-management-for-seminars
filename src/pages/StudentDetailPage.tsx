@@ -28,7 +28,7 @@ type PaperType = Paper & {
 
 function StudentDetailPage() {
     const {seminarOID, studentOID} = useParams();
-    const {data} = useFetch<UserType>(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/get-student/${seminarOID}/${studentOID}`);
+    const {data} = useFetch<UserType>(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/get-student/${seminarOID}/${studentOID}`);
 
     const styles = {
         uploadedPaper: {
@@ -51,7 +51,7 @@ function StudentDetailPage() {
         return {
             text: concept.text,
             pdf: concept.attachmentO ?
-                <a href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${concept.attachmentO?.attachmentOID}`}>{concept.attachmentO?.filename}</a> : "-",
+                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/attachment/${concept.attachmentO?.attachmentOID}`}>{concept.attachmentO?.filename}</a> : "-",
             supervisor: concept.userOIDSupervisor_user ? `${concept.userOIDSupervisor_user.firstName} ${concept.userOIDSupervisor_user.lastName}` : '-',
             feedback: concept.feedback || '-',
             status: mapConceptStatusToString(concept.accepted),
@@ -76,7 +76,7 @@ function StudentDetailPage() {
                     {data?.papers && data?.papers.length > 0 && data?.papers.map((paper: PaperType, index: number) => {
                         return (
                             <Fragment key={index}>
-                                <a href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.paperOID}`}>{paper.attachmentO.filename}</a>
+                                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.paperOID}`}>{paper.attachmentO.filename}</a>
                                 <p>{paper.createdAt ? new Date(paper.createdAt).toLocaleString() : '-'}</p>
                                 {data.roleassignments.length > 0 ? (
                                     paper.paperOID === data.roleassignments[0].phase4paperOID ? (

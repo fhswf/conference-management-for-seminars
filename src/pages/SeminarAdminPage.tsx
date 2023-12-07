@@ -11,7 +11,7 @@ import HiddenLabel from "../components/ToggleLabel.tsx";
 
 function SeminarAdminPage() {
     const [showAddUser, setShowAddUser] = useState<Seminar>()
-    const {data} = useFetch<Seminar[]>(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminars`);
+    const {data} = useFetch<Seminar[]>(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminars`);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const styles = {
@@ -52,7 +52,7 @@ function SeminarAdminPage() {
             return
         }
 
-        const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/seminar`, {
+        const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/seminar`, {
             method: "POST",
             credentials: 'include',
             headers: {

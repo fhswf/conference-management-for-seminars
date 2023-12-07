@@ -36,18 +36,18 @@ function SeminarPage() {
     //const [showCommentsOwnPaper, setShowCommentsOwnPaper] = useState(false);
     //const [showCommentsStrangerPaper, setShowCommentsStrangerPaper] = useState(false);
     const [showChat, setShowChat] = useState<Paper>();
-    const {data: seminar} = useFetch<SeminarType>(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminar/${seminarOID}`,);
+    const {data: seminar} = useFetch<SeminarType>(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminar/${seminarOID}`,);
     // TODO only fetch if phase >= 2 and phase >= 5
     const {
         data: concept,
         loading: loadingConcept,
         error: errorConcept
-    } = useFetch<ConceptType>(`https://${import.meta.env.VITE_BACKEND_URL}/concepts/newest/${seminarOID}`);
+    } = useFetch<ConceptType>(`http://${import.meta.env.VITE_BACKEND_URL}/concepts/newest/${seminarOID}`);
     const {
         data: assignedPaper,
         loading: loadingPaper,
         error: errorPaper
-    } = useFetch<PaperType[]>(`https://${import.meta.env.VITE_BACKEND_URL}/paper/get-assigned-paper/${seminarOID}`);
+    } = useFetch<PaperType[]>(`http://${import.meta.env.VITE_BACKEND_URL}/paper/get-assigned-paper/${seminarOID}`);
 
     //const [concept, setConcept] = useState<Concept | null>(null)
     //const [assignedPaper, setAssignedPaper] = useState<Paper[] | null>(null)
@@ -91,7 +91,7 @@ function SeminarPage() {
                         {/**/}
                         <div>
                             {(concept?.attachmentO?.filename) ? //if filename exists pdf exists
-                                <a href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${concept.attachmentOID}`}>{concept.attachmentO.filename}</a> :
+                                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/attachment/${concept.attachmentOID}`}>{concept.attachmentO.filename}</a> :
                                 <p>-</p>
                             }
                         </div>
@@ -137,7 +137,7 @@ function SeminarPage() {
                             if (paper.attachmentO) {
                                 return (
                                     <Fragment key={index}>
-                                        <a href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
+                                        <a href={`http://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
                                         <Button onClick={() => setShowChat(paper)}>Kommentieren</Button>
                                     </Fragment>
                                 )

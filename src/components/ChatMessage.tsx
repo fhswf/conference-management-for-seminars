@@ -15,13 +15,13 @@ function ChatMessage({message}: Props) {
                     </div>
                     <div className={styles.text}>
                         <p>{message.message}</p>
-                        {message.attachmentO && <><hr/><a href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${message.attachmentO.attachmentOID}`}>{message.attachmentO.filename}</a></>}
+                        {message.attachmentO && <><hr/><a href={`http://${import.meta.env.VITE_BACKEND_URL}/attachment/${message.attachmentO.attachmentOID}`}>{message.attachmentO.filename}</a></>}
                     </div>
                 </> :
                 <>
                     <div className={styles.text}>
                         <p>{message.message}</p>
-                        {message.attachmentO && <><hr/><a href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${message.attachmentO.attachmentOID}`}>{message.attachmentO.filename}</a></>}
+                        {message.attachmentO && <><hr/><a href={`http://${import.meta.env.VITE_BACKEND_URL}/attachment/${message.attachmentO.attachmentOID}`}>{message.attachmentO.filename}</a></>}
                     </div>
                     <div>
                         <p>{new Date(message.createdAt).toLocaleString()}</p>

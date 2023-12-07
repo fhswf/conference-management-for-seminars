@@ -46,7 +46,7 @@ function ConceptUploadPage() {
         console.log(formData);
 
         try {
-            const res = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/concepts`, {
+            const res = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/concepts`, {
                 method: 'POST',
                 credentials: 'include',
                 body: formData,
@@ -73,7 +73,7 @@ function ConceptUploadPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/user/get-supervisor-list/${seminarOID}`,{
+                const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/user/get-supervisor-list/${seminarOID}`,{
                     method: 'GET',
                     credentials: 'include'
                 });

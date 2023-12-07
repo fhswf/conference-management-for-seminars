@@ -30,7 +30,7 @@ function MainLayout({children}: Props) {
         }
     ].filter(Boolean) as MenuItem[]
 
-    const start = <img alt="logo" src="https://www.fh-swf.de/media/_tech__fhswf/layout__fhswf/images__fhswf/Logo.png"
+    const start = <img alt="logo" src="http://www.fh-swf.de/media/_tech__fhswf/layout__fhswf/images__fhswf/Logo.png"
                        height="40" className="mr-2"></img>;
 
     const itemsSplit = [
@@ -42,7 +42,7 @@ function MainLayout({children}: Props) {
     const logout = () => {
         const leave = window.confirm("Wollen Sie sich wirklich abmelden?");
         if (leave) {
-            fetch(`https://${import.meta.env.VITE_BACKEND_URL}/logout`, {
+            fetch(`http://${import.meta.env.VITE_BACKEND_URL}/logout`, {
                 method: 'GET',
                 credentials: 'include',
             }).then(response => response.json())
