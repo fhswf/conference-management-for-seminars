@@ -13,7 +13,7 @@ function MainLayout({children}: Props) {
     const navigate = useNavigate();
     const {user, setUser} = useContext(AuthContext);
 
-    console.log(user)
+    //console.log(user)
 
     const items = [
         {

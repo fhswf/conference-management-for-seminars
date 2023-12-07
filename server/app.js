@@ -127,8 +127,8 @@ app.get('/conference/api/login/callback', passport.authenticate('openidconnect',
 
 
 app.get('/conference/api/success', function (req, res) {
-    console.log(req.user);
-    console.log(req.session);
+    //console.log(req.user);
+    //console.log(req.session);
     res.redirect('https://' + process.env.FRONTEND_URL);
 });
 
@@ -145,7 +145,12 @@ app.get('/conference/api/authstatus', (req, res) => {
     console.log("APP CHCECK AUTH");
     if (req.isAuthenticated()) {
         return res.status(200).json({
-            user: req.user
+            user: {
+                firstName: req.user.firstName,
+                lastName: req.user.lastName,
+                mail: req.user.mail,
+                isAdmin: req.user.isAdmin,
+            }
         });
     }
     return res.status(401).json({msg: "Not authenticated"});

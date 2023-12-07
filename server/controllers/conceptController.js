@@ -1,6 +1,7 @@
 const db = require("../models");
 const attachmentController = require("./attachmentController");
 const path = require("path");
+const {isValidPdf} = require("../util/PdfUtils");
 
 const Concept = db.concept;
 const User = db.user;
@@ -51,10 +52,13 @@ const uploadConcept = async (req, res) => {
 
         const supervisorOID = req.body?.supervisorOID || undefined;
 
-        let attachment = null;
-        if (req.files?.file) {
-            attachment = await attachmentController.createAttachment(req.files?.file, t)
+        const file = req.files?.file
+
+        if(!await isValidPdf(file.data)){
+            return res.status(415).json({error: 'Unsupported Media Type; Only PDF files are allowed'});
         }
+
+        const attachment = await attachmentController.createAttachment(req.files?.file, t)
 
         await Concept.create({
             text: text,
