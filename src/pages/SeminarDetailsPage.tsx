@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import Modal from "../components/Modal.tsx";
 import ConceptAcceptReject from "../components/ConceptAcceptReject.tsx";
 import MainLayout from "../components/layout/MainLayout.tsx";
@@ -16,6 +16,7 @@ import User from "../entities/database/User.ts";
 import Attachment from "../entities/database/Attachment.ts";
 import Seminar from "../entities/database/Seminar.ts";
 import RoleAssignment from "../entities/database/RoleAssignment.ts";
+import {AuthContext} from "../context/AuthContext.ts";
 
 type ConceptType = Concept & {
     userOIDSupervisor_user: User,
@@ -35,6 +36,7 @@ type StudentListResponse = Seminar & {
 }
 
 function SeminarDetailsPage() {
+    const { user } = useContext(AuthContext);
     const navigate = useNavigate();
     const {seminarOID} = useParams();
     const [isEditMode, setIsEditMode] = useState(0);
@@ -138,6 +140,8 @@ function SeminarDetailsPage() {
     const conceptCount = studentList?.roleassignments.filter(user => user.userO.userOIDStudent_concepts[0]?.accepted === true).length;
     const studentCount = studentList?.roleassignments.filter(user => user.roleOID === 3).length;
 
+    const currentRole = studentList?.roleassignments.find(userEntry => userEntry.userOID === user.userOID);
+
     return (
         <div>
             <MainLayout>
@@ -148,7 +152,7 @@ function SeminarDetailsPage() {
                             onNextPhaseClicked();
                         }
                     }}>{mapPhaseToString(studentList?.phase)} 🖊</p>}
-                    {/* <pre>{JSON.stringify(studentList, null, 2)}</pre> */}
+                    <pre>{JSON.stringify(currentRole, null, 2)}</pre>
                     <HiddenLabel text={studentList?.assignmentkey || ""}/>
                     <p>Eingereichte und angenommene Konzepte: {conceptCount}/{studentCount}</p>
                     <p>Eingereichte Paper Phase 4: TODO</p>
@@ -199,9 +203,9 @@ function SeminarDetailsPage() {
                         }}>Add User</Button>
                     }
 
-                    {showUserConcept && availableSupervisor &&
+                    {showUserConcept && availableSupervisor  && currentRole &&
                         <Modal isOpen={!!showUserConcept} onClose={() => setShowUserConcept(undefined)}>
-                            <ConceptAcceptReject user0={showUserConcept} availableSupervisors={availableSupervisor}/>
+                            <ConceptAcceptReject user0={showUserConcept} availableSupervisors={availableSupervisor} userRole={currentRole.roleOID!}/>
                         </Modal>}
                     {/* TODO verbessern */}
                     {studentList?.description && studentList.seminarOID && <Modal isOpen={showAddUser} onClose={() => {

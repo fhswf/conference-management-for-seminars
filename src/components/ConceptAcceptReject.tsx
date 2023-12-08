@@ -19,9 +19,10 @@ interface Props {
     user0: UserType;
     availableSupervisors: User[];
     onClose?: () => void;
+    userRole: number;
 }
 
-function ConceptAcceptReject({user0, availableSupervisors, onClose}: Props) {
+function ConceptAcceptReject({user0, availableSupervisors, onClose, userRole}: Props) {
     const [selectedSupervisor, setSelectedSupervisor] = useState<User | null>(null)
     const [inputText, setInputText] = useState("")
     const styles = {
@@ -105,7 +106,8 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose}: Props) {
             <p>Status: {user0.userOIDStudent_concepts[0].accepted === null ? "Bewertung ausstehend" : user0.userOIDStudent_concepts[0].accepted ? "Angenommen" : "Abgelehnt"}</p>
             <p>Feedback: {user0.userOIDStudent_concepts[0].feedback || "-"}</p>
 
-            {(!user0.userOIDStudent_concepts[0].accepted) && // if evaluation pending
+            {/* if evaluation pending */}
+            {(!user0.userOIDStudent_concepts[0].accepted) && userRole === 1 &&
                 <>
                     <h4>TODO Beurteilung auf Kurs-Admin beschränken</h4>
                     Betreuer: <Dropdown value={selectedSupervisor} options={supervisor} optionLabel="name"
