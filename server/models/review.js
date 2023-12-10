@@ -22,7 +22,11 @@ module.exports = function(sequelize, DataTypes) {
         model: 'user',
         key: 'userOID'
       }
-    }
+    },
+    rating: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
   }, {
     sequelize,
     tableName: 'review',

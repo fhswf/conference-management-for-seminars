@@ -5,18 +5,18 @@ import styles from "./AddUserForm.module.css";
 import {Button} from "primereact/button";
 import useFetch from "../hooks/useFetch.ts";
 import User from "../entities/database/User.ts";
+import Seminar from "../entities/database/Seminar.ts";
 
 interface Props {
-    seminarOID: number;
-    seminarname: string;
+    seminar: Seminar;
     onClose?: () => void;
 }
 
-function AssignUserPage({seminarOID, seminarname, onClose}: Props) {
+function AssignUserPage({seminar, onClose}: Props) {
     const [selectedRole, setSelectedRole] = useState<number>();
     const [selectedUser, setSelectedUser] = useState<any>();
 
-    const userList = useFetch<User[]>(`http://${import.meta.env.VITE_BACKEND_URL}/user/get-addable-users/${seminarOID}`);
+    const userList = useFetch<User[]>(`http://${import.meta.env.VITE_BACKEND_URL}/user/get-addable-users/${seminar.seminarOID}`);
 
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
@@ -29,7 +29,7 @@ function AssignUserPage({seminarOID, seminarname, onClose}: Props) {
             method: 'POST',
             credentials: 'include',
             body: JSON.stringify({
-                seminarOID: seminarOID,
+                seminarOID: seminar.seminarOID,
                 userOID: selectedUser.userOID,
                 //index
                 roleOID: selectedRole,
@@ -57,10 +57,11 @@ function AssignUserPage({seminarOID, seminarname, onClose}: Props) {
         setSelectedRole(rollen[2].value);
     }, [])
 
-    let usersJson: { name: string, comment: string | null, userOID: number }[] = [];
+    // TODO anpassen
+    let usersJson: { name: string, userOID: number }[] = [];
 
     userList?.data?.map((user: User) => {
-        usersJson.push({name: `${user.lastName}, ${user.firstName}`, comment: user.comment, userOID: user.userOID!})
+        usersJson.push({name: `${user.lastName}, ${user.firstName}`, userOID: user.userOID!})
     });
 
 
@@ -72,8 +73,7 @@ function AssignUserPage({seminarOID, seminarname, onClose}: Props) {
                           optionLabel="name" placeholder="User wählen" filter/><br/>
                 <Dropdown id="role" value={selectedRole} onChange={(e) => setSelectedRole(e.value)} options={rollen}
                           placeholder="Rolle wählen" optionLabel="name"/><br/>
-                <p>Seminar: {seminarname}</p>
-                <p>Kommentar: {selectedUser?.comment || "-"}</p>
+                <p>Seminar: {seminar.description}</p>
 
                 <Button type="submit" label="Nutzer eintragen"/>
                 {/*<p>{JSON.stringify(userList?.data)}</p>*/}

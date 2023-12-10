@@ -16,7 +16,7 @@ const fileUpload = require('express-fileupload');
 const app = express();
 app.set('trust proxy', true);
 // ------------------------------ middleware ------------------------------
-const {isAuthenticated, isInstructor, isStudent} = require("./middleware/authMiddleware");
+const {isAuthenticated} = require("./middleware/authMiddleware");
 
 app.use(cors({
     origin: `http://${process.env.FRONTEND_URL}`,
@@ -58,8 +58,8 @@ app.use(session({
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
         //TODO
-        secure: false,
-        sameSite: true,
+        //secure: false,
+        //sameSite: true,
         //secure: true,
         //sameSite: 'none',
     }

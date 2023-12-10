@@ -1,9 +1,41 @@
 const jwt = require('jsonwebtoken');
-const {isAccessTokenExpired, refreshAccessToken, introspectToken} = require("../util/TokenUtils");
 
+const db = require("../models");
+const Chatmessage = db.chatmessage;
+const Concept = db.concept;
+const Paper = db.paper;
+
+const {isAccessTokenExpired, refreshAccessToken, introspectToken} = require("../util/TokenUtils");
+const {
+    userIsMemberOfSeminar,
+    userRoleIsCourseAdmin,
+    userRoleIsStudent,
+    userRoleIsSupervisor
+} = require("../controllers/roleassignmentController");
+
+const {userIsChatParticipant} = require("../controllers/chatmessageController");
+const {userIsAuthorOfConcept, conceptHasAttachment} = require("../controllers/conceptController");
+const {userIsAuthorOfPaper, paperHasAttachment, getSeminarOIDOfPaper} = require("../controllers/paperController");
+const {userIsReviewerOfPaper} = require("../controllers/reviewController");
+const {getAttachmentDetails} = require("../controllers/attachmentController");
+const {userIsSystemAdmin} = require("../controllers/userController");
+
+/**
+ * Checks if the user is authenticated.
+ * If user has logged in with OIDC, the access token will be checked for expiration.
+ * If the access token is expired, a new one will be requested with the refresh token.
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<*>}
+ */
 async function isAuthenticated(req, res, next) {
     if (!req.isAuthenticated()) {
         return res.status(401).json({msg: "Not authenticated"});
+    }
+
+    if(!req.user.authtype) {
+        return res.status(400).json({msg: "No authtype"});
     }
 
     if (req.user.authtype === "lti") {
@@ -33,6 +65,7 @@ async function isAuthenticated(req, res, next) {
 
         // check if token is active
         //const tokenActive = newAccessToken ? await introspectToken(newAccessToken) : await introspectToken(req.user.accessToken);
+        // setted to true, because if the introspectToken failed the user will be logged out
         const tokenActive = true;
 
         if (tokenActive) {
@@ -45,45 +78,257 @@ async function isAuthenticated(req, res, next) {
     }
 }
 
+/**
+ * Checks if the user is a student in the seminar.
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<*>}
+ */
+async function isStudentInSeminar(req, res, next) {
+    const userOID = req.user.userOID;
+    const seminarOID = req.params.seminarOID || req.body.seminarOID;
 
-//TODO edit
-function isInstructor(req, res, next) {
-    if (req.user.lti) {
-        if (req.user.lti.roles.includes("Instructor")) {
-            return next();
-        } else {
-            res.status(401).json({msg: "Not authorized"});
-        }
+    if(!userOID || !seminarOID) {
+        return res.status(400).json({msg: "No userOID or seminarOID"});
+    }
+
+    if (await userRoleIsStudent(userOID, seminarOID)) {
+        return next();
     } else {
-        const tokenData = jwt.decode(req.user.accessToken);
-        if (tokenData.realm_access.roles.includes("instructor")) {
-            return next();
-        } else {
-            res.status(401).json({msg: "Not authorized"});
-        }
+        return res.status(403).json({msg: "Not authorized"});
     }
 }
 
-//TODO edit
-function isStudent(req, res, next) {
-    if (req.user.lti) {
-        if (req.user.lti.roles.includes("Learner")) {
-            return next();
-        } else {
-            res.status(401).json({msg: "Not authorized"});
-        }
-    } else {
-        const tokenData = jwt.decode(req.user.accessToken);
-        if (tokenData.realm_access.roles.includes("student")) {
-            return next();
-        } else {
-            res.status(401).json({msg: "Not authorized"});
-        }
+/**
+ * Checks if the user is a supervisor in the seminar.
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<*>}
+ */
+async function isSupervisorInSeminar(req, res, next) {
+    const userOID = req.user.userOID;
+    const seminarOID = req.params.seminarOID || req.body.seminarOID;
+
+    if(!userOID || !seminarOID) {
+        return res.status(400).json({msg: "No userOID or seminarOID"});
     }
+
+    if (await userIsMemberOfSeminar(userOID, seminarOID) && await userRoleIsSupervisor(userOID, seminarOID)) {
+        return next();
+    } else {
+        return res.status(403).json({msg: "Not authorized"});
+    }
+}
+
+
+/**
+ * Checks if the user is a course admin in the seminar.
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<*>}
+ */
+async function isCourseAdminInSeminar(req, res, next) {
+    const userOID = req.user.userOID;
+    const seminarOID = req.params.seminarOID || req.body.seminarOID;
+
+    if(!userOID || !seminarOID) {
+        return res.status(400).json({msg: "No userOID or seminarOID"});
+    }
+
+    if (await userIsMemberOfSeminar(userOID, seminarOID) && await userRoleIsCourseAdmin(userOID, seminarOID)) {
+        return next();
+    } else {
+        return res.status(403).json({msg: "Not authorized"});
+    }
+}
+
+
+/**
+ * Checks if the user is a course admin or a supervisor in the seminar with the given seminarOID or paperOID.
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<*>}
+ */
+async function isCourseAdminOrSupervisorInSeminar(req, res, next) {
+    const userOID = req.user.userOID;
+    let seminarOID = req.params.seminarOID || req.body.seminarOID;
+    const paperOID = req.params.paperOID || req.body.paperOID;
+
+    if(!userOID || (!seminarOID && !paperOID)) {
+        return res.status(400).json({msg: "No userOID or seminarOID or paperOID"});
+    }
+
+    if (paperOID) {
+        seminarOID = await getSeminarOIDOfPaper(paperOID);
+    }
+
+    if (await userRoleIsCourseAdmin(userOID, seminarOID) || await userRoleIsSupervisor(userOID, seminarOID)) {
+        return next();
+    } else {
+        return res.status(403).json({msg: "Not authorized"});
+    }
+}
+
+/**
+ * Checks if the user is the author of the concept with the given conceptOID.
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<*>}
+ */
+async function isConceptAuthor(req, res, next) {
+    const userOID = req.user.userOID;
+    const conceptOID = req.params.conceptOID;
+
+    if(!userOID || !conceptOID) {
+        return res.status(400).json({msg: "No userOID or conceptOID"});
+    }
+
+    if (await userIsAuthorOfConcept(userOID, conceptOID)) {
+        return next();
+    } else {
+        return res.status(403).json({msg: "Not authorized"});
+    }
+}
+
+/**
+ * Checks if the user is permitted to access the file with the given attachmentOID.
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<*>}
+ */
+async function isPermittedToAccessFile(req, res, next) {
+    const userOID = req.user.userOID;
+    const attachmentOID = req.params.attachmentOID;
+
+    if(!userOID || !attachmentOID) {
+        return res.status(400).json({msg: "No userOID or attachmentOID"});
+    }
+
+    const model = await getAttachmentDetails(attachmentOID);
+
+    if (model instanceof Chatmessage) {
+        if (await userIsChatParticipant(userOID, attachmentOID)) {
+            return next();
+        }
+    } else if (model instanceof Concept) {
+        if (await userIsAuthorOfConcept(userOID, model.conceptOID) ||
+            await userRoleIsCourseAdmin(userOID, model.seminarOID) ||
+            await userRoleIsSupervisor(userOID, model.seminarOID)) {
+            return next();
+        }
+        //return res.status(403).json({msg: "concept"});
+    } else if (model instanceof Paper) {
+        if (await userIsAuthorOfPaper(userOID, model.paperOID) ||
+            await userRoleIsCourseAdmin(userOID, model.seminarOID) ||
+            await userRoleIsSupervisor(userOID, model.seminarOID) ||
+            await userIsReviewerOfPaper(userOID, model.paperOID)) {
+            return next();
+        }
+        //return res.status(403).json({msg: "paper"});
+    }
+
+    return res.status(403).json({msg: "Not authorized"});
+
+
+    //const conc = await conceptHasAttachment(attachmentOID);
+    //const paper = await paperHasAttachment(attachmentOID);
+
+    //if ((!!conc && (await userIsAuthorOfConcept(userOID, conc.conceptOID) || userRoleIsCourseAdmin(userOID, conc.seminarOID) || userRoleIsSupervisor(userOID, conc.seminarOID))) ||
+    //    (!!paper && (await userIsAuthorOfPaper(userOID, paper.paperOID) /*||  user is course admin  || user is Supervisor of paper || user is ReviewerofPaper*/)) ||
+    //    await userIsChatParticipant(userOID, attachmentOID)) {
+    //    return next();
+    //} else {
+    //    return res.status(403).json({msg: "Not authorized"});
+    //}
+}
+
+/**
+ * Checks if the user is a member of the seminar with the given seminarOID.
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<*>}
+ */
+async function isMemberOfSeminar(req, res, next) {
+    const userOID = req.user.userOID;
+    const seminarOID = req.params.seminarOID || req.body.seminarOID;
+
+    if(!userOID || !seminarOID) {
+        return res.status(400).json({msg: "No userOID or seminarOID"});
+    }
+
+    if (await userIsMemberOfSeminar(userOID, seminarOID)) {
+        return next();
+    } else {
+        return res.status(403).json({msg: "Not authorized"});
+    }
+}
+
+async function isSystemAdmin(req, res, next) {
+    const userOID = req.user.userOID;
+
+    if(await userIsSystemAdmin(userOID)) {
+        return next();
+    }
+}
+
+/**
+ * Checks if the user is a participant of the chat with the given chatmessageOID or reviewOID.
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<*>}
+ */
+async function isChatParticipant(req, res, next) {
+    const userOID = req.user.userOID;
+    const chatmessageOID = req.params.chatmessageOID || req.body.chatmessageOID;
+    const reviewOID = req.params.reviewOID || req.body.reviewOID;
+
+    if(!userOID || (!chatmessageOID && !reviewOID)) {
+        return res.status(400).json({msg: "No userOID or chatmessageOID or reviewOID"});
+    }
+
+    if (await userIsChatParticipant(userOID, chatmessageOID, reviewOID)) {
+        return next();
+    } else {
+        return res.status(403).json({msg: "Not authorized"});
+    }
+}
+
+/**
+ * Checks if the user is a reviewer or author of the paper with the given paperOID.
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<*>}
+ */
+async function isReviewerOrAuthorOfPaper(req, res, next) {
+    if(!req.user.userOID || !req.params.paperOID) {
+        return res.status(400).json({msg: "No userOID or paperOID"});
+    }
+
+    if(userIsReviewerOfPaper || userIsAuthorOfPaper) {
+        return next();
+    }
+    return res.status(403).json({msg: "Not authorized"});
 }
 
 module.exports = {
     isAuthenticated,
-    isInstructor,
-    isStudent,
+    isStudentInSeminar,
+    isSupervisorInSeminar,
+    isCourseAdminInSeminar,
+    isCourseAdminOrSupervisorInSeminar,
+    isPermittedToAccessFile,
+    isConceptAuthor,
+    isMemberOfSeminar,
+    isSystemAdmin,
+    isChatParticipant,
+    isReviewerOrAuthorOfPaper
 };

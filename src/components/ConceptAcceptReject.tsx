@@ -95,7 +95,6 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose, userRole}: P
             <h2>Konzept annehmen / ablehnen</h2>
             <h3>Autor:</h3>
             <p>Name: {user0.firstName} {user0.lastName}</p>
-            <p>Kommentar: {user0.comment || "-"}</p>
             <p>Mail: {user0.mail}</p>
             <hr/>
             <h3>Konzept:</h3>

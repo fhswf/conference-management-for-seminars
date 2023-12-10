@@ -6,10 +6,21 @@ const Attachment = db.attachment;
 const Chatmessage = db.chatmessage;
 const Paper = db.paper;
 
+/**
+ * Retrieves chat messages related to a specific review.
+ * The messages are ordered by creation date in ascending order.
+ * Removes the partners user ID from each message for privacy reasons if user is not sender.
+ * @param req
+ * @param res
+ */
 const getMessagesOfReview = async (req, res) => {
     try {
         const userOID = req.user.userOID
         const reviewOID = req.params.reviewOID
+
+        if(!reviewOID) {
+            return res.status(400).json({error: 'Bad Request'});
+        }
 
         const messages = await Chatmessage.findAll({
             where: {
@@ -44,6 +55,12 @@ const getMessagesOfReview = async (req, res) => {
     }
 }
 
+/**
+ * Creates a chat message associated with a review, including optional attachments.
+ * Returns the created message and attachment (if any).
+ * @param req
+ * @param res
+ */
 const createMessage = async (req, res) => {
     const t = await db.sequelize.transaction();
     try {
@@ -104,7 +121,83 @@ const createMessage = async (req, res) => {
     }
 }
 
+/**
+ * Checks if a user with the provided userOID is a participant in a chat conversation.
+ * @param userOID - The userOID to be checked.
+ * @param attachmentOID - The attachmentOID associated with the chat (optional).
+ * @param reviewOID - The reviewOID associated with the chat (optional).
+ * @throws {Error} - Throws an error if userOID, attachmentOID, or reviewOID is null.
+ * @returns {Promise<boolean>} - True if the user is a chat participant, otherwise false.
+ */
+async function userIsChatParticipant(userOID, attachmentOID = false, reviewOID= false) {
+    if(!userOID || (!attachmentOID && !reviewOID)) {
+        throw new Error("userOID or attachmentOID or reviewOID is null");
+    }
+
+    let chatmessage = null;
+
+    if(attachmentOID) {
+        chatmessage = await Chatmessage.findOne({
+        where: {
+            attachmentOID: attachmentOID,
+            [Op.or]: [{ sender: userOID }, { receiver: userOID }]
+        },
+    })
+    } else if(reviewOID) {
+        chatmessage = await Chatmessage.findOne({
+            where: {
+                reviewOID: reviewOID,
+                [Op.or]: [{ sender: userOID }, { receiver: userOID }]
+            },
+        })
+    }
+
+    return chatmessage !== null;
+}
+
+/**
+ * Checks if a user with the provided userOID is a participant in a chat conversation associated with the given attachmentOID.
+ * @param userOID - The userOID to be checked.
+ * @param attachmentOID - The attachmentOID to be associated with a chat.
+ * @throws {Error} - Throws an error if userOID or attachmentOID is null.
+ * @returns {Promise<boolean>} - True if the user is a participant and the attachment is associated, otherwise false.
+ */
+async function chatHasAttachmentAndUserIsParticipant(userOID, attachmentOID) {
+    if(!userOID || !attachmentOID) {
+        throw new Error("userOID or attachmentOID is null");
+    }
+
+    const chatmessage = await Chatmessage.findOne({
+        where: {
+            attachmentOID: attachmentOID
+        }
+    });
+    return chatmessage !== null;
+}
+
+/**
+ * Checks if there is a chat message associated with the given attachmentOID.
+ * @param attachmentOID
+ * @throws {Error} - Throws an error if attachmentOID is null.
+ * @returns {Promise<Object|null>} - The found chat message or null if not found.
+ */
+async function chatHasAttachment(attachmentOID) {
+    if(!attachmentOID) {
+        throw new Error("attachmentOID is null");
+    }
+
+    const chatmessage = await Chatmessage.findOne({
+        where: {
+            attachmentOID: attachmentOID
+        }
+    });
+    return chatmessage;
+}
+
 module.exports = {
     getMessagesOfReview,
-    createMessage
+    createMessage,
+    userIsChatParticipant,
+    chatHasAttachmentAndUserIsParticipant,
+    chatHasAttachment
 }

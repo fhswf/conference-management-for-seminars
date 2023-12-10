@@ -4,11 +4,16 @@ const path = require("path");
 
 const Concept = db.concept;
 const User = db.user;
-const Status = db.status;
 const Attachment = db.attachment;
 
-
-const getNewestConcept = async (req, res) => {
+/**
+ * Retrieves the newest Concept associated with the current user and the given seminar.
+ * If no Concept is found, it returns an empty response.
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
+const getNewestConceptOfCurrentUser = async (req, res) => {
     // TODO ggf anpassen
     try {
         const seminarOID = req.params.seminarOID;
@@ -41,6 +46,13 @@ const getNewestConcept = async (req, res) => {
     }
 }
 
+/**
+ * Uploads a Concept associated with a user and seminar, optionally with text and attachments.
+ * Sends an email notification to admin and supervisor (TODO).
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 const uploadConcept = async (req, res) => {
     // TODO move
     const t = await db.sequelize.transaction();
@@ -77,7 +89,33 @@ const uploadConcept = async (req, res) => {
     }
 }
 
+async function userIsAuthorOfConcept(userOID, conceptOID) {
+    const concept = await Concept.findOne({
+        where: {
+            conceptOID: conceptOID
+        }
+    });
+    return concept.userOIDStudent === userOID;
+}
+
+/**
+ * Checks if there is a Concept associated with the given attachmentOID.
+ * Returns the found Concept if it exists, otherwise null.
+ * @param {number} attachmentOID - The attachmentOID to be checked for association with a Concept.
+ * @returns {Promise<Object|null>} - A Promise that resolves to the found Concept or null if not found.
+ */
+async function conceptHasAttachment(attachmentOID) {
+    const concept = await Concept.findOne({
+        where: {
+            attachmentOID: attachmentOID
+        }
+    });
+    return concept;
+}
+
 module.exports = {
-    getNewestConcept,
-    uploadConcept
+    getNewestConceptOfCurrentUser,
+    uploadConcept,
+    userIsAuthorOfConcept,
+    conceptHasAttachment
 }

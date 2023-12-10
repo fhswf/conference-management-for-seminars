@@ -23,7 +23,7 @@ function ChatWindowPage({paper, reviewOID}: Props){
     const [text, setText] = useState<string>("")
     //const {data: chatmessages} = useFetch<Message[]>(`http://${import.meta.env.VITE_BACKEND_URL}/chat/879`)
     const [chatmessages, setChatmessages] = useState<Message[]>([])
-    const {data: reviewOIDs} = useFetch<Review[]>(`http://${import.meta.env.VITE_BACKEND_URL}/review/get-from-reviews-paper/${paper.paperOID}`)
+    const {data: reviewOIDs} = useFetch<Review[]>(`http://${import.meta.env.VITE_BACKEND_URL}/review/get-reviewoids-from-paper/${paper.paperOID}`)
     const [selectedReview, setSelectedReview] = useState<number>()
 
 

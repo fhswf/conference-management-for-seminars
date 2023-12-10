@@ -10,8 +10,18 @@ const Concept = db.concept;
 const Attachment = db.attachment;
 const Paper = db.paper;
 
+/**
+ * Returns the seminar with the given seminarOID.
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
 const getSeminar = async (req, res) => {
     try {
+        if(!req.params.seminarOID){
+            return res.status(400).json({error: 'Not Found'});
+        }
+
         //const userOID = req.user.userOID;
         const userOID = req.user.userOID;
         const seminarOID = req.params.seminarOID;
@@ -37,7 +47,12 @@ const getSeminar = async (req, res) => {
     }
 }
 
-// TODO check if User isAdmin
+/**
+ * Returns all existing seminars in database.
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
 const getSeminars = async (req, res) => {
     try {
         const seminars = await Seminar.findAll({
@@ -54,10 +69,21 @@ const getSeminars = async (req, res) => {
     }
 }
 
+/**
+ * Go to next phase of seminar with given seminarOID.
+ * If next phase is phase 4, sets the phase4paperOID for all users and assign reviewer.
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 const gotoNextPhase = async (req, res) => {
     const t = await db.sequelize.transaction();
     try {
         const seminarOID = req.params.seminarOID;
+
+        if (!seminarOID) {
+            return res.status(400).send({message: "SeminarOID is missing."});
+        }
 
         const currentPhase = await Seminar.findByPk(seminarOID, {attributes: ["phase"]});
         if(currentPhase.phase+1 >= 8){
@@ -75,6 +101,7 @@ const gotoNextPhase = async (req, res) => {
 
         const seminar = await Seminar.update({phase: currentPhase.phase+1}, {where: {seminaroid: seminarOID}});
 
+        // TODO affectedRows prüfen
         if (seminar[0] === 1) {
             // TODO handle phase change
             await t.commit();
@@ -90,9 +117,20 @@ const gotoNextPhase = async (req, res) => {
     }
 }
 
+/**
+ * Returns all users of a seminar with their roleassignments and newest concept, with given seminarOID.
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 const getUserList = async (req, res) => {
     try {
         const seminarOID = req.params.seminarOID;
+
+        if (!seminarOID) {
+            return res.status(400).send({message: "SeminarOID is missing."});
+        }
+
         const users = await Seminar.findByPk(seminarOID,
             {
                 include: [{
@@ -139,6 +177,12 @@ const getUserList = async (req, res) => {
     }
 }
 
+/**
+ * Updates the roleassignment of a user in a seminar.
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 const updateUserInSeminar = async (req, res) => {
     const t = await db.sequelize.transaction();
     try {
@@ -146,7 +190,10 @@ const updateUserInSeminar = async (req, res) => {
         const roleOid = req.body.roleOID;
         const seminarOid = req.body.seminarOID;
         //const supervisorOid = req.body.supervisorOID;
-        const comment = req.body.comment;
+
+        if (!userOid || !roleOid || !seminarOid) {
+            return res.status(400).send({message: "Missing required parameters."});
+        }
 
         //change:
         // 1. roleassignment
@@ -156,11 +203,13 @@ const updateUserInSeminar = async (req, res) => {
             {transaction: t}
         );
         // 2. user
+        /*
         const user = await User.update(
             {comment: comment},
             {where: {useroid: userOid}},
             {transaction: t}
         );
+         */
         //3. concept
         //const newestConcept = await Concept.findOne({
         //    where: {userOIDStudent: userOid},
@@ -183,8 +232,15 @@ const updateUserInSeminar = async (req, res) => {
     }
 }
 
+
+/**
+ * Evaluates a concept with given conceptOID, accepted, feedback and userOIDSupervisor.
+ * TODO Also sends mail to author.
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 const evaluateConcept = async (req, res) => {
-    // TODO check permissions
     try {
         const conceptOID = req.body.conceptOID;
         const accepted = req.body.accepted;
@@ -216,6 +272,12 @@ const evaluateConcept = async (req, res) => {
     }
 }
 
+/**
+ * Creates a new seminar with a random assignmentkey.
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 const createSeminar = async (req, res) => {
     try {
         let existingSeminar = null;
@@ -234,16 +296,27 @@ const createSeminar = async (req, res) => {
             phase: 1,
             assignmentkey: key.toString()
         });
-        return res.status(200).send({message: "Seminar successfully created."});
+        return res.status(200).send(seminar);
     } catch (e) {
         console.log(e);
         return res.status(500).send({message: "Error while creating seminar."});
     }
 }
 
+/**
+ * Returns all seminars assigned to the current user with their roleassignments.
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
 const getAssignedSeminars = async (req, res) => {
     try {
         const userOID = req.user.userOID;
+
+        if (!userOID) {
+            return res.status(400).send({message: "UserOID is missing."});
+        }
+
         const seminars = await Seminar.findAll({
             include: [{
                 model: RoleAssignment,
@@ -264,11 +337,22 @@ const getAssignedSeminars = async (req, res) => {
     }
 }
 
+/**
+ * Returns a student with all uploaded concepts with attachments and paper with attachments.
+ * Also returns the roleassignments phase4paperOID and phase7paperOID.
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
 const getStudent = async (req, res) => {
     try{
         // get student in seminar with all uploaded concepts with attachments and paper with attachments
         const seminarOID = req.params.seminarOID;
         const userOID = req.params.userOID;
+
+        if (!seminarOID || !userOID) {
+            return res.status(400).send({message: "SeminarOID or userOID is missing."});
+        }
 
         const user = await User.findByPk(userOID, {
             include: [{
@@ -324,10 +408,20 @@ const getStudent = async (req, res) => {
     }
 }
 
+/**
+ * Adds a user to a seminar associated with the given assignmentkey.
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
 const enterSeminar = async (req, res) => {
     try {
         const userOID = req.user.userOID;
         const assignmentkey = req.params.assignmentkey;
+
+        if (!userOID || !assignmentkey) {
+            return res.status(400).send({message: "UserOID or assignmentkey is missing."});
+        }
 
         const seminar = await Seminar.findOne({
             where: {

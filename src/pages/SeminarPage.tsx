@@ -6,7 +6,7 @@ import ChatWindowPage from "./ChatWindowPage.tsx";
 import MainLayout from "../components/layout/MainLayout.tsx";
 import {Button} from "primereact/button";
 import useFetch from "../hooks/useFetch.ts";
-import {mapPhaseToString, mapRoleToString} from "../utils/helpers.ts";
+import {mapPhaseToString, mapRatingToString, mapRoleToString} from "../utils/helpers.ts";
 import RoleAssignment from "../entities/database/RoleAssignment.ts";
 import Seminar from "../entities/database/Seminar.ts";
 import Paper from "../entities/database/Paper.ts";
@@ -14,6 +14,7 @@ import Attachment from "../entities/database/Attachment.ts";
 import Concept from "../entities/database/Concept.ts";
 import User from "../entities/database/User.ts";
 import Review from "../entities/database/Review.ts";
+import PaperRating from "../components/PaperRating.tsx";
 
 type SeminarType = Seminar & {
     roleassignments: RoleAssignment[];
@@ -36,8 +37,10 @@ function SeminarPage() {
     //const [showCommentsOwnPaper, setShowCommentsOwnPaper] = useState(false);
     //const [showCommentsStrangerPaper, setShowCommentsStrangerPaper] = useState(false);
     const [showChat, setShowChat] = useState<Paper>();
+    const [showRating, setSetShowRating] = useState(false)
     const {data: seminar} = useFetch<SeminarType>(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminar/${seminarOID}`,);
     // TODO only fetch if phase >= 2 and phase >= 5
+    // and user is student
     const {
         data: concept,
         loading: loadingConcept,
@@ -63,12 +66,16 @@ function SeminarPage() {
         return true;
     }
 
+    function handleRating(rating: string) {
+        console.log(rating)
+    }
+
     return (
         <div>
             <MainLayout>
                 <div>
                     <p>{seminarOID}</p>
-                    {/*<p>{JSON.stringify(concept)}</p>*/}
+                    <pre>{JSON.stringify(concept, null, 2)}</pre>
                     {/*<p>{JSON.stringify(seminar)}</p>*/}
                     <pre>{JSON.stringify(assignedPaper, null, 2)}</pre>
                 </div>
@@ -114,8 +121,8 @@ function SeminarPage() {
                             <Button onClick={() => {
                                 navigate(`/concept-upload/${seminarOID}`)
                             }}
-                                    /*disabled = {(concept && (concept?.accepted === null || concept?.accepted)) || (!concept && (seminar && seminar.phase! <= 3))}*/
-                                    disabled = {!isJsonEmpty(concept) && (concept?.accepted === null || concept?.accepted || seminar?.phase !== 2) && concept?.accepted !== false}
+                                /*disabled = {(concept && (concept?.accepted === null || concept?.accepted)) || (!concept && (seminar && seminar.phase! <= 3))}*/
+                                    disabled={!isJsonEmpty(concept) && (concept?.accepted === null || concept?.accepted || seminar?.phase !== 2) && concept?.accepted !== false}
                             >➡</Button>
                         </div>
                     </div>
@@ -134,19 +141,23 @@ function SeminarPage() {
                 <div className={styles.assignedPaperContainer}>
                     {assignedPaper && assignedPaper.length > 0 && assignedPaper.map((paper: PaperType, index: number) => {
                         // müsste eigentlich immer vorhanden sein
-                            if (paper.attachmentO) {
-                                return (
-                                    <Fragment key={index}>
-                                        <a href={`http://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
-                                        <Button onClick={() => setShowChat(paper)}>Kommentieren</Button>
-                                    </Fragment>
-                                )
-                            }
+                        if (paper.attachmentO) {
+                            return (
+                                <Fragment key={index}>
+                                    <a href={`http://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
+                                    <p onClick={() => setSetShowRating(true)}>{mapRatingToString(null)}</p>
+                                    <Button onClick={() => setShowChat(paper)}>Kommentieren</Button>
+                                </Fragment>
+                            )
+                        }
                     })}
                 </div>
                 {/*<Modal isOpen={showCommentsOwnPaper} onClose={() => setShowCommentsOwnPaper(false)}><ChatWindowPage paper={s}/></Modal>*/}
                 {showChat && <Modal isOpen={!!showChat} onClose={() => setShowChat(undefined)}><ChatWindowPage
                     paper={showChat} /*reviewOID={showChat}*//></Modal>}
+                <Modal isOpen={showRating} onClose={() => setSetShowRating(false)}>
+                    <PaperRating onSaveClicked={handleRating}/>
+                </Modal>
             </MainLayout>
         </div>
     )

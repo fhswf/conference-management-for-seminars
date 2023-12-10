@@ -46,7 +46,8 @@ function HomePage() {
         role: seminar.roleassignments[0].roleOID && mapRoleToString(seminar.roleassignments[0].roleOID),
         btnSeminar: <Button onClick={() => {
             navigate(`/seminar/${seminar.seminarOID}`)
-        }}>➡</Button>,
+        }} disabled={seminar.roleassignments[0].roleOID === 1}
+        >➡</Button>,
         btnSeminarDetails: //(seminar.roleassignments[0].roleOID === 1) ?
             <Button onClick={() => {
             navigate(`/seminar-details/${seminar.seminarOID}`)
@@ -87,7 +88,7 @@ function HomePage() {
     return (
         <>
             <MainLayout>
-                {/*<p>{JSON.stringify(assignedSeminars)}</p>*/}
+                <pre>{JSON.stringify(assignedSeminars, null, 2)}</pre>
                 <div>
                     <h1>Sie sind in folgenden Seminaren eingeschrieben:</h1>
                     <div style={styles.enterSeminar}>

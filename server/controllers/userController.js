@@ -7,6 +7,7 @@ const Status = db.status;
 const RoleAssignment = db.roleassignment;
 const OidcUser = db.oidcuser;
 
+/*
 const getUserById = async (req, res) => {
     try {
         const user = await User.findAll({
@@ -25,17 +26,29 @@ const getUserById = async (req, res) => {
         console.error(error);
         res.status(500).json({error: 'Internal Server Error'});
     }
-};
+};*/
 
+
+/**
+ * Returns a list of supervisors for a seminar with the given seminarOID.
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
 const getSupervisorList = async (req, res) => {
-    // TODO check if USer is member of requested Seminar
     try {
+        const seminarOID = req.params.seminarOID;
+
+        if (!seminarOID){
+            return res.status(400).json({error: 'Bad Request'});
+        }
+
         const supervisors = await User.findAll({
             include: [{
                 model: RoleAssignment,
                 as: 'roleassignments',
                 where: {
-                    seminarOID: req.params.seminarOID,
+                    seminarOID: seminarOID,
                     roleOID: 2 // 2 = Supervisor
                 },
                 attributes: [],
@@ -49,6 +62,13 @@ const getSupervisorList = async (req, res) => {
     }
 }
 
+
+/**
+ * Returns a list of oidc users that can be assigned to a seminar.
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
 const getAddableUsers = async (req, res) => {
     try {
         const seminarOID = req.params.seminarOID;
@@ -64,7 +84,7 @@ const getAddableUsers = async (req, res) => {
                 attributes: [],
                 required: true
             }],
-            attributes: ["userOID", "firstName", "lastName", "mail", "comment"],
+            attributes: ["userOID", "firstName", "lastName", "mail"],
         });
         res.status(200).json(users);
     } catch (error) {
@@ -73,13 +93,23 @@ const getAddableUsers = async (req, res) => {
     }
 };
 
-
-//TODO check if User isAdmin
+/**
+ * Assigns a user to a seminar with the given role and seminarOID.
+ * TODO also send mail to user
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
 const assignToSeminar = async (req, res) => {
     try {
         const userOID = req.body.userOID;
         const seminarOID = req.body.seminarOID;
         const roleOID = req.body.roleOID;
+
+        if(!userOID || !seminarOID || !roleOID) {
+            return res.status(400).json({error: 'Bad Request'});
+        }
+
         const roleassignment = await RoleAssignment.create({
             userOID: userOID,
             seminarOID: seminarOID,
@@ -93,9 +123,24 @@ const assignToSeminar = async (req, res) => {
     }
 }
 
+/**
+ * Returns true if the user is a system admin.
+ * @param userOID
+ * @returns {Promise<boolean|*>}
+ */
+async function userIsSystemAdmin(userOID) {
+    if (!userOID) {
+        return false;
+    }
+
+    const user = await User.findByPk(userOID);
+    return user.isAdmin;
+}
+
 module.exports = {
-    getUserById,
+    //getUserById,
     getSupervisorList,
     getAddableUsers,
-    assignToSeminar
+    assignToSeminar,
+    userIsSystemAdmin
 }

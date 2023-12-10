@@ -84,7 +84,7 @@ function SeminarAdminPage() {
             </div>
             {showAddUser?.seminarOID && showAddUser?.description && <Modal isOpen={!!showAddUser} onClose={() => {
                 setShowAddUser(undefined)
-            }}> <AddUserForm seminarname={showAddUser?.description} seminarOID={showAddUser?.seminarOID}
+            }}> <AddUserForm seminar={showAddUser}
                              onClose={() => setShowAddUser(undefined)}/></Modal>}
         </MainLayout>
     )

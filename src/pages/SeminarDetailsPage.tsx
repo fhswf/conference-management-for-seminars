@@ -43,8 +43,6 @@ function SeminarDetailsPage() {
     const [showUserConcept, setShowUserConcept] = useState<UserO>();
     const [selectedRole, setSelectedRole] = useState<number | null>(null);
     //const [selectedSupervisor, setSelectedSupervisor] = useState<number | null>(null);
-    const [comment, setComment] = useState("");
-    const [showAddUser, setShowAddUser] = useState(false);
     const {data: studentList} = useFetch<StudentListResponse>(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/get-students-list/${seminarOID}`);
     const {data: availableSupervisor} = useFetch<User[]>(`http://${import.meta.env.VITE_BACKEND_URL}/user/get-supervisor-list/${seminarOID}`);
 
@@ -58,7 +56,6 @@ function SeminarDetailsPage() {
         {field: "lname", header: "Nachname"},
         {field: "fname", header: "Vorname"},
         {field: "mail", header: "Mail"},
-        {field: "comment", header: "Kommentar"},
         {field: "role", header: "Rolle"},
         {field: "supervisor", header: "Betreuer"},
         {field: "concept", header: "Konzept"},
@@ -71,7 +68,6 @@ function SeminarDetailsPage() {
         {field: "lname", header: "Nachname"},
         {field: "fname", header: "Vorname"},
         {field: "mail", header: "Mail"},
-        {field: "comment", header: "Kommentar"},
         {field: "role", header: "Rolle"},
         {field: "supervisor", header: "Betreuer"},
         {field: "concept", header: "Konzept"},
@@ -81,7 +77,7 @@ function SeminarDetailsPage() {
         lname: user.userO.lastName || "-",
         fname: user.userO.firstName || "-",
         mail: user.userO.mail || "-",
-        comment: user.userO.comment || "-",
+
         role: user.roleOID && mapRoleToString(user.roleOID),
         supervisor: !user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user ? "-" : user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.firstName + " " + user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.lastName || '-',
         concept: !user.userO.userOIDStudent_concepts[0] ? "-" : user.userO.userOIDStudent_concepts[0]?.accepted === null ? 'Bewertung ausstehend' : user.userO.userOIDStudent_concepts[0]?.accepted ? 'Angenommen' : 'Abgelehnt',
@@ -90,7 +86,6 @@ function SeminarDetailsPage() {
             //return;
             user.userOID && setIsEditMode(user.userOID)
             //set data
-            user.userO.comment && setComment(user.userO.comment)
             setSelectedRole(user.roleOID)
             //setSelectedSupervisor(user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.userOID)
         }}>Edit</Button>,
@@ -123,8 +118,6 @@ function SeminarDetailsPage() {
         lname: user.userO.lastName,
         fname: user.userO.firstName,
         mail: user.userO.mail,
-        comment: isEditMode === user.userOID ? <InputText defaultValue={user.userO.comment || ""}
-                                                          onChange={(e) => setComment(e.target.value)}/> : user.userO.comment,
         role: isEditMode === user.userOID ?
             <Dropdown value={selectedRole} options={roles} optionLabel="name" placeholder="Rolle wählen"
                       onChange={(e) => setSelectedRole(e.value)}/> : user.roleOID,
@@ -140,7 +133,7 @@ function SeminarDetailsPage() {
     const conceptCount = studentList?.roleassignments.filter(user => user.userO.userOIDStudent_concepts[0]?.accepted === true).length;
     const studentCount = studentList?.roleassignments.filter(user => user.roleOID === 3).length;
 
-    const currentRole = studentList?.roleassignments.find(userEntry => userEntry.userOID === user.userOID);
+    const currentRole = studentList?.roleassignments.find(userEntry => userEntry.userOID === user?.userOID);
 
     return (
         <div>
@@ -161,19 +154,19 @@ function SeminarDetailsPage() {
                         <Table header={header} data={tableData}/> :
                         <Table header={headerEdit} data={tableDataEdit}/>
                     }
-                    {isEditMode ?
+                    {isEditMode &&
                         <>
                             <Button onClick={async () => {
                                 setIsEditMode(0);
                                 console.log("----------------------------------")
                                 console.log(selectedRole);
                                 //console.log(selectedSupervisor);
-                                console.log(comment);
                                 console.log("----------------------------------")
 
                                 //TODO send changes
                                 const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/update-user`, {
                                     method: 'POST',
+                                    credentials: 'include',
                                     headers: {
                                         'Content-Type': 'application/json'
                                     },
@@ -181,7 +174,6 @@ function SeminarDetailsPage() {
                                         userOID: isEditMode,
                                         roleOID: roles.find(role => role.value === selectedRole)?.value,
                                         //supervisorOID: selectedSupervisor || null,
-                                        comment: comment,
                                         seminarOID: studentList!.seminarOID
                                     })
                                 });
@@ -189,7 +181,7 @@ function SeminarDetailsPage() {
                                 if (result.ok) {
                                     setSelectedRole(null);
                                     //setSelectedSupervisor(undefined);
-                                    setComment("");
+                                    alert("Rolle erfolgreich geändert");
                                 } else {
                                     alert("Fehler beim Speichern");
                                 }
@@ -197,21 +189,13 @@ function SeminarDetailsPage() {
                             <Button onClick={() => {
                                 setIsEditMode(0)
                             }}>Abbrechen</Button>
-                        </> :
-                        <Button onClick={() => {
-                            setShowAddUser(true)
-                        }}>Add User</Button>
+                        </>
                     }
 
                     {showUserConcept && availableSupervisor  && currentRole &&
                         <Modal isOpen={!!showUserConcept} onClose={() => setShowUserConcept(undefined)}>
                             <ConceptAcceptReject user0={showUserConcept} availableSupervisors={availableSupervisor} userRole={currentRole.roleOID!}/>
                         </Modal>}
-                    {/* TODO verbessern */}
-                    {studentList?.description && studentList.seminarOID && <Modal isOpen={showAddUser} onClose={() => {
-                        setShowAddUser(false)
-                    }}><AddUserForm seminarname={studentList.description} seminarOID={studentList.seminarOID}
-                                    onClose={() => setShowAddUser(false)}/></Modal>}
                 </div>
             </MainLayout>
         </div>

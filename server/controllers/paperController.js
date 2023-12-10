@@ -12,6 +12,16 @@ const Attachment = db.attachment;
 const Seminar = db.seminar;
 const RoleAssignment = db.roleassignment;
 
+
+/**
+ * Uploads a Paper associated with a user and seminar, with optional file.
+ * Returns 415 if the file is not a PDF.
+ * Returns 409 if the user has already uploaded a paper in phase 7.
+ * @param req
+ * @param res
+ * @throws {Error} if the user has already uploaded a paper in phase 7
+ * @returns {Promise<*>}
+ */
 async function uploadPaper(req, res) {
     const t = await db.sequelize.transaction();
     try {
@@ -40,7 +50,7 @@ async function uploadPaper(req, res) {
         if(currentPhase.phase === 7){
             // TODO
             if(!await setPhase7PaperOID(t, paper.paperOID, userOID, seminarOID)){
-                throw new Error("Phase 7 Paper already set");
+                return res.status(409).json({error: 'Bad Request'});
             }
         }
 
@@ -53,6 +63,14 @@ async function uploadPaper(req, res) {
     }
 }
 
+
+/**
+ * Retrieves all papers assigned to a user within a seminar.
+ * Returns a list of papers with their reviews.
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 async function getAssignedPaper(req, res) {
     try {
         //const userOID = req.user.userOID;
@@ -100,6 +118,13 @@ async function getAssignedPaper(req, res) {
     }
 }
 
+/**
+ * Retrieves all papers uploaded by a user within a seminar.
+ * Returns a list of papers with their attachments.
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 async function getUploadedPaper(req, res) {
     try {
         const userOID = req.user.userOID;
@@ -126,8 +151,68 @@ async function getUploadedPaper(req, res) {
     }
 }
 
+/**
+ * Checks if a user is the author of a paper.
+ * Returns false if userOID or paperOID is null.
+ * @param userOID
+ * @param paperOID
+ * @returns {Promise<boolean>}
+ */
+async function userIsAuthorOfPaper(userOID, paperOID ) {
+    if (!userOID || !paperOID) {
+        return false;
+    }
+
+    const paper = await Paper.findByPk(paperOID, {attributes: ["authorOID"]});
+    return paper.authorOID === userOID;
+}
+
+/**
+ * Checks if a paper has an attachment and if the user is the author of the paper.
+ * @param userOID
+ * @param attachmentOID
+ * @returns {Promise<boolean>}
+ */
+async function paperHasAttachmentAndUserIsAuthor(userOID, attachmentOID) {
+    const paper = await Paper.findOne({
+        where: {
+            attachmentOID: attachmentOID
+        }
+    });
+    return paper !== null;
+}
+
+/**
+ * Checks if a paper has an attachment.
+ * Returns the paper if it exists, null otherwise.
+ * @param attachmentOID
+ * @returns {Promise<Object|null>}
+ */
+async function paperHasAttachment(attachmentOID) {
+    const paper = await Paper.findOne({
+        where: {
+            attachmentOID: attachmentOID
+        }
+    });
+    return paper;
+}
+
+/**
+ * Returns the seminarOID associated with a paper.
+ * @param paperOID
+ * @returns {Promise<*>}
+ */
+async function getSeminarOIDOfPaper(paperOID) {
+    const paper = await Paper.findByPk(paperOID, {attributes: ["seminarOID"]});
+    return paper.seminarOID;
+}
+
 module.exports = {
     uploadPaper,
     getAssignedPaper,
-    getUploadedPaper
+    getUploadedPaper,
+    userIsAuthorOfPaper,
+    paperHasAttachmentAndUserIsAuthor,
+    paperHasAttachment,
+    getSeminarOIDOfPaper
 }
