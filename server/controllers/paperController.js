@@ -41,7 +41,7 @@ async function uploadPaper(req, res) {
 
         let attachment = await attachmentController.createAttachment(file, t)
 
-        const paper = await Paper.create({
+        let paper = await Paper.create({
             seminarOID: seminarOID,
             authorOID: userOID,
             attachmentOID: attachment.attachmentOID
@@ -54,8 +54,14 @@ async function uploadPaper(req, res) {
             }
         }
 
+        // add created attachment to paper
+        attachment = attachment.get({plain: true});
+        paper = paper.get({plain: true});
+        delete attachment.file;
+        paper.attachmentO = attachment;
+
         await t.commit();
-        return res.status(200).end();
+        return res.status(200).json(paper);
     } catch (error) {
         await t.rollback();
         console.error("Error :" + error);

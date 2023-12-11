@@ -36,8 +36,8 @@ function SeminarPage() {
     const navigate = useNavigate();
     //const [showCommentsOwnPaper, setShowCommentsOwnPaper] = useState(false);
     //const [showCommentsStrangerPaper, setShowCommentsStrangerPaper] = useState(false);
-    const [showChat, setShowChat] = useState<Paper>();
-    const [showRating, setSetShowRating] = useState(false)
+    const [showChat, setShowChat] = useState<PaperType>();
+    const [showRating, setSetShowRating] = useState<PaperType>()
     const {data: seminar} = useFetch<SeminarType>(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminar/${seminarOID}`,);
     // TODO only fetch if phase >= 2 and phase >= 5
     // and user is student
@@ -66,8 +66,35 @@ function SeminarPage() {
         return true;
     }
 
-    function handleRating(rating: string) {
+    async function handleRating(rating: string) {
         console.log(rating)
+
+        const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/review/rate`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                reviewOID: showRating?.reviews[0].reviewOID,
+                rating: parseInt(rating)
+            })
+        })
+
+        if (response.ok) {
+            console.log("rating saved")
+            alert("Bewertung gespeichert")
+            setShowChat(undefined)
+            setSetShowRating(undefined)
+            assignedPaper?.forEach((paper: PaperType) => {
+                if (paper.reviews[0].reviewOID === showRating?.reviews[0].reviewOID) {
+                    paper.reviews[0].rating = parseInt(rating)
+                }
+            })
+        } else {
+            console.log("rating failed")
+            alert("Bewertung konnte nicht gespeichert werden")
+        }
     }
 
     return (
@@ -145,7 +172,7 @@ function SeminarPage() {
                             return (
                                 <Fragment key={index}>
                                     <a href={`http://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
-                                    <p onClick={() => setSetShowRating(true)}>{mapRatingToString(null)}</p>
+                                    <p onClick={() => setSetShowRating(paper)}>{mapRatingToString(paper.reviews[0].rating)}</p>
                                     <Button onClick={() => setShowChat(paper)}>Kommentieren</Button>
                                 </Fragment>
                             )
@@ -155,9 +182,9 @@ function SeminarPage() {
                 {/*<Modal isOpen={showCommentsOwnPaper} onClose={() => setShowCommentsOwnPaper(false)}><ChatWindowPage paper={s}/></Modal>*/}
                 {showChat && <Modal isOpen={!!showChat} onClose={() => setShowChat(undefined)}><ChatWindowPage
                     paper={showChat} /*reviewOID={showChat}*//></Modal>}
-                <Modal isOpen={showRating} onClose={() => setSetShowRating(false)}>
-                    <PaperRating onSaveClicked={handleRating}/>
-                </Modal>
+                {showRating?.reviews[0] && <Modal isOpen={!!showRating} onClose={() => setSetShowRating(undefined)}>
+                    <PaperRating onSaveClicked={handleRating} value={showRating?.reviews[0].rating}/>
+                </Modal>}
             </MainLayout>
         </div>
     )

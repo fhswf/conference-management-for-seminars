@@ -5,22 +5,23 @@ import {Dropdown} from "primereact/dropdown";
 import {useEffect, useState} from "react";
 import {InputTextarea} from "primereact/inputtextarea";
 import {Button} from "primereact/button";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import User from "../entities/database/User.ts";
 
 
 function ConceptUploadPage() {
+    const navigate = useNavigate();
     const { seminarOID } = useParams();
     const [text, setText] = useState<string>("")
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [availableSupervisor, setAvailableSupervisor] = useState<User[]>([])
     const [selectedSupervisor, setSelectedSupervisor] = useState<User>()
 
-    const supervisor = [
-        {name: "Betreuer A"},
-        {name: "Betreuer B"},
-        {name: "Betreuer C"},
-    ];
+    //const supervisor = [
+    //    {name: "Betreuer A"},
+    //    {name: "Betreuer B"},
+    //    {name: "Betreuer C"},
+    //];
 
     // TODO check if user is allowed to upload concept: if last one was rejected or if no concept was uploaded yet
 
@@ -55,9 +56,10 @@ function ConceptUploadPage() {
             //TODO res not working
             console.log("=>" + res.status);
 
-            if (res.status === 200) {
+            if (res.ok) {
                 alert('Concept uploaded successfully.');
                 setText("");
+                navigate(`/seminar/${seminarOID}`);
                 setSelectedFile(null);
                 setSelectedSupervisor(undefined);
             } else {

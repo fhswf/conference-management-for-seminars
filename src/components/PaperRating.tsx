@@ -1,14 +1,21 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {RadioButton, RadioButtonChangeEvent} from "primereact/radiobutton";
 import {Button} from "primereact/button";
 import {mapRatingToString} from "../utils/helpers.ts";
 interface Props{
-    onSaveClicked: (rating: string) => void;
-    onClose?: () => void;
+    onSaveClicked: (rating: string) => void,
+    onClose?: () => void,
+    value: number | null
 }
 
-function PaperRating({onSaveClicked, onClose}: Props) {
+function PaperRating({ onSaveClicked, onClose, value }: Props) {
     const [rating, setRating] = useState("")
+
+    useEffect(() => {
+        if (value) {
+            setRating(value.toString());
+        }
+    }, []);
 
     const styles = {
         container: {

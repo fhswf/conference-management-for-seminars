@@ -43,7 +43,7 @@ function SeminarDetailsPage() {
     const [showUserConcept, setShowUserConcept] = useState<UserO>();
     const [selectedRole, setSelectedRole] = useState<number | null>(null);
     //const [selectedSupervisor, setSelectedSupervisor] = useState<number | null>(null);
-    const {data: studentList} = useFetch<StudentListResponse>(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/get-students-list/${seminarOID}`);
+    const {data: studentList, setData: setStudentList} = useFetch<StudentListResponse>(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/get-students-list/${seminarOID}`);
     const {data: availableSupervisor} = useFetch<User[]>(`http://${import.meta.env.VITE_BACKEND_URL}/user/get-supervisor-list/${seminarOID}`);
 
     const roles = [
@@ -90,14 +90,9 @@ function SeminarDetailsPage() {
             //setSelectedSupervisor(user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.userOID)
         }}>Edit</Button>,
         btnGoto: <Button onClick={() => setShowUserConcept(user.userO)}
-                         disabled={!user.userO.userOIDStudent_concepts[0]}>Bewerten</Button>,
+                         disabled={!user.userO.userOIDStudent_concepts[0] || user.roleOID !== 3}>Bewerten</Button>,
         btnDetails: <Button onClick={() => navigate(`/student-details/${seminarOID}/${user.userOID}`)}>Details</Button>
     }));
-
-    function onDeleteClicked(userOID: number) {
-        // TODO
-        console.log(userOID);
-    }
 
     async function onNextPhaseClicked() {
         // TODO
@@ -125,7 +120,7 @@ function SeminarDetailsPage() {
             <Dropdown showClear value={selectedSupervisor} options={availableSupervisor!} optionLabel="name"
                       placeholder="Betreuer wählen"
                       onChange={(e) => setSelectedSupervisor(e.value)}/> : user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.firstName + " " + user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.lastName, */
-            user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.firstName + " " + user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.lastName || '-',
+            !user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user ? "-" : user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.firstName + " " + user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.lastName || '-',
         concept: user.userO.userOIDStudent_concepts[0]?.accepted === null ? 'Bewertung ausstehend' : user.userO.userOIDStudent_concepts[0]?.accepted === false ? 'Abgelehnt' : 'Angenommen',
 
     }));
@@ -134,6 +129,41 @@ function SeminarDetailsPage() {
     const studentCount = studentList?.roleassignments.filter(user => user.roleOID === 3).length;
 
     const currentRole = studentList?.roleassignments.find(userEntry => userEntry.userOID === user?.userOID);
+
+    async function onUpdateUser(){
+        setIsEditMode(0);
+
+        //TODO send changes
+        const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/update-user`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userOID: isEditMode,
+                roleOID: roles.find(role => role.value === selectedRole)?.value,
+                //supervisorOID: selectedSupervisor || null,
+                seminarOID: studentList!.seminarOID
+            })
+        });
+
+        if (result.ok) {
+            setSelectedRole(null);
+            setStudentList( studentList => {
+                const newStudentList = {...studentList!};
+                const user = newStudentList.roleassignments.find(user => user.userOID === isEditMode);
+                if(user){
+                    user.roleOID = roles.find(role => role.value === selectedRole)?.value || null;
+                }
+                return newStudentList;
+            })
+            //setSelectedSupervisor(undefined);
+            alert("Rolle erfolgreich geändert");
+        } else {
+            alert("Fehler beim Speichern");
+        }
+    }
 
     return (
         <div>
@@ -145,7 +175,7 @@ function SeminarDetailsPage() {
                             onNextPhaseClicked();
                         }
                     }}>{mapPhaseToString(studentList?.phase)} 🖊</p>}
-                    <pre>{JSON.stringify(currentRole, null, 2)}</pre>
+                    <pre>{JSON.stringify(studentList, null, 2)}</pre>
                     <HiddenLabel text={studentList?.assignmentkey || ""}/>
                     <p>Eingereichte und angenommene Konzepte: {conceptCount}/{studentCount}</p>
                     <p>Eingereichte Paper Phase 4: TODO</p>
@@ -156,36 +186,7 @@ function SeminarDetailsPage() {
                     }
                     {isEditMode &&
                         <>
-                            <Button onClick={async () => {
-                                setIsEditMode(0);
-                                console.log("----------------------------------")
-                                console.log(selectedRole);
-                                //console.log(selectedSupervisor);
-                                console.log("----------------------------------")
-
-                                //TODO send changes
-                                const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/update-user`, {
-                                    method: 'POST',
-                                    credentials: 'include',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({
-                                        userOID: isEditMode,
-                                        roleOID: roles.find(role => role.value === selectedRole)?.value,
-                                        //supervisorOID: selectedSupervisor || null,
-                                        seminarOID: studentList!.seminarOID
-                                    })
-                                });
-
-                                if (result.ok) {
-                                    setSelectedRole(null);
-                                    //setSelectedSupervisor(undefined);
-                                    alert("Rolle erfolgreich geändert");
-                                } else {
-                                    alert("Fehler beim Speichern");
-                                }
-                            }}>Speichern</Button>
+                            <Button onClick={onUpdateUser}>Speichern</Button>
                             <Button onClick={() => {
                                 setIsEditMode(0)
                             }}>Abbrechen</Button>

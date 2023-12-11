@@ -16,7 +16,7 @@ const {
 const {userIsChatParticipant} = require("../controllers/chatmessageController");
 const {userIsAuthorOfConcept, conceptHasAttachment} = require("../controllers/conceptController");
 const {userIsAuthorOfPaper, paperHasAttachment, getSeminarOIDOfPaper} = require("../controllers/paperController");
-const {userIsReviewerOfPaper} = require("../controllers/reviewController");
+const {userIsReviewerOfPaper, userIsReviewerOfReviewOID} = require("../controllers/reviewController");
 const {getAttachmentDetails} = require("../controllers/attachmentController");
 const {userIsSystemAdmin} = require("../controllers/userController");
 
@@ -86,17 +86,22 @@ async function isAuthenticated(req, res, next) {
  * @returns {Promise<*>}
  */
 async function isStudentInSeminar(req, res, next) {
-    const userOID = req.user.userOID;
-    const seminarOID = req.params.seminarOID || req.body.seminarOID;
+    try {
+        const userOID = req.user.userOID;
+        const seminarOID = req.params.seminarOID || req.body.seminarOID;
 
-    if(!userOID || !seminarOID) {
-        return res.status(400).json({msg: "No userOID or seminarOID"});
-    }
+        if (!userOID || !seminarOID) {
+            return res.status(400).json({msg: "No userOID or seminarOID"});
+        }
 
-    if (await userRoleIsStudent(userOID, seminarOID)) {
-        return next();
-    } else {
-        return res.status(403).json({msg: "Not authorized"});
+        if (await userRoleIsStudent(userOID, seminarOID)) {
+            return next();
+        } else {
+            return res.status(403).json({msg: "Not authorized"});
+        }
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({msg: "Internal server error"});
     }
 }
 
@@ -309,11 +314,26 @@ async function isChatParticipant(req, res, next) {
  * @returns {Promise<*>}
  */
 async function isReviewerOrAuthorOfPaper(req, res, next) {
-    if(!req.user.userOID || !req.params.paperOID) {
-        return res.status(400).json({msg: "No userOID or paperOID"});
+    if(!req.user.userOID || (!req.params.paperOID && !req.params.reviewOID) && (!req.body.paperOID && !req.body.reviewOID)) {
+        return res.status(400).json({msg: "No userOID or paperOID or reviewOID"});
+    }
+
+    if(req.params.reviewOID){
+        console.log("review");
     }
 
     if(userIsReviewerOfPaper || userIsAuthorOfPaper) {
+        return next();
+    }
+    return res.status(403).json({msg: "Not authorized"});
+}
+
+async function isReviewer(req, res, next) {
+    if(!req.user.userOID || !req.body.reviewOID) {
+        return res.status(400).json({msg: "No userOID or reviewOID"});
+    }
+
+    if(userIsReviewerOfReviewOID) {
         return next();
     }
     return res.status(403).json({msg: "Not authorized"});
@@ -330,5 +350,6 @@ module.exports = {
     isMemberOfSeminar,
     isSystemAdmin,
     isChatParticipant,
-    isReviewerOrAuthorOfPaper
+    isReviewerOrAuthorOfPaper,
+    isReviewer
 };

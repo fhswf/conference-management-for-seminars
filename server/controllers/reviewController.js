@@ -215,9 +215,52 @@ async function userIsReviewerOfPaper(userOID, paperOID) {
     return reviews !== null;
 }
 
+/**
+ * Checks if a user is the reviewer of a review, with the given userOID and reviewOID.
+ * @param reviewOID
+ * @param userOID
+ * @returns {Promise<boolean>}
+ */
+async function userIsReviewerOfReviewOID(reviewOID, userOID) {
+    if (!reviewOID || !userOID) {
+        return false;
+    }
+
+    const review = await Review.findOne({
+        where: {
+            reviewOID: reviewOID,
+            reviewerOID: userOID,
+        },
+    });
+
+    return review !== null;
+}
+
+async function rateReview(req, res){
+    try{
+        const reviewOID = req.body.reviewOID;
+        const rating = req.body.rating;
+
+        await Review.update({
+            rating: rating,
+        }, {
+            where: {
+                reviewOID: reviewOID,
+            },
+        });
+
+        return res.status(200).json({message: 'Review successfully rated'});
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({error: 'Internal Server Error'});
+    }
+}
+
 module.exports = {
     getReviewerUserOfPaper,
     assignReviewer,
     getReviewOIDsOfPaper,
     userIsReviewerOfPaper,
+    userIsReviewerOfReviewOID,
+    rateReview,
 }

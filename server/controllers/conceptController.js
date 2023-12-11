@@ -62,9 +62,18 @@ const uploadConcept = async (req, res) => {
         const text = req.body.text || null;
 
         const supervisorOID = req.body?.supervisorOID || undefined;
+        const file = req.files?.file || undefined;
+
+        if(!file && !text.trim()){
+            return res.status(400).json({error: "No text or file provided."})
+        }
+
+        if(!await userIsAllowedToUploadConcept(userOID, seminarOID)) {
+            return res.status(403).json({error: "You are not allowed to upload a Concept for this seminar."})
+        }
 
         let attachment = null;
-        if (req.files?.file) {
+        if (file) {
             attachment = await attachmentController.createAttachment(req.files?.file, t)
         }
 
@@ -89,6 +98,34 @@ const uploadConcept = async (req, res) => {
     }
 }
 
+/**
+ * Checks if the given user is allowed to upload a Concept for the given seminar:
+ * if last one was rejected or if no Concept was uploaded yet.
+ * @param userOID
+ * @param seminarOID
+ * @returns {Promise<boolean>}
+ */
+async function userIsAllowedToUploadConcept(userOID, seminarOID) {
+    const concept = await Concept.findOne({
+        where: {
+            userOIDStudent: userOID,
+            seminarOID: seminarOID
+        },
+        order: [['createdAt', 'DESC']], //Das neueste Concept
+        limit: 1
+    });
+    if(!concept) {
+        return true;
+    }
+    return concept.accepted === false;
+}
+
+/**
+ * Checks if the given user is the author of the given Concept.
+ * @param userOID
+ * @param conceptOID
+ * @returns {Promise<boolean>}
+ */
 async function userIsAuthorOfConcept(userOID, conceptOID) {
     const concept = await Concept.findOne({
         where: {
@@ -112,6 +149,7 @@ async function conceptHasAttachment(attachmentOID) {
     });
     return concept;
 }
+
 
 module.exports = {
     getNewestConceptOfCurrentUser,
