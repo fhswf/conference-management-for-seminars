@@ -62,6 +62,7 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose, userRole}: P
             accepted: accepted,
             feedback: inputText,
             userOIDSupervisor: selectedSupervisor?.userOID || null,
+            seminarOID: user0.userOIDStudent_concepts[0].seminarOID,
         }
 
         const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/evaluate-concept`, {// TODO change to concept route
@@ -87,6 +88,7 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose, userRole}: P
         <div>
             {/*<pre>{JSON.stringify(user0, null, 2)}</pre>*/}
             {/*<pre>{JSON.stringify(availableSupervisors, null, 2)}</pre>*/}
+            <pre>{JSON.stringify(user0.userOIDStudent_concepts[0], null, 2)}</pre>
             {/*
                 <pre>{JSON.stringify(concept, null, 2)}</pre>
                 <pre>{JSON.stringify(availableSupervisors, null, 2)}</pre>

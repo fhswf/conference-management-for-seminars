@@ -3,6 +3,9 @@ const attachmentController = require("./attachmentController");
 const pdf = require('pdf-parse');
 const {isValidPdf, replaceInFilename} = require("../util/PdfUtils");
 const {setPhase7PaperOID} = require("./roleassignmentController");
+const {getCAdminsAndSupervisors, getUserWithOID} = require("./userController");
+const {sendMail} = require("../mailer");
+const {getSeminarWithOID} = require("./seminarController");
 
 const Op = db.Sequelize.Op;
 const Paper = db.paper;
@@ -17,6 +20,7 @@ const RoleAssignment = db.roleassignment;
  * Uploads a Paper associated with a user and seminar, with optional file.
  * Returns 415 if the file is not a PDF.
  * Returns 409 if the user has already uploaded a paper in phase 7.
+ * Sends an email notification to admin and supervisor.
  * @param req
  * @param res
  * @throws {Error} if the user has already uploaded a paper in phase 7
@@ -61,6 +65,22 @@ async function uploadPaper(req, res) {
         paper.attachmentO = attachment;
 
         await t.commit();
+
+        const users = await getCAdminsAndSupervisors(seminarOID);
+        const student = await getUserWithOID(userOID);
+        const seminar = await getSeminarWithOID(seminarOID)
+
+        for (const user of users) {
+            const emailText = `Hallo ${user.firstName} ${user.lastName},
+                    \nder Student ${student.firstName} ${student.lastName} hat ein Paper hochgeladen.
+                    \nSeminar: ${seminar.description}
+                    \n\nMit freundlichen Grüßen`;
+
+            console.log("Send Mail to: " + user.mail);
+
+            //sendMail(user.mail, "Neues Paper hochgeladen", emailText);
+        }
+
         return res.status(200).json(paper);
     } catch (error) {
         await t.rollback();

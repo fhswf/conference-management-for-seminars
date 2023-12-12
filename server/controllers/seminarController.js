@@ -2,6 +2,9 @@ const crypto = require('crypto');
 const db = require("../models");
 const {setPhase4PaperOID} = require("./roleassignmentController");
 const {assignReviewer} = require("./reviewController");
+const {sendMail} = require("../mailer");
+const {getUser, getUserWithConceptOID} = require("./userController");
+const {getConceptWithOID} = require("./conceptController");
 
 const Seminar = db.seminar;
 const RoleAssignment = db.roleassignment;
@@ -18,7 +21,7 @@ const Paper = db.paper;
  */
 const getSeminar = async (req, res) => {
     try {
-        if(!req.params.seminarOID){
+        if (!req.params.seminarOID) {
             return res.status(400).json({error: 'Not Found'});
         }
 
@@ -86,11 +89,11 @@ const gotoNextPhase = async (req, res) => {
         }
 
         const currentPhase = await Seminar.findByPk(seminarOID, {attributes: ["phase"]});
-        if(currentPhase.phase+1 >= 8){
+        if (currentPhase.phase + 1 >= 8) {
             return res.status(200).send({message: "Seminar is already in the last phase."});
         }
 
-        if(currentPhase.phase+1 === 4){
+        if (currentPhase.phase + 1 === 4) {
             await setPhase4PaperOID(seminarOID, t);
             await assignReviewer(seminarOID, t);
             currentPhase.phase++;
@@ -99,7 +102,7 @@ const gotoNextPhase = async (req, res) => {
         //await t.rollback()
         //return res.status(500).send({message: ""});
 
-        const seminar = await Seminar.update({phase: currentPhase.phase+1}, {where: {seminaroid: seminarOID}});
+        const seminar = await Seminar.update({phase: currentPhase.phase + 1}, {where: {seminaroid: seminarOID}});
 
         // TODO affectedRows prüfen
         if (seminar[0] === 1) {
@@ -143,7 +146,6 @@ const getUserList = async (req, res) => {
                         include: [{
                             model: Concept,
                             as: "userOIDStudent_concepts",
-                            attributes: ["conceptOID", "accepted", "userOIDSupervisor", "text", "attachmentOID", "feedback"],
                             include: [{
                                 model: User,
                                 as: "userOIDSupervisor_user",
@@ -235,7 +237,7 @@ const updateUserInSeminar = async (req, res) => {
 
 /**
  * Evaluates a concept with given conceptOID, accepted, feedback and userOIDSupervisor.
- * TODO Also sends mail to author.
+ * Also sends mail to author.
  * @param req
  * @param res
  * @returns {Promise<*>}
@@ -248,7 +250,7 @@ const evaluateConcept = async (req, res) => {
         const feedback = req.body.feedback;
         const userOIDSupervisor = req.body.userOIDSupervisor;
 
-        if(!conceptOID || accepted === null || accepted === undefined || (!userOIDSupervisor && accepted)){
+        if (!conceptOID || accepted === null || accepted === undefined || (!userOIDSupervisor && accepted)) {
             return res.status(400).send({message: "Missing required parameters."});
         }
 
@@ -261,7 +263,20 @@ const evaluateConcept = async (req, res) => {
             {where: {conceptOID: conceptOID}}
         );
         if (concept[0] === 1) {
-            // TODO send mail to author
+            // TODO move
+            const conc = await getConceptWithOID(conceptOID);
+            const student = conc.userOIDStudent_user;
+            const supervisor = conc.userOIDSupervisor_user;
+            const seminar = conc.seminarO;
+
+            sendMail(student.mail, "Ihr Konzept wurde bewertet",
+                `Hallo ${student.firstName} ${student.lastName} ,
+                \n\nIhr Konzept wurde ${accepted ? "angenommen" : "abgelehnt"}.
+                \n\nSeminar: ${seminar.description}
+            ${feedback ? "\n\nFeedback: " + feedback : ""}
+            Sie wurden dem Betreuer ${supervisor.firstName} ${supervisor.lastName} zugewiesen.
+            \n\nMit freundlichen Grüßen`);
+
             return res.status(200).send({message: "Concept successfully evaluated."});
         } else {
             return res.status(500).send({message: "Error while evaluating concept."});
@@ -345,7 +360,7 @@ const getAssignedSeminars = async (req, res) => {
  * @returns {Promise<void>}
  */
 const getStudent = async (req, res) => {
-    try{
+    try {
         // get student in seminar with all uploaded concepts with attachments and paper with attachments
         const seminarOID = req.params.seminarOID;
         const userOID = req.params.userOID;
@@ -397,12 +412,12 @@ const getStudent = async (req, res) => {
             ]
         });
 
-        if(user){
+        if (user) {
             res.status(200).send(user);
-        }else{
+        } else {
             res.status(404).send({message: "Student not found."});
         }
-    }catch(e){
+    } catch (e) {
         console.log(e);
         res.status(500).send({message: "Error while retrieving student."});
     }
@@ -446,7 +461,7 @@ const enterSeminar = async (req, res) => {
             }
         });
 
-        if(!created){
+        if (!created) {
             res.status(400).json({error: 'User already in seminar'});
             return;
         }
@@ -462,6 +477,10 @@ const enterSeminar = async (req, res) => {
     }
 }
 
+async function getSeminarWithOID(seminarOID) {
+    return await Seminar.findByPk(seminarOID);
+}
+
 module.exports = {
     gotoNextPhase,
     getSeminar,
@@ -472,5 +491,6 @@ module.exports = {
     createSeminar,
     getAssignedSeminars,
     getStudent,
-    enterSeminar
+    enterSeminar,
+    getSeminarWithOID
 }

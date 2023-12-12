@@ -130,6 +130,7 @@ async function isSupervisorInSeminar(req, res, next) {
 
 /**
  * Checks if the user is a course admin in the seminar.
+ * Needs the seminarOID in the request body or as a parameter.
  * @param req
  * @param res
  * @param next
@@ -139,11 +140,11 @@ async function isCourseAdminInSeminar(req, res, next) {
     const userOID = req.user.userOID;
     const seminarOID = req.params.seminarOID || req.body.seminarOID;
 
-    if(!userOID || !seminarOID) {
+    if(!userOID && !seminarOID) {
         return res.status(400).json({msg: "No userOID or seminarOID"});
     }
 
-    if (await userIsMemberOfSeminar(userOID, seminarOID) && await userRoleIsCourseAdmin(userOID, seminarOID)) {
+    if (await userRoleIsCourseAdmin(userOID, seminarOID)) {
         return next();
     } else {
         return res.status(403).json({msg: "Not authorized"});

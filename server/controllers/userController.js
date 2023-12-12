@@ -137,10 +137,108 @@ async function userIsSystemAdmin(userOID) {
     return user.isAdmin;
 }
 
+/**
+ * Returns a list of Course Admins and Supervisors for a seminar with the given seminarOID.
+ * @param seminarOID
+ * @returns {Promise<*>}
+ */
+async function getCAdminsAndSupervisors(seminarOID) {
+    const users = await User.findAll({
+        include: [{
+            model: RoleAssignment,
+            as: 'roleassignments',
+            where: {
+                seminarOID: seminarOID,
+                [Op.or]: [{ roleOID: 2 }, { roleOID: 1 }]
+            },
+            attributes: [],
+        }],
+    });
+
+    return users;
+}
+
+/**
+ * Return a User with the given userOID.
+ * @param userOID
+ * @returns {Promise<Model|null>}
+ */
+async function getUserWithOID(userOID) {
+    const user = await User.findOne({
+        where: {
+            userOID: userOID
+        },
+    });
+
+    return user;
+}
+
+/**
+ * Return a User with a concept with the given conceptOID.
+ * @param conceptOID
+ * @returns {Promise<Model|null>}
+ */
+async function getUserWithConceptOID(conceptOID) {
+    const user = await User.findOne({
+        include: [{
+            model: Concept,
+            as: 'userOIDStudent_concepts',
+            where: {
+                conceptOID: conceptOID
+            },
+            attributes: [],
+        }],
+    });
+
+    return user;
+}
+
+/**
+ * Return a list of supervisors for a seminar with the given seminarOID.
+ * @param seminarOID
+ * @returns {Promise<*>}
+ */
+async function getSupervisorUsersInSeminar(seminarOID){
+    const user = await User.findAll({
+        include: [{
+            model: RoleAssignment,
+            as: 'roleassignments',
+            where: {
+                seminarOID: seminarOID,
+                roleOID: 2 // 2 = Supervisor
+            },
+            attributes: [],
+        }],
+    });
+
+    return user;
+}
+
+async function getCourseAdminUserInSeminar(seminarOID){
+    const user = await User.findAll({
+        include: [{
+            model: RoleAssignment,
+            as: 'roleassignments',
+            where: {
+                seminarOID: seminarOID,
+                roleOID: 1 // 1 = Course Admin
+            },
+            attributes: [],
+        }],
+    });
+
+    return user;
+}
+
 module.exports = {
     //getUserById,
     getSupervisorList,
     getAddableUsers,
     assignToSeminar,
-    userIsSystemAdmin
+    userIsSystemAdmin,
+    getCAdminsAndSupervisors,
+    getUserWithOID,
+    getUserWithConceptOID,
+    getSupervisorUsersInSeminar,
+    getCourseAdminUserInSeminar
 }
