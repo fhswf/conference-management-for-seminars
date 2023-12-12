@@ -88,8 +88,8 @@ function ChatWindowPage({paper, reviewOID}: Props){
 
         const jsondata: {createdMessage: Message, createdAttachment: Attachment | null} = await response.json()
 
-        if(!response.ok){
-            alert("Nachricht konnte nicht gesendet werden")
+        if(response.status === 415){
+            alert("Nur PDF Dateien sind erlaubt!")
             return
         }
 

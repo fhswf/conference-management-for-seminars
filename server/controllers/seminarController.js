@@ -2,9 +2,8 @@ const crypto = require('crypto');
 const db = require("../models");
 const {setPhase4PaperOID} = require("./roleassignmentController");
 const {assignReviewer} = require("./reviewController");
-const {sendMail} = require("../mailer");
+const {sendMailPhaseChanged, sendMailConceptEvaluated} = require("../mailer");
 const {getUser, getUserWithConceptOID} = require("./userController");
-const {getConceptWithOID} = require("./conceptController");
 
 const Seminar = db.seminar;
 const RoleAssignment = db.roleassignment;
@@ -99,14 +98,30 @@ const gotoNextPhase = async (req, res) => {
             currentPhase.phase++;
         }
 
-        //await t.rollback()
-        //return res.status(500).send({message: ""});
+        await t.rollback()
+        return res.status(500).send({message: ""});
 
         const seminar = await Seminar.update({phase: currentPhase.phase + 1}, {where: {seminaroid: seminarOID}});
 
         // TODO affectedRows prüfen
         if (seminar[0] === 1) {
             // TODO handle phase change
+
+            const users = await User.findAll({
+                include: [{
+                    model: RoleAssignment,
+                    as: "roleassignments",
+                    where: {
+                        seminarOID: seminarOID,
+                    },
+                }],
+            });
+
+            const updatedSeminar = await Seminar.findByPk(seminarOID);
+
+            sendMailPhaseChanged(users, updatedSeminar)
+
+
             await t.commit();
             return res.status(200).send({message: "Phase successfully changed."});
         } else {
@@ -139,7 +154,6 @@ const getUserList = async (req, res) => {
                 include: [{
                     model: RoleAssignment,
                     as: "roleassignments",
-                    attributes: ["userOID", "roleOID"],
                     include: [{
                         model: User,
                         as: "userO",
@@ -265,17 +279,9 @@ const evaluateConcept = async (req, res) => {
         if (concept[0] === 1) {
             // TODO move
             const conc = await getConceptWithOID(conceptOID);
-            const student = conc.userOIDStudent_user;
-            const supervisor = conc.userOIDSupervisor_user;
-            const seminar = conc.seminarO;
 
-            sendMail(student.mail, "Ihr Konzept wurde bewertet",
-                `Hallo ${student.firstName} ${student.lastName} ,
-                \n\nIhr Konzept wurde ${accepted ? "angenommen" : "abgelehnt"}.
-                \n\nSeminar: ${seminar.description}
-            ${feedback ? "\n\nFeedback: " + feedback : ""}
-            Sie wurden dem Betreuer ${supervisor.firstName} ${supervisor.lastName} zugewiesen.
-            \n\nMit freundlichen Grüßen`);
+            sendMailConceptEvaluated(conc)
+
 
             return res.status(200).send({message: "Concept successfully evaluated."});
         } else {
@@ -285,6 +291,44 @@ const evaluateConcept = async (req, res) => {
         console.log(e);
         return res.status(500).send({message: "Error while evaluating concept."});
     }
+}
+
+/**
+ * Returns the Concept with the given conceptOID.
+ * The Object contains all relevant information about the Concept.
+ * Relevant for sending mail
+ * @param conceptOID - The conceptOID of the Concept to be found.
+ * @returns {Promise<Model|null>}
+ */
+async function getConceptWithOID(conceptOID) {
+    const concept = await Concept.findOne({
+        where: {
+            conceptOID: conceptOID
+        },
+        include: [{
+            model: Attachment,
+            as: 'attachmentO',
+            attributes: ['filename'],
+        },
+            {
+                model: User,
+                as: 'userOIDSupervisor_user',
+                attributes: ["userOID", "firstName", "lastName"]
+            },
+            {
+                model: User,
+                as: 'userOIDStudent_user',
+                attributes: ["userOID", "firstName", "lastName", "mail"]
+            },
+            {
+                model: Seminar,
+                as: 'seminarO',
+                attributes: ["seminarOID", "description"]
+            }
+        ],
+    });
+
+    return concept;
 }
 
 /**

@@ -1,4 +1,5 @@
 const db = require("../models");
+const {isValidPdf} = require("../util/PdfUtils");
 
 const Op = db.Sequelize.Op;
 const Review = db.review;
@@ -14,18 +15,19 @@ const Paper = db.paper;
  * @param res
  */
 const getMessagesOfReview = async (req, res) => {
+    //TODO check if user is the who is revieded, then check if phase is 6
     try {
         const userOID = req.user.userOID
         const reviewOID = req.params.reviewOID
 
-        if(!reviewOID) {
+        if (!reviewOID) {
             return res.status(400).json({error: 'Bad Request'});
         }
 
         const messages = await Chatmessage.findAll({
             where: {
                 reviewOID: reviewOID,
-                [Op.or]: [{ sender: userOID }, { receiver: userOID }]
+                [Op.or]: [{sender: userOID}, {receiver: userOID}]
             },
             include: [{
                 model: Attachment,
@@ -39,9 +41,9 @@ const getMessagesOfReview = async (req, res) => {
         const messagesWithoutPartnerId = messages.map(message => {
             message = message.get();
 
-            if(message.sender === userOID) {
+            if (message.sender === userOID) {
                 delete message.receiver;
-            }else if(message.receiver === userOID) {
+            } else if (message.receiver === userOID) {
                 delete message.sender;
             }
 
@@ -75,12 +77,17 @@ const createMessage = async (req, res) => {
             return res.status(400).json({error: 'Bad Request'});
         }
 
+        if (file && file.data && !await isValidPdf(file.data)) {
+            return res.status(415).json({error: 'Unsupported Media Type; Only PDF files are allowed'});
+        }
+
         const review = await Review.findByPk(reviewOID);
 
         if (!review) {
             await t.rollback();
             return res.status(404).json({error: 'Not Found'});
         }
+
 
         // create attachment if file is present
         let createdAttachment = null
@@ -93,10 +100,10 @@ const createMessage = async (req, res) => {
         }
 
         let receiverId;
-        if(review.reviewerOID === userOID) {
+        if (review.reviewerOID === userOID) {
             const paper = await Paper.findByPk(review.paperOID);
             receiverId = paper.authorOID;
-        }else{
+        } else {
             receiverId = review.reviewerOID;
         }
 
@@ -112,6 +119,8 @@ const createMessage = async (req, res) => {
         await t.commit();
 
         createdMessage.attachmentO = createdAttachment;
+
+        // TODO optional: send mail to receiver
 
         return res.status(200).json({createdMessage, createdAttachment});
     } catch (e) {
@@ -129,25 +138,25 @@ const createMessage = async (req, res) => {
  * @throws {Error} - Throws an error if userOID, attachmentOID, or reviewOID is null.
  * @returns {Promise<boolean>} - True if the user is a chat participant, otherwise false.
  */
-async function userIsChatParticipant(userOID, attachmentOID = false, reviewOID= false) {
-    if(!userOID || (!attachmentOID && !reviewOID)) {
+async function userIsChatParticipant(userOID, attachmentOID = false, reviewOID = false) {
+    if (!userOID || (!attachmentOID && !reviewOID)) {
         throw new Error("userOID or attachmentOID or reviewOID is null");
     }
 
     let chatmessage = null;
 
-    if(attachmentOID) {
+    if (attachmentOID) {
         chatmessage = await Chatmessage.findOne({
-        where: {
-            attachmentOID: attachmentOID,
-            [Op.or]: [{ sender: userOID }, { receiver: userOID }]
-        },
-    })
-    } else if(reviewOID) {
+            where: {
+                attachmentOID: attachmentOID,
+                [Op.or]: [{sender: userOID}, {receiver: userOID}]
+            },
+        })
+    } else if (reviewOID) {
         chatmessage = await Chatmessage.findOne({
             where: {
                 reviewOID: reviewOID,
-                [Op.or]: [{ sender: userOID }, { receiver: userOID }]
+                [Op.or]: [{sender: userOID}, {receiver: userOID}]
             },
         })
     }
@@ -163,7 +172,7 @@ async function userIsChatParticipant(userOID, attachmentOID = false, reviewOID= 
  * @returns {Promise<boolean>} - True if the user is a participant and the attachment is associated, otherwise false.
  */
 async function chatHasAttachmentAndUserIsParticipant(userOID, attachmentOID) {
-    if(!userOID || !attachmentOID) {
+    if (!userOID || !attachmentOID) {
         throw new Error("userOID or attachmentOID is null");
     }
 
@@ -182,7 +191,7 @@ async function chatHasAttachmentAndUserIsParticipant(userOID, attachmentOID) {
  * @returns {Promise<Object|null>} - The found chat message or null if not found.
  */
 async function chatHasAttachment(attachmentOID) {
-    if(!attachmentOID) {
+    if (!attachmentOID) {
         throw new Error("attachmentOID is null");
     }
 

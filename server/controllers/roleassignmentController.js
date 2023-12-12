@@ -46,6 +46,21 @@ async function setPhase4PaperOID(seminarOID, t) {
     }
 }
 
+/*
+async function setPhase4PaperOID(t, paperOID, userOID, seminarOID) {
+    await RoleAssignment.update({
+        phase4paperOID: paperOID
+    }, {
+        where: {
+            userOID: userOID,
+            seminarOID: seminarOID,
+        }, transaction: t
+    });
+
+    return true;
+}
+* */
+
 /**
  * Sets phase7paperOID of a student to the given data.
  * @param t

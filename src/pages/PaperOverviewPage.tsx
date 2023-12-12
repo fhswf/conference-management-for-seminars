@@ -70,8 +70,8 @@ function PaperOverviewPage() {
     return (
         <div>
             <MainLayout>
-                <pre>{JSON.stringify(uploadedPaper, null, 2)}</pre>
-                <pre>{JSON.stringify(seminar, null, 2)}</pre>
+                {/*<pre>{JSON.stringify(uploadedPaper, null, 2)}</pre>*/}
+                {/*<pre>{JSON.stringify(seminar, null, 2)}</pre>*/}
                 <p>Ihre eingereichten Paper:</p>
                 <div className={styles.container}>
                     <p>Datei:</p>
@@ -81,11 +81,11 @@ function PaperOverviewPage() {
                         uploadedPaper.map((paper: PaperType, index: number) => (
                             <Fragment key={index}>
                                 <a href={`http://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
-                                {seminar && seminar.roleassignments.length > 0 ? (
+                                {seminar && seminar.phase && seminar.roleassignments.length > 0 ? (
                                     paper.paperOID === seminar.roleassignments[0].phase4paperOID ? (
                                         <>
                                             <p>Phase 4</p>
-                                            <Button onClick={() => setShowChat(paper)} disabled={/*seminar.phase < 6*/ false}>Kommentare</Button>
+                                            <Button onClick={() => setShowChat(paper)} disabled={seminar.phase < 6}>Kommentare</Button>
                                         </>
                                     ) : paper.paperOID === seminar.roleassignments[0].phase7paperOID ? (
                                         <>

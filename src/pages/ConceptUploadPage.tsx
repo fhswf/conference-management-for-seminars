@@ -28,6 +28,10 @@ function ConceptUploadPage() {
     async function onSubmit(event: any) {
         event.preventDefault();
 
+        if(!confirm("Sind Sie sicher, dass Sie das Konzept einreichen möchten?")) {
+            return;
+        }
+
         if (!selectedFile && !text.trim()) {
             alert('Bitte PDF oder Text eingeben.');
             return;

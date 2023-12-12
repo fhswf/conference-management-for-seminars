@@ -104,6 +104,11 @@ function SeminarDetailsPage() {
 
         if (result.ok) {
             alert("Erfolgreich");
+            setStudentList(studentList => {
+                const newStudentList = {...studentList!};
+                newStudentList.phase = newStudentList.phase! + 1;
+                return newStudentList;
+            });
         } else {
             alert("Fehler");
         }
@@ -125,6 +130,8 @@ function SeminarDetailsPage() {
 
     }));
 
+    const p4paperCount = studentList?.roleassignments.filter(user => user.phase4paperOID !== null).length;
+    const p7paperCount = studentList?.roleassignments.filter(user => user.phase7paperOID !== null).length;
     const conceptCount = studentList?.roleassignments.filter(user => user.userO.userOIDStudent_concepts[0]?.accepted === true).length;
     const studentCount = studentList?.roleassignments.filter(user => user.roleOID === 3).length;
 
@@ -165,21 +172,24 @@ function SeminarDetailsPage() {
         }
     }
 
+    const role = studentList?.roleassignments.find(userEntry => userEntry.userOID === user?.userOID)?.roleOID;
+
     return (
         <div>
             <MainLayout>
                 <div>
                     <p>Seminar Details: “{studentList?.description || "-"}”</p>
-                    {studentList?.phase && <p onClick={() => {
+                    <p>{role}</p>
+                    {studentList?.phase && role === 1 && <p onClick={() => {
                         if (studentList?.phase && studentList?.phase < 7 && confirm(`Möchten Sie von "${mapPhaseToString(studentList?.phase)}" übergehen zu "${mapPhaseToString(studentList?.phase + 1)}"?`)) {
                             onNextPhaseClicked();
                         }
                     }}>{mapPhaseToString(studentList?.phase)} 🖊</p>}
-                    <pre>{JSON.stringify(studentList, null, 2)}</pre>
+                    {/*<pre>{JSON.stringify(studentList, null, 2)}</pre>*/}
                     <HiddenLabel text={studentList?.assignmentkey || ""}/>
                     <p>Eingereichte und angenommene Konzepte: {conceptCount}/{studentCount}</p>
-                    <p>Eingereichte Paper Phase 4: TODO</p>
-                    <p>Eingereichte Paper Phase 7: TODO</p>
+                    <p>Eingereichte Paper Phase 4: {p4paperCount}/{studentCount}</p>
+                    <p>Eingereichte Paper Phase 7: {p7paperCount}/{studentCount}</p>
                     {!isEditMode ?
                         <Table header={header} data={tableData}/> :
                         <Table header={headerEdit} data={tableDataEdit}/>

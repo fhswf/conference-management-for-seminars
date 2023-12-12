@@ -2,9 +2,9 @@ const db = require("../models");
 const attachmentController = require("./attachmentController");
 const pdf = require('pdf-parse');
 const {isValidPdf, replaceInFilename} = require("../util/PdfUtils");
-const {setPhase7PaperOID} = require("./roleassignmentController");
+const {setPhase7PaperOID, setPhase4PaperOID} = require("./roleassignmentController");
 const {getCAdminsAndSupervisors, getUserWithOID} = require("./userController");
-const {sendMail} = require("../mailer");
+const {sendMailPaperUploaded} = require("../mailer");
 const {getSeminarWithOID} = require("./seminarController");
 
 const Op = db.Sequelize.Op;
@@ -34,7 +34,10 @@ async function uploadPaper(req, res) {
 
         const file = req.files?.file
 
-
+        if (!seminarOID || !file) {
+            await t.rollback();
+            return res.status(400).json({error: 'Bad Request'});
+        }
 
         if(!await isValidPdf(file.data)){
             return res.status(415).json({error: 'Unsupported Media Type; Only PDF files are allowed'});
@@ -56,6 +59,10 @@ async function uploadPaper(req, res) {
             if(!await setPhase7PaperOID(t, paper.paperOID, userOID, seminarOID)){
                 return res.status(409).json({error: 'Bad Request'});
             }
+        }else if(currentPhase.phase === 3){
+            if(!await setPhase4PaperOID(t, paper.paperOID, userOID, seminarOID)){
+                return res.status(409).json({error: 'Bad Request'});
+            }
         }
 
         // add created attachment to paper
@@ -70,16 +77,7 @@ async function uploadPaper(req, res) {
         const student = await getUserWithOID(userOID);
         const seminar = await getSeminarWithOID(seminarOID)
 
-        for (const user of users) {
-            const emailText = `Hallo ${user.firstName} ${user.lastName},
-                    \nder Student ${student.firstName} ${student.lastName} hat ein Paper hochgeladen.
-                    \nSeminar: ${seminar.description}
-                    \n\nMit freundlichen Grüßen`;
-
-            console.log("Send Mail to: " + user.mail);
-
-            //sendMail(user.mail, "Neues Paper hochgeladen", emailText);
-        }
+        sendMailPaperUploaded(users, seminar, student);
 
         return res.status(200).json(paper);
     } catch (error) {
@@ -180,8 +178,8 @@ async function getUploadedPaper(req, res) {
 /**
  * Checks if a user is the author of a paper.
  * Returns false if userOID or paperOID is null.
- * @param userOID
- * @param paperOID
+ * @param userOID - The userOID to be checked.
+ * @param paperOID - The paperOID to be checked.
  * @returns {Promise<boolean>}
  */
 async function userIsAuthorOfPaper(userOID, paperOID ) {
@@ -195,7 +193,7 @@ async function userIsAuthorOfPaper(userOID, paperOID ) {
 
 /**
  * Checks if a paper has an attachment and if the user is the author of the paper.
- * @param userOID
+ * @param userOID - The userOID to be checked.
  * @param attachmentOID
  * @returns {Promise<boolean>}
  */
@@ -211,7 +209,7 @@ async function paperHasAttachmentAndUserIsAuthor(userOID, attachmentOID) {
 /**
  * Checks if a paper has an attachment.
  * Returns the paper if it exists, null otherwise.
- * @param attachmentOID
+ * @param attachmentOID - The attachmentOID to be checked.
  * @returns {Promise<Object|null>}
  */
 async function paperHasAttachment(attachmentOID) {

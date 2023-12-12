@@ -13,7 +13,9 @@ function PaperUploadPage({seminarOID, phase, onUpload}: Props) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     async function onClick(event: any) {
-        selectedFile && onUpload(selectedFile);
+        if(confirm("Sind Sie sicher, dass Sie das Paper hochladen möchten?")) {
+            selectedFile && onUpload(selectedFile);
+        }
     }
 
     return (

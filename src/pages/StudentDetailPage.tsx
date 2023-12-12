@@ -83,8 +83,8 @@ function StudentDetailPage() {
     return (
         <MainLayout>
             <div>
-                <pre>{JSON.stringify(data, null, 2)}</pre>
-                <pre>{JSON.stringify(reviewer, null, 2)}</pre>
+                {/*<pre>{JSON.stringify(data, null, 2)}</pre>*/}
+                {/*<pre>{JSON.stringify(reviewer, null, 2)}</pre>*/}
                 <h1>Student Detail Page</h1>
                 <p>Seminar: ... {seminarOID}</p>
                 <p>Student: {data?.firstName} {data?.lastName}</p>

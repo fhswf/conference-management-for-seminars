@@ -102,9 +102,9 @@ function SeminarPage() {
             <MainLayout>
                 <div>
                     <p>{seminarOID}</p>
-                    <pre>{JSON.stringify(concept, null, 2)}</pre>
+                    {/*<pre>{JSON.stringify(concept, null, 2)}</pre>*/}
                     {/*<p>{JSON.stringify(seminar)}</p>*/}
-                    <pre>{JSON.stringify(assignedPaper, null, 2)}</pre>
+                    {/*<pre>{JSON.stringify(assignedPaper, null, 2)}</pre>*/}
                 </div>
                 <div>
                     <p>Übersicht</p>

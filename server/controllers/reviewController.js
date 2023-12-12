@@ -43,12 +43,13 @@ async function getReviewerUserOfPaper(req, res) {
  * @returns {Promise<void>}
  */
 async function assignReviewer(seminarOID, t) {
-    // Jeder User (Student) eines Seminars soll 2 Reviewe Eintrag mit sich als Reviewer bekommen
+    // Jeder User (Student) eines Seminars soll 2 Reviewer Einträge als Reviewer bekommen
     let assignment = [];
     //let assignment: { paper, reviewer1, reviewer2, betreuer }[] = [];
     let reviewerMap = new Map();
     let reviewerCount = new Map();
 
+    // all students in seminar who have a concept and a paper
     const studentsInSeminar = await User.findAll({
         include: [{
             model: RoleAssignment,

@@ -1,4 +1,4 @@
-const {sendMail} = require("../mailer");
+const {sendMailConceptUploaded} = require("../mailer");
 const db = require("../models");
 const attachmentController = require("./attachmentController");
 const path = require("path");
@@ -91,24 +91,15 @@ const uploadConcept = async (req, res) => {
             attachmentOID: attachment?.attachmentOID,
         }, {transaction: t});
 
-        await t.commit();
+
 
         const users = await getCourseAdminUserInSeminar(seminarOID);
         const student = await getUserWithOID(userOID);
         const seminar = await getSeminarWithOID(seminarOID);
 
-        for (const user of users) {
-            const emailText = `Hallo ${user.firstName} ${user.lastName},
-                    \nSeminar: ${seminar.description}
-                    \nder Student ${student.firstName} ${student.lastName} hat ein Konzept eingereicht.
-                    \nKonzept ${text || "-"}
-                    \nDatei ${attachment?.filename || "-"}
-                    \n\nMit freundlichen Grüßen`;
+        sendMailConceptUploaded(users, seminar, student)
 
-            console.log("Send Mail to: " + user.mail);
-
-            //await sendMail(user.mail, "Neues Konzept hochgeladen", emailText);
-        }
+        await t.commit();
 
         return res.status(200).end();
     } catch (error) {
@@ -170,47 +161,11 @@ async function conceptHasAttachment(attachmentOID) {
     return concept;
 }
 
-/**
- * Returns the Concept with the given conceptOID.
- * The Object contains all relevant information about the Concept.
- * @param conceptOID
- * @returns {Promise<Model|null>}
- */
-async function getConceptWithOID(conceptOID) {
-    const concept = await Concept.findOne({
-        where: {
-            conceptOID: conceptOID
-        },
-        include: [{
-            model: Attachment,
-            as: 'attachmentO',
-            attributes: ['filename'],
-        },
-            {
-                model: User,
-                as: 'userOIDSupervisor_user',
-                attributes: ["userOID", "firstName", "lastName"]
-            },
-            {
-                model: User,
-                as: 'userOIDStudent_user',
-                attributes: ["userOID", "firstName", "lastName", "mail"]
-            },
-            {
-                model: Seminar,
-                as: 'seminarO',
-                attributes: ["seminarOID", "description"]
-            }
-        ],
-    });
 
-    return concept;
-}
 
 module.exports = {
     getNewestConceptOfCurrentUser,
     uploadConcept,
     userIsAuthorOfConcept,
-    conceptHasAttachment,
-    getConceptWithOID,
+    conceptHasAttachment
 }

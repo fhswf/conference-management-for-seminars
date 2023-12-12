@@ -5,14 +5,12 @@ describe('LoginPage Test', () => {
     cy.contains('Login').should('exist');
     cy.get('button').should('exist');
 
-    // Überwachen der Änderung von window.location.href
     cy.window().then((win) => {
       cy.stub(win, 'open').as('windowOpen');
     });
 
     cy.get('button').click();
 
-    // Überprüfen, ob window.open mit der erwarteten URL aufgerufen wurde
     cy.get('@windowOpen').should('be.calledWith', 'http://google.com');
   });
 });

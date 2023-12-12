@@ -88,7 +88,7 @@ function HomePage() {
     return (
         <>
             <MainLayout>
-                <pre>{JSON.stringify(assignedSeminars, null, 2)}</pre>
+                {/*<pre>{JSON.stringify(assignedSeminars, null, 2)}</pre>*/}
                 <div>
                     <h1>Sie sind in folgenden Seminaren eingeschrieben:</h1>
                     <div style={styles.enterSeminar}>
