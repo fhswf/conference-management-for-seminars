@@ -8,13 +8,14 @@ const {Sequelize, DataTypes} = require("sequelize");
 const sequelize = new Sequelize(dbConfig.DATABASE, dbConfig.USER, dbConfig.PASSWORD, {
     host: dbConfig.HOST,
     dialect: dbConfig.DIALECT,
+    timezone: 'Europe/Berlin',
     pool: {
         max: dbConfig.pool.max,
         min: dbConfig.pool.min,
         acquire: dbConfig.pool.acquire,
         idle: dbConfig.pool.idle,
     },
-    logging: false
+    logging: true
 });
 
 sequelize.authenticate().then(() => {

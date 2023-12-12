@@ -15,10 +15,6 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TEXT,
       allowNull: false
     },
-    comment: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    },
     mail: {
       type: DataTypes.TEXT,
       allowNull: false

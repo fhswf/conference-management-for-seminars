@@ -25,14 +25,53 @@ function PaperOverviewPage() {
     const [showModal, setShowModal] = useState(false);
     const [showChat, setShowChat] = useState<Paper>();
     //const [uploadedPaper, setUploadedPaper] = useState<PaperObj[] | null>(null)
-    const {data: uploadedPaper} = useFetch<PaperType[]>(`https://${import.meta.env.VITE_BACKEND_URL}/paper/get-uploaded-paper/${seminarOID}`);
-    const {data: seminar} = useFetch<SeminarType>(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminar/${seminarOID}`);
+    const {data: uploadedPaper, setData: setUploadedPaper} = useFetch<PaperType[]>(`http://${import.meta.env.VITE_BACKEND_URL}/paper/get-uploaded-paper/${seminarOID}`);
+    const {data: seminar} = useFetch<SeminarType>(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminar/${seminarOID}`);
+
+    async function onUpload(file: any) {
+        if (!file || !seminarOID) {
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('seminarOID', seminarOID);
+        formData.append('file', file);
+
+        console.log(file);
+
+        try {
+            const res = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/paper`, {
+                method: 'POST',
+                credentials: 'include',
+                body: formData,
+            },);
+
+            if (res.status === 200) {
+                alert('Paper uploaded successfully.');
+                //setSelectedFile(null);
+                setShowModal(false);
+                const data = await res.json();
+                console.log(data);
+                setUploadedPaper([...uploadedPaper!, data]);
+
+                if(seminar?.phase === 7){
+                    seminar.roleassignments[0].phase7paperOID = data.paperOID;
+                }
+
+            } else {
+                alert('Error uploading paper. Please try again.');
+            }
+        } catch (error) {
+            console.error("Error uploading paper:", error);
+            alert('Error uploading paper. Please check your internet connection and try again.');
+        }
+    }
 
     return (
         <div>
             <MainLayout>
-                {/*<p>{JSON.stringify(uploadedPaper)}</p>*/}
-                {/*<p>{JSON.stringify(seminar)}</p>*/}
+                {/*<pre>{JSON.stringify(uploadedPaper, null, 2)}</pre>*/}
+                {/*<pre>{JSON.stringify(seminar, null, 2)}</pre>*/}
                 <p>Ihre eingereichten Paper:</p>
                 <div className={styles.container}>
                     <p>Datei:</p>
@@ -41,12 +80,12 @@ function PaperOverviewPage() {
                     {uploadedPaper && uploadedPaper.length > 0 ? (
                         uploadedPaper.map((paper: PaperType, index: number) => (
                             <Fragment key={index}>
-                                <a href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
-                                {seminar && seminar.roleassignments.length > 0 ? (
+                                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
+                                {seminar && seminar.phase && seminar.roleassignments.length > 0 ? (
                                     paper.paperOID === seminar.roleassignments[0].phase4paperOID ? (
                                         <>
                                             <p>Phase 4</p>
-                                            <Button onClick={() => setShowChat(paper)} disabled={/*seminar.phase < 6*/ false}>Kommentare</Button>
+                                            <Button onClick={() => setShowChat(paper)} disabled={seminar.phase < 6}>Kommentare</Button>
                                         </>
                                     ) : paper.paperOID === seminar.roleassignments[0].phase7paperOID ? (
                                         <>
@@ -73,11 +112,11 @@ function PaperOverviewPage() {
                     )}
                     <p></p>
                     <Button onClick={() => setShowModal(true)}
-                            disabled={seminar?.phase !== 3 && seminar?.phase !== 7}>Hochladen</Button> {/* TODO if phase = 7 or if User has not uploaded a paper yet */}
+                            disabled={seminar?.phase !== 3 && (seminar?.phase !== 7 || !!seminar?.roleassignments[0].phase7paperOID)}>Hochladen</Button>
                     <p></p>
                 </div>
                 {seminar && <Modal isOpen={showModal} onClose={() => setShowModal(false)}><PaperUploadPage
-                    seminarOID={seminarOID!} phase={seminar.phase!}/></Modal>}
+                    seminarOID={seminarOID!} phase={seminar.phase!} onUpload={onUpload}/></Modal>}
                 {showChat && <Modal isOpen={!!showChat} onClose={() => setShowChat(undefined)}><ChatWindowPage
                     paper={showChat}/></Modal>}
             </MainLayout>

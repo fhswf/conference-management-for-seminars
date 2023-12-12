@@ -20,7 +20,7 @@ type AssignedSeminar = Seminar & {
 function HomePage() {
     const navigate = useNavigate();
     const { user, setUser } = useContext(AuthContext);
-    const {data: assignedSeminars} = useFetch<AssignedSeminar[]>(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/get-assigned-seminars`);
+    const {data: assignedSeminars} = useFetch<AssignedSeminar[]>(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/get-assigned-seminars`);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const styles = {
@@ -46,7 +46,8 @@ function HomePage() {
         role: seminar.roleassignments[0].roleOID && mapRoleToString(seminar.roleassignments[0].roleOID),
         btnSeminar: <Button onClick={() => {
             navigate(`/seminar/${seminar.seminarOID}`)
-        }}>➡</Button>,
+        }} disabled={seminar.roleassignments[0].roleOID === 1}
+        >➡</Button>,
         btnSeminarDetails: //(seminar.roleassignments[0].roleOID === 1) ?
             <Button onClick={() => {
             navigate(`/seminar-details/${seminar.seminarOID}`)
@@ -65,7 +66,7 @@ function HomePage() {
             return;
         }
 
-        const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/enter-seminar/${seminarKey}`, {
+        const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/enter-seminar/${seminarKey}`, {
             method: "POST",
             credentials: 'include',
             headers: {
@@ -87,7 +88,7 @@ function HomePage() {
     return (
         <>
             <MainLayout>
-                {/*<p>{JSON.stringify(assignedSeminars)}</p>*/}
+                {/*<pre>{JSON.stringify(assignedSeminars, null, 2)}</pre>*/}
                 <div>
                     <h1>Sie sind in folgenden Seminaren eingeschrieben:</h1>
                     <div style={styles.enterSeminar}>
@@ -99,7 +100,7 @@ function HomePage() {
                     </div>
                 </div>
                 <Button onClick={async () => {
-                    const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/authstatus`, {
+                    const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/authstatus`, {
                         method: "GET",
                         credentials: 'include',
                     });

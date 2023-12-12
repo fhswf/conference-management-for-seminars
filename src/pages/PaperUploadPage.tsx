@@ -6,39 +6,15 @@ import {useState} from "react";
 interface Props {
     seminarOID: string;
     phase: number;
+    onUpload: (selectedFile: File) => void;
 }
 
-function PaperUploadPage({seminarOID, phase}: Props) {
+function PaperUploadPage({seminarOID, phase, onUpload}: Props) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     async function onClick(event: any) {
-        if (!selectedFile) {
-            alert('Bitte PDF auswählen.');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('seminarOID', seminarOID);
-        formData.append('file', selectedFile);
-
-        console.log(selectedFile);
-
-        try {
-            const res = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/paper`, {
-                method: 'POST',
-                credentials: 'include',
-                body: formData,
-            },);
-
-            if (res.status === 200) {
-                alert('Paper uploaded successfully.');
-                setSelectedFile(null);
-            } else {
-                alert('Error uploading paper. Please try again.');
-            }
-        } catch (error) {
-            console.error("Error uploading paper:", error);
-            alert('Error uploading paper. Please check your internet connection and try again.');
+        if(confirm("Sind Sie sicher, dass Sie das Paper hochladen möchten?")) {
+            selectedFile && onUpload(selectedFile);
         }
     }
 

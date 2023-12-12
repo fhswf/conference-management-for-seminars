@@ -55,7 +55,8 @@ function Table({header, data}: Props) {
             <div className="card">
                 <DataTable value={filteredData} header={headerT} showGridlines tableStyle={{minWidth: '50rem'}}>
                     {header && header.map((h, index) => {
-                        return <Column field={h.field} header={h.header} key={index}></Column>
+                        const isButton = h.field.startsWith("btn")
+                        return <Column sortable={!isButton} field={h.field} header={h.header} key={index}></Column>
                     })}
                 </DataTable>
             </div>

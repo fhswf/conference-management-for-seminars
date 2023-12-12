@@ -31,3 +31,27 @@ export function mapConceptStatusToString(accepted: boolean | null){
         default: return 'Status ungültig';
     }
 }
+
+/*
+                <RadioButton inputId="5" value="5" onChange={(e) => setRating(e.value)} checked={rating === '5'} />
+                <p>Tendenziell Annehmen</p>
+                <RadioButton inputId="4" value="4" onChange={(e) => setRating(e.value)} checked={rating === '4'} />
+                <p>Enthaltung</p>
+                <RadioButton inputId="3" value="3" onChange={(e) => setRating(e.value)} checked={rating === '3'} />
+                <p>Tendenziell Ablehnen</p>
+                <RadioButton inputId="2" value="2" onChange={(e) => setRating(e.value)} checked={rating === '2'} />
+                <p>Ablehnen</p>
+                <RadioButton inputId="1" value="1" onChange={(e) => setRating(e.value)} checked={rating === '1'} />
+*/
+
+export function mapRatingToString(rating: number | null){
+    switch (rating) {
+        case 5: return 'Annehmen';
+        case 4: return 'Tendenziell Annehmen';
+        case 3: return 'Enthaltung';
+        case 2: return 'Tendenziell Ablehnen';
+        case 1: return 'Ablehnen';
+
+        default: return 'Nicht bewertet';
+    }
+}

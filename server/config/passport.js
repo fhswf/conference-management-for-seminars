@@ -44,7 +44,6 @@ async function addOrUpdateUser(lti, t) {
             firstName: lti.lis_person_name_given,
             lastName: lti.lis_person_name_family,
             mail: lti.lis_person_contact_email_primary,
-            comment: null,
             isAdmin: false,
         }, transaction: t
     });
@@ -194,7 +193,6 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
                 firstName: profile.name?.givenName || "",
                 lastName: profile.name?.familyName || "",
                 mail: profile.emails && profile.emails[0]?.value || "",
-                comment: null,
                 isAdmin: false,
             }, {transaction: t});
 
@@ -215,7 +213,6 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
                 firstName: profile.name?.givenName || "",
                 lastName: profile.name?.familyName || "",
                 mail: profile.emails && profile.emails[0]?.value || "",
-                comment: null,
                 isAdmin: false,
             }, transaction: t
         });

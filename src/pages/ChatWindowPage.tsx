@@ -8,6 +8,8 @@ import useFetch from "../hooks/useFetch.ts";
 import Paper from "../entities/database/Paper.ts";
 import Review from "../entities/database/Review.ts";
 import {AuthContext} from "../context/AuthContext.ts";
+import useInterval from "../hooks/useInterval.ts";
+import Attachment from "../entities/database/Attachment.ts";
 
 interface Props {
     paper: Paper;
@@ -15,16 +17,16 @@ interface Props {
 }
 
 function ChatWindowPage({paper, reviewOID}: Props){
+    const pollingInterval = 2000;
     const { user, setUser } = useContext(AuthContext);
-    const [selectedFile, setSelectedFile] = useState<File | null>(null)
-    const [messages, setMessages] = useState<Message[]>([])
+    const [selectedFile, setSelectedFile] = useState<File>()
     const [text, setText] = useState<string>("")
-    //const {data: messages2} = useFetch<Message[]>(`https://${import.meta.env.VITE_BACKEND_URL}/chat/879`)
-    const [messages2, setMessages2] = useState<Message[]>()
-    const {data: reviewOIDs} = useFetch<Review[]>(`https://${import.meta.env.VITE_BACKEND_URL}/review/get-from-paper/${paper.paperOID}`)
+    //const {data: chatmessages} = useFetch<Message[]>(`http://${import.meta.env.VITE_BACKEND_URL}/chat/879`)
+    const [chatmessages, setChatmessages] = useState<Message[]>([])
+    const {data: reviewOIDs} = useFetch<Review[]>(`http://${import.meta.env.VITE_BACKEND_URL}/review/get-reviewoids-from-paper/${paper.paperOID}`)
     const [selectedReview, setSelectedReview] = useState<number>()
 
-    useEffect(() => {
+
         async function fetchMessages(){
             if(!reviewOIDs){
                 return
@@ -32,7 +34,7 @@ function ChatWindowPage({paper, reviewOID}: Props){
 
             console.log("fetch " + selectedReview)
 
-            const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/chat/${selectedReview}`, {
+            const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/chat/${selectedReview}`, {
                 credentials: "include"
             });
 
@@ -42,10 +44,18 @@ function ChatWindowPage({paper, reviewOID}: Props){
             console.log(jsondata)
             console.log(messages)
 
-            setMessages2(messages)
+            setChatmessages(messages)
         }
 
-        fetchMessages()
+
+    useInterval(() => {
+        fetchMessages();
+    }, pollingInterval);
+
+    useEffect(() => {
+        if (selectedReview) {
+            fetchMessages();
+        }
     }, [selectedReview]);
 
     useEffect(() => {
@@ -58,14 +68,6 @@ function ChatWindowPage({paper, reviewOID}: Props){
         setSelectedReview(reviewOIDs[0].reviewOID || undefined)
     }, [reviewOIDs]);
 
-    useEffect(() => {
-        setMessages(messages2 || [])
-    }, [messages2]);
-
-    function onChatChanged(partner: string, reviewOID: number){
-        console.log(partner + " " + reviewOID)
-        setSelectedReview(reviewOID)
-    }
 
     async function onSendClicked(){
         if(!text && !selectedFile){
@@ -78,41 +80,48 @@ function ChatWindowPage({paper, reviewOID}: Props){
         paper.paperOID && formData.append('paperOID', paper.paperOID.toString());
         selectedReview && formData.append('reviewOID', selectedReview.toString());
 
-        const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/chat`, {
+        const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/chat`, {
             method: "POST",
             credentials: "include",
             body: formData
         });
 
-        const jsondata = await response.json()
+        const jsondata: {createdMessage: Message, createdAttachment: Attachment | null} = await response.json()
 
-        if(!response.ok){
-            alert("Nachricht konnte nicht gesendet werden")
+        if(response.status === 415){
+            alert("Nur PDF Dateien sind erlaubt!")
             return
         }
 
-        const newMessage = jsondata as Message
-
-        console.log(jsondata)
+        const newMessage = jsondata.createdMessage as Message;
+        newMessage.attachmentO = jsondata.createdAttachment;
         console.log(newMessage)
 
-        setMessages([...messages, newMessage])
+        setChatmessages([...chatmessages, newMessage])
         setText("")
-        setSelectedFile(null)
+        setSelectedFile(undefined)
     }
 
     return(
         <div className={styles.container}>
             {/*JSON.stringify(paper)*/}
             {/*JSON.stringify(reviewOIDs)*/}
-            {reviewOIDs && <div className={styles.buttonContainer}>
-                <Button key={reviewOIDs[0].reviewOID} onClick={()=>setSelectedReview(reviewOIDs[0].reviewOID || undefined)}>Reviewer A</Button>
-                <Button key={reviewOIDs[1].reviewOID} onClick={()=>setSelectedReview(reviewOIDs[1].reviewOID || undefined)}>Reviewer B</Button>
-                <Button key={reviewOIDs[2].reviewOID} onClick={()=>setSelectedReview(reviewOIDs[2].reviewOID || undefined)}>Betreuer</Button>
-            </div>}
+            {/*JSON.stringify(reviewOIDs)*/}
+            {reviewOIDs && (
+                <div className={styles.buttonContainer}>
+                    {reviewOIDs.map((review, index) => {
+                        const buttonText = index === 0 ? 'Review A' : index === 1 ? 'Review B' : index === 2 ? 'Betreuer' : '';
+                        return (
+                            <Button key={review.reviewOID} onClick={() => setSelectedReview(review.reviewOID || undefined)}>
+                                {buttonText}
+                            </Button>
+                        );
+                    })}
+                </div>
+            )}
             <div className={styles.conversation}>
 
-                {messages?.map((message, index) => {
+                {chatmessages?.map((message, index) => {
                     if(message.sender === user?.userOID){
                         return <div key={index} className={styles.messageRight}>
                             <ChatMessage message={message}/>
@@ -126,7 +135,7 @@ function ChatWindowPage({paper, reviewOID}: Props){
             </div>
             <div className={styles.textfieldAndButton}>
                 <InputTextarea value={text} onChange={(e) => setText(e.target.value)}/>
-                <CustomFileUpload onSelectionChanged={(file) => setSelectedFile(file || null)}/>
+                <CustomFileUpload onSelectionChanged={(file) => setSelectedFile(file || undefined)}/>
                 <Button onClick={onSendClicked} label="➡" disabled={!text && !selectedFile}/>
             </div>
         </div>

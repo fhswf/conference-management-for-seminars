@@ -19,9 +19,10 @@ interface Props {
     user0: UserType;
     availableSupervisors: User[];
     onClose?: () => void;
+    userRole: number;
 }
 
-function ConceptAcceptReject({user0, availableSupervisors, onClose}: Props) {
+function ConceptAcceptReject({user0, availableSupervisors, onClose, userRole}: Props) {
     const [selectedSupervisor, setSelectedSupervisor] = useState<User | null>(null)
     const [inputText, setInputText] = useState("")
     const styles = {
@@ -61,9 +62,10 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose}: Props) {
             accepted: accepted,
             feedback: inputText,
             userOIDSupervisor: selectedSupervisor?.userOID || null,
+            seminarOID: user0.userOIDStudent_concepts[0].seminarOID,
         }
 
-        const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/evaluate-concept`, {// TODO change to concept route
+        const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/evaluate-concept`, {// TODO change to concept route
             method: "POST",
             credentials: 'include',
             headers: {
@@ -86,6 +88,7 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose}: Props) {
         <div>
             {/*<pre>{JSON.stringify(user0, null, 2)}</pre>*/}
             {/*<pre>{JSON.stringify(availableSupervisors, null, 2)}</pre>*/}
+            {/*<pre>{JSON.stringify(user0.userOIDStudent_concepts[0], null, 2)}</pre>*/}
             {/*
                 <pre>{JSON.stringify(concept, null, 2)}</pre>
                 <pre>{JSON.stringify(availableSupervisors, null, 2)}</pre>
@@ -94,18 +97,18 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose}: Props) {
             <h2>Konzept annehmen / ablehnen</h2>
             <h3>Autor:</h3>
             <p>Name: {user0.firstName} {user0.lastName}</p>
-            <p>Kommentar: {user0.comment || "-"}</p>
             <p>Mail: {user0.mail}</p>
             <hr/>
             <h3>Konzept:</h3>
             <p>Text: {user0.userOIDStudent_concepts[0].text || "-"}</p>
             <p>Anhang: {user0.userOIDStudent_concepts[0].attachmentO ? <a
-                href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${user0.userOIDStudent_concepts[0].attachmentO.attachmentOID}`}>{user0.userOIDStudent_concepts[0].attachmentO.filename}</a> : "-"}
+                href={`http://${import.meta.env.VITE_BACKEND_URL}/attachment/${user0.userOIDStudent_concepts[0].attachmentO.attachmentOID}`}>{user0.userOIDStudent_concepts[0].attachmentO.filename}</a> : "-"}
             </p>
             <p>Status: {user0.userOIDStudent_concepts[0].accepted === null ? "Bewertung ausstehend" : user0.userOIDStudent_concepts[0].accepted ? "Angenommen" : "Abgelehnt"}</p>
             <p>Feedback: {user0.userOIDStudent_concepts[0].feedback || "-"}</p>
 
-            {(!user0.userOIDStudent_concepts[0].accepted) && // if evaluation pending
+            {/* if evaluation pending */}
+            {(!user0.userOIDStudent_concepts[0].accepted) && userRole === 1 &&
                 <>
                     <h4>TODO Beurteilung auf Kurs-Admin beschränken</h4>
                     Betreuer: <Dropdown value={selectedSupervisor} options={supervisor} optionLabel="name"

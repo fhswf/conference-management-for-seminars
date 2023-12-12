@@ -1,15 +1,23 @@
+const {sendMailConceptUploaded} = require("../mailer");
 const db = require("../models");
 const attachmentController = require("./attachmentController");
 const path = require("path");
-const {isValidPdf} = require("../util/PdfUtils");
+const {getUserWithOID, getCourseAdminUserInSeminar} = require("./userController");
+const {getSeminarWithOID} = require("./seminarController");
 
 const Concept = db.concept;
 const User = db.user;
-const Status = db.status;
 const Attachment = db.attachment;
+const Seminar = db.seminar;
 
-
-const getNewestConcept = async (req, res) => {
+/**
+ * Retrieves the newest Concept associated with the current user and the given seminar.
+ * If no Concept is found, it returns an empty response.
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
+const getNewestConceptOfCurrentUser = async (req, res) => {
     // TODO ggf anpassen
     try {
         const seminarOID = req.params.seminarOID;
@@ -32,16 +40,23 @@ const getNewestConcept = async (req, res) => {
             order: [['createdAt', 'DESC']], //Das neueste Concept
             limit: 1
         });
-        if(!concept) {
+        if (!concept) {
             return res.status(200).json({})
         }
         return res.status(200).json(concept);
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: 'Internal Server Error' });
+        return res.status(500).json({error: 'Internal Server Error'});
     }
 }
 
+/**
+ * Uploads a Concept associated with a user and seminar, optionally with text and attachments.
+ * Sends an email notification to admin and supervisor.
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 const uploadConcept = async (req, res) => {
     // TODO move
     const t = await db.sequelize.transaction();
@@ -51,14 +66,20 @@ const uploadConcept = async (req, res) => {
         const text = req.body.text || null;
 
         const supervisorOID = req.body?.supervisorOID || undefined;
+        const file = req.files?.file || undefined;
 
-        const file = req.files?.file
-
-        if(!await isValidPdf(file.data)){
-            return res.status(415).json({error: 'Unsupported Media Type; Only PDF files are allowed'});
+        if (!file && !text.trim()) {
+            return res.status(400).json({error: "No text or file provided."})
         }
 
-        const attachment = await attachmentController.createAttachment(req.files?.file, t)
+        if (!await userIsAllowedToUploadConcept(userOID, seminarOID)) {
+            return res.status(403).json({error: "You are not allowed to upload a Concept for this seminar."})
+        }
+
+        let attachment = null;
+        if (file) {
+            attachment = await attachmentController.createAttachment(req.files?.file, t)
+        }
 
         await Concept.create({
             text: text,
@@ -70,9 +91,16 @@ const uploadConcept = async (req, res) => {
             attachmentOID: attachment?.attachmentOID,
         }, {transaction: t});
 
+
+
+        const users = await getCourseAdminUserInSeminar(seminarOID);
+        const student = await getUserWithOID(userOID);
+        const seminar = await getSeminarWithOID(seminarOID);
+
+        sendMailConceptUploaded(users, seminar, student)
+
         await t.commit();
 
-        // TODO send mail to Admin and supervisor
         return res.status(200).end();
     } catch (error) {
         await t.rollback();
@@ -81,7 +109,63 @@ const uploadConcept = async (req, res) => {
     }
 }
 
+/**
+ * Checks if the given user is allowed to upload a Concept for the given seminar:
+ * if last one was rejected or if no Concept was uploaded yet.
+ * @param userOID
+ * @param seminarOID
+ * @returns {Promise<boolean>}
+ */
+async function userIsAllowedToUploadConcept(userOID, seminarOID) {
+    const concept = await Concept.findOne({
+        where: {
+            userOIDStudent: userOID,
+            seminarOID: seminarOID
+        },
+        order: [['createdAt', 'DESC']], //Das neueste Concept
+        limit: 1
+    });
+    if (!concept) {
+        return true;
+    }
+    return concept.accepted === false;
+}
+
+/**
+ * Checks if the given user is the author of the given Concept.
+ * @param userOID
+ * @param conceptOID
+ * @returns {Promise<boolean>}
+ */
+async function userIsAuthorOfConcept(userOID, conceptOID) {
+    const concept = await Concept.findOne({
+        where: {
+            conceptOID: conceptOID
+        }
+    });
+    return concept.userOIDStudent === userOID;
+}
+
+/**
+ * Checks if there is a Concept associated with the given attachmentOID.
+ * Returns the found Concept if it exists, otherwise null.
+ * @param {number} attachmentOID - The attachmentOID to be checked for association with a Concept.
+ * @returns {Promise<Object|null>} - A Promise that resolves to the found Concept or null if not found.
+ */
+async function conceptHasAttachment(attachmentOID) {
+    const concept = await Concept.findOne({
+        where: {
+            attachmentOID: attachmentOID
+        }
+    });
+    return concept;
+}
+
+
+
 module.exports = {
-    getNewestConcept,
-    uploadConcept
+    getNewestConceptOfCurrentUser,
+    uploadConcept,
+    userIsAuthorOfConcept,
+    conceptHasAttachment
 }

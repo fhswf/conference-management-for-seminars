@@ -5,27 +5,32 @@ import {Dropdown} from "primereact/dropdown";
 import {useEffect, useState} from "react";
 import {InputTextarea} from "primereact/inputtextarea";
 import {Button} from "primereact/button";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import User from "../entities/database/User.ts";
 
 
 function ConceptUploadPage() {
+    const navigate = useNavigate();
     const { seminarOID } = useParams();
     const [text, setText] = useState<string>("")
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [availableSupervisor, setAvailableSupervisor] = useState<User[]>([])
     const [selectedSupervisor, setSelectedSupervisor] = useState<User>()
 
-    const supervisor = [
-        {name: "Betreuer A"},
-        {name: "Betreuer B"},
-        {name: "Betreuer C"},
-    ];
+    //const supervisor = [
+    //    {name: "Betreuer A"},
+    //    {name: "Betreuer B"},
+    //    {name: "Betreuer C"},
+    //];
 
     // TODO check if user is allowed to upload concept: if last one was rejected or if no concept was uploaded yet
 
     async function onSubmit(event: any) {
         event.preventDefault();
+
+        if(!confirm("Sind Sie sicher, dass Sie das Konzept einreichen möchten?")) {
+            return;
+        }
 
         if (!selectedFile && !text.trim()) {
             alert('Bitte PDF oder Text eingeben.');
@@ -46,7 +51,7 @@ function ConceptUploadPage() {
         console.log(formData);
 
         try {
-            const res = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/concepts`, {
+            const res = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/concepts`, {
                 method: 'POST',
                 credentials: 'include',
                 body: formData,
@@ -55,9 +60,10 @@ function ConceptUploadPage() {
             //TODO res not working
             console.log("=>" + res.status);
 
-            if (res.status === 200) {
+            if (res.ok) {
                 alert('Concept uploaded successfully.');
                 setText("");
+                navigate(`/seminar/${seminarOID}`);
                 setSelectedFile(null);
                 setSelectedSupervisor(undefined);
             } else {
@@ -73,7 +79,7 @@ function ConceptUploadPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/user/get-supervisor-list/${seminarOID}`,{
+                const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/user/get-supervisor-list/${seminarOID}`,{
                     method: 'GET',
                     credentials: 'include'
                 });
