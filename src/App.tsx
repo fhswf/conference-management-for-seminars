@@ -30,7 +30,7 @@ function App() {
     useEffect(() => {
         const getUser = () => {
             console.log("fetching user");
-            fetch(`http://${import.meta.env.VITE_BACKEND_URL}/authstatus`, {
+            fetch(`https://${import.meta.env.VITE_BACKEND_URL}/authstatus`, {
                 method: "GET",
                 credentials: "include",
             })

@@ -19,7 +19,7 @@ app.set('trust proxy', true);
 const {isAuthenticated} = require("./middleware/authMiddleware");
 
 app.use(cors({
-    origin: `http://${process.env.FRONTEND_URL}`,
+    origin: `https://${process.env.FRONTEND_URL}`,
     credentials: true
 }));
 
@@ -60,8 +60,8 @@ app.use(session({
         //TODO
         //secure: false,
         //sameSite: true,
-        //secure: true,
-        //sameSite: 'none',
+        secure: true,
+        sameSite: 'none',
     }
 }))
 
@@ -123,7 +123,7 @@ app.post('/conference/api/lti/launch', passport.authenticate('lti', {
 app.get('/conference/api/login', passport.authenticate('openidconnect'));
 
 
-app.get('/conference/api/login/callback', passport.authenticate('openidconnect', {failureRedirect: 'http://' + process.env.FRONTEND_URL}), function (req, res) {
+app.get('/conference/api/login/callback', passport.authenticate('openidconnect', {failureRedirect: 'https://' + process.env.FRONTEND_URL}), function (req, res) {
         res.redirect('/conference/api/success');
     }
 );
@@ -132,7 +132,7 @@ app.get('/conference/api/login/callback', passport.authenticate('openidconnect',
 app.get('/conference/api/success', function (req, res) {
     //console.log(req.user);
     //console.log(req.session);
-    res.redirect('http://' + process.env.FRONTEND_URL);
+    res.redirect('https://' + process.env.FRONTEND_URL);
 });
 
 app.get('/conference/api/error', function (req, res) {
@@ -199,7 +199,7 @@ try {
     };
     const serverHttps = https.createServer(optionsHttps, app);
     serverHttps.listen(PORT_HTTPS, () => {
-        console.log('App listening at http://localhost:' + PORT_HTTPS);
+        console.log('App listening at https://localhost:' + PORT_HTTPS);
     });
 } catch (e) {
     console.log('HTTPS server not started: ' + e);
@@ -210,5 +210,5 @@ try {
 
 
 const serverHttp = app.listen(PORT_HTTP, function () {
-    console.log('App listening at http://localhost:' + PORT_HTTP);
+    console.log('App listening at https://localhost:' + PORT_HTTP);
 });

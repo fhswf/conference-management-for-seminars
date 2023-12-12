@@ -65,7 +65,7 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose, userRole}: P
             seminarOID: user0.userOIDStudent_concepts[0].seminarOID,
         }
 
-        const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/evaluate-concept`, {// TODO change to concept route
+        const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/evaluate-concept`, {// TODO change to concept route
             method: "POST",
             credentials: 'include',
             headers: {
@@ -102,7 +102,7 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose, userRole}: P
             <h3>Konzept:</h3>
             <p>Text: {user0.userOIDStudent_concepts[0].text || "-"}</p>
             <p>Anhang: {user0.userOIDStudent_concepts[0].attachmentO ? <a
-                href={`http://${import.meta.env.VITE_BACKEND_URL}/attachment/${user0.userOIDStudent_concepts[0].attachmentO.attachmentOID}`}>{user0.userOIDStudent_concepts[0].attachmentO.filename}</a> : "-"}
+                href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${user0.userOIDStudent_concepts[0].attachmentO.attachmentOID}`}>{user0.userOIDStudent_concepts[0].attachmentO.filename}</a> : "-"}
             </p>
             <p>Status: {user0.userOIDStudent_concepts[0].accepted === null ? "Bewertung ausstehend" : user0.userOIDStudent_concepts[0].accepted ? "Angenommen" : "Abgelehnt"}</p>
             <p>Feedback: {user0.userOIDStudent_concepts[0].feedback || "-"}</p>

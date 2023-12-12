@@ -43,8 +43,8 @@ function SeminarDetailsPage() {
     const [showUserConcept, setShowUserConcept] = useState<UserO>();
     const [selectedRole, setSelectedRole] = useState<number | null>(null);
     //const [selectedSupervisor, setSelectedSupervisor] = useState<number | null>(null);
-    const {data: studentList, setData: setStudentList} = useFetch<StudentListResponse>(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/get-students-list/${seminarOID}`);
-    const {data: availableSupervisor} = useFetch<User[]>(`http://${import.meta.env.VITE_BACKEND_URL}/user/get-supervisor-list/${seminarOID}`);
+    const {data: studentList, setData: setStudentList} = useFetch<StudentListResponse>(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/get-students-list/${seminarOID}`);
+    const {data: availableSupervisor} = useFetch<User[]>(`https://${import.meta.env.VITE_BACKEND_URL}/user/get-supervisor-list/${seminarOID}`);
 
     const roles = [
         {name: "Kurs-Admin", value: 1},
@@ -97,7 +97,7 @@ function SeminarDetailsPage() {
     async function onNextPhaseClicked() {
         // TODO
         console.log("next phase");
-        const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/go-to-next-phase/${seminarOID}`, {
+        const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/go-to-next-phase/${seminarOID}`, {
             method: 'POST',
             credentials: 'include'
         });
@@ -141,7 +141,7 @@ function SeminarDetailsPage() {
         setIsEditMode(0);
 
         //TODO send changes
-        const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/update-user`, {
+        const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/update-user`, {
             method: 'POST',
             credentials: 'include',
             headers: {
