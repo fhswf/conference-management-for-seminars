@@ -98,9 +98,6 @@ const gotoNextPhase = async (req, res) => {
             currentPhase.phase++;
         }
 
-        await t.rollback()
-        return res.status(500).send({message: ""});
-
         const seminar = await Seminar.update({phase: currentPhase.phase + 1}, {where: {seminaroid: seminarOID}});
 
         // TODO affectedRows prüfen
