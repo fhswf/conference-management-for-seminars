@@ -38,7 +38,7 @@ function SeminarPage() {
     //const [showCommentsStrangerPaper, setShowCommentsStrangerPaper] = useState(false);
     const [showChat, setShowChat] = useState<PaperType>();
     const [showRating, setSetShowRating] = useState<PaperType>()
-    const {data: seminar} = useFetch<SeminarType>(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminar/${seminarOID}`,);
+    const {data: seminar} = useFetch<SeminarType>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminar/${seminarOID}`,);
     // TODO only fetch if phase >= 2 and phase >= 5
     // and user is student
     const {
@@ -55,7 +55,7 @@ function SeminarPage() {
     //const [concept, setConcept] = useState<Concept | null>(null)
     //const [assignedPaper, setAssignedPaper] = useState<Paper[] | null>(null)
 
-    isStudent = seminar?.roleassignments && seminar?.roleassignments[0]?.roleOID === 3;
+    isStudent = seminar?.roleassignments[0]?.roleOID === 3;
 
     function isJsonEmpty(json: any) {
         for (var key in json) {
@@ -103,7 +103,7 @@ function SeminarPage() {
                 <div>
                     <p>{seminarOID}</p>
                     {/*<pre>{JSON.stringify(concept, null, 2)}</pre>*/}
-                    {/*<p>{JSON.stringify(seminar)}</p>*/}
+                    <pre><p>{JSON.stringify(seminar, null, 2)}</p></pre>
                     {/*<pre>{JSON.stringify(assignedPaper, null, 2)}</pre>*/}
                 </div>
                 <div>

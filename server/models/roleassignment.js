@@ -31,7 +31,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.FLOAT,
       allowNull: true
     },
-    phase4paperOID: {
+    phase3paperOID: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
@@ -95,7 +95,7 @@ module.exports = function(sequelize, DataTypes) {
         name: "RoleAssignment4",
         using: "BTREE",
         fields: [
-          { name: "phase4paperOID" },
+          { name: "phase3paperOID" },
         ]
       },
       {

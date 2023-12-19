@@ -50,8 +50,8 @@ async function addOrUpdateUser(lti, t) {
 
     if (!created) {
         // update user
-        user.firstName = lti.lis_person_name_given;
-        user.lastName = lti.lis_person_name_family;
+        user.firstName = lti.lis_person_name_given || null;
+        user.lastName = lti.lis_person_name_family || null;
         user.mail = lti.lis_person_contact_email_primary;
         await user.save({transaction: t});
     }
@@ -167,7 +167,7 @@ const ltiVerifyCallback = async (username, lti, done) => {
     } catch (e) {
         console.log(e);
         await t.rollback();
-        return done(e);
+        return done(null, false);
     }
 }
 
@@ -199,9 +199,9 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
             // Create OidcUser
             cred = await OidcUser.create({
                 subject: profile.id,
-                provider: issuer,
+                //provider: issuer,
                 userOID: user.userOID,
-                idToken: idToken,
+                //idToken: idToken,
             }, {transaction: t});
         }
         // only the User table should be updated

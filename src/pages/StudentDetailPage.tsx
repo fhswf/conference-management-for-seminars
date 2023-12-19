@@ -36,7 +36,7 @@ function StudentDetailPage() {
         if (data && data.userOID) {
             const fetchReviewer = async () => {
                 try {
-                    const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/review/get-reviewer-of-paper/${data.roleassignments[0].phase4paperOID}`,
+                    const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/review/get-reviewer-of-paper/${data.roleassignments[0].phase3paperOID}`,
                         {
                             credentials: "include",
                         });
@@ -47,7 +47,7 @@ function StudentDetailPage() {
                 }
             };
 
-            data.roleassignments[0].phase4paperOID && fetchReviewer();
+            data.roleassignments[0].phase3paperOID && fetchReviewer();
         }
     }, [data]);
 
@@ -101,7 +101,7 @@ function StudentDetailPage() {
                                 <a href={`http://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.paperOID}`}>{paper.attachmentO.filename}</a>
                                 <p>{paper.createdAt ? new Date(paper.createdAt).toLocaleString() : '-'}</p>
                                 {data.roleassignments.length > 0 ? (
-                                    paper.paperOID === data.roleassignments[0].phase4paperOID ? (
+                                    paper.paperOID === data.roleassignments[0].phase3paperOID ? (
                                         <p>Phase 4</p>
                                     ) : paper.paperOID === data.roleassignments[0].phase7paperOID ? (
                                         <p>Phase 7</p>

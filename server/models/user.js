@@ -9,11 +9,11 @@ module.exports = function(sequelize, DataTypes) {
     },
     firstName: {
       type: DataTypes.TEXT,
-      allowNull: false
+      allowNull: true
     },
     lastName: {
       type: DataTypes.TEXT,
-      allowNull: false
+      allowNull: true
     },
     mail: {
       type: DataTypes.TEXT,

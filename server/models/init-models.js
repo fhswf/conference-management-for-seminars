@@ -38,8 +38,8 @@ function initModels(sequelize) {
   attachment.hasMany(paper, { as: "papers", foreignKey: "attachmentOID"});
   review.belongsTo(paper, { as: "paperO", foreignKey: "paperOID"});
   paper.hasMany(review, { as: "reviews", foreignKey: "paperOID"});
-  roleassignment.belongsTo(paper, { as: "phase4paperO", foreignKey: "phase4paperOID"});
-  paper.hasMany(roleassignment, { as: "roleassignments", foreignKey: "phase4paperOID"});
+  roleassignment.belongsTo(paper, { as: "phase4paperO", foreignKey: "phase3paperOID"});
+  paper.hasMany(roleassignment, { as: "roleassignments", foreignKey: "phase3paperOID"});
   roleassignment.belongsTo(paper, { as: "phase7paperO", foreignKey: "phase7paperOID"});
   paper.hasMany(roleassignment, { as: "phase7paperO_roleassignments", foreignKey: "phase7paperOID"});
   chatmessage.belongsTo(review, { as: "reviewO", foreignKey: "reviewOID"});

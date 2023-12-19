@@ -3,7 +3,7 @@ type RoleAssignment = {
     seminarOID: number | null;
     roleOID: number | null;
     grade: number | null;
-    phase4paperOID: number | null;
+    phase3paperOID: number | null;
     phase7paperOID: number | null;
 };
 

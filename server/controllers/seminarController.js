@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const db = require("../models");
-const {setPhase4PaperOID} = require("./roleassignmentController");
+const {setPhase3PaperOID} = require("./roleassignmentController");
 const {assignReviewer} = require("./reviewController");
 const {sendMailPhaseChanged, sendMailConceptEvaluated} = require("../mailer");
 const {getUser, getUserWithConceptOID} = require("./userController");
@@ -14,6 +14,7 @@ const Paper = db.paper;
 
 /**
  * Returns the seminar with the given seminarOID.
+ * The user must be assigned to the seminar.
  * @param req
  * @param res
  * @returns {Promise<void>}
@@ -33,6 +34,7 @@ const getSeminar = async (req, res) => {
                     model: RoleAssignment,
                     as: "roleassignments",
                     where: {userOID: userOID},
+                    required: true,
                 }],
                 attributes: ["description", "phase"]
             },
@@ -73,7 +75,7 @@ const getSeminars = async (req, res) => {
 
 /**
  * Go to next phase of seminar with given seminarOID.
- * If next phase is phase 4, sets the phase4paperOID for all users and assign reviewer.
+ * If next phase is phase 4, sets the phase3paperOID for all users and assign reviewer.
  * @param req
  * @param res
  * @returns {Promise<*>}
@@ -93,7 +95,7 @@ const gotoNextPhase = async (req, res) => {
         }
 
         if (currentPhase.phase + 1 === 4) {
-            await setPhase4PaperOID(seminarOID, t);
+            await setPhase3PaperOID(seminarOID, t);
             await assignReviewer(seminarOID, t);
             currentPhase.phase++;
         }
@@ -395,7 +397,7 @@ const getAssignedSeminars = async (req, res) => {
 
 /**
  * Returns a student with all uploaded concepts with attachments and paper with attachments.
- * Also returns the roleassignments phase4paperOID and phase7paperOID.
+ * Also returns the roleassignments phase3paperOID and phase7paperOID.
  * @param req
  * @param res
  * @returns {Promise<void>}
@@ -445,7 +447,7 @@ const getStudent = async (req, res) => {
                 {
                     model: RoleAssignment,
                     as: "roleassignments",
-                    attributes: ["phase4paperOID", "phase7paperOID"],
+                    attributes: ["phase3paperOID", "phase7paperOID"],
                     where: {seminarOID: seminarOID},
                     required: false,
                 }

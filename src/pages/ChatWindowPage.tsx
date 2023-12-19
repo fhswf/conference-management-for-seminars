@@ -16,50 +16,52 @@ interface Props {
     reviewOID?: number;
 }
 
-function ChatWindowPage({paper, reviewOID}: Props){
+function ChatWindowPage({paper, reviewOID}: Props) {
     const pollingInterval = 2000;
-    const { user, setUser } = useContext(AuthContext);
+    const {user, setUser} = useContext(AuthContext);
     const [selectedFile, setSelectedFile] = useState<File>()
     const [text, setText] = useState<string>("")
-    //const {data: chatmessages} = useFetch<Message[]>(`http://${import.meta.env.VITE_BACKEND_URL}/chat/879`)
+    //const {data: chatmessages} = useFetch<Message[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/chat/879`)
     const [chatmessages, setChatmessages] = useState<Message[]>([])
-    const {data: reviewOIDs} = useFetch<Review[]>(`http://${import.meta.env.VITE_BACKEND_URL}/review/get-reviewoids-from-paper/${paper.paperOID}`)
+    const {data: reviewOIDs} = useFetch<Review[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/review/get-reviewoids-from-paper/${paper.paperOID}`)
     const [selectedReview, setSelectedReview] = useState<number>()
 
 
-        async function fetchMessages(){
-            if(!reviewOIDs){
-                return
-            }
-
-            console.log("fetch " + selectedReview)
-
-            const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/chat/${selectedReview}`, {
-                credentials: "include"
-            });
-
-            const jsondata = await response.json()
-            const messages = jsondata as Message[]
-
-            console.log(jsondata)
-            console.log(messages)
-
-            setChatmessages(messages)
+    async function fetchMessages() {
+        if (!reviewOIDs) {
+            return
         }
 
+        //console.log("fetch " + selectedReview)
 
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/chat/${selectedReview}`, {
+            credentials: "include"
+        });
+
+        const jsondata = await response.json()
+        const messages = jsondata as Message[]
+
+        console.log(jsondata)
+        console.log(messages)
+
+        setChatmessages(messages)
+    }
+
+    // fetch messages in intervall
     useInterval(() => {
         fetchMessages();
     }, pollingInterval);
 
+    //reload messages if user
     useEffect(() => {
         if (selectedReview) {
             fetchMessages();
         }
     }, [selectedReview]);
 
+    // set selected review to first review after reviewOIDs are loaded
     useEffect(() => {
-        if(!reviewOIDs){
+        if (!reviewOIDs) {
             return
         }
 
@@ -69,8 +71,8 @@ function ChatWindowPage({paper, reviewOID}: Props){
     }, [reviewOIDs]);
 
 
-    async function onSendClicked(){
-        if(!text && !selectedFile){
+    async function onSendClicked() {
+        if (!text && !selectedFile) {
             return
         }
 
@@ -80,15 +82,15 @@ function ChatWindowPage({paper, reviewOID}: Props){
         paper.paperOID && formData.append('paperOID', paper.paperOID.toString());
         selectedReview && formData.append('reviewOID', selectedReview.toString());
 
-        const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/chat`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/chat`, {
             method: "POST",
             credentials: "include",
             body: formData
         });
 
-        const jsondata: {createdMessage: Message, createdAttachment: Attachment | null} = await response.json()
+        const jsondata: { createdMessage: Message, createdAttachment: Attachment | null } = await response.json()
 
-        if(response.status === 415){
+        if (response.status === 415) {
             alert("Nur PDF Dateien sind erlaubt!")
             return
         }
@@ -102,7 +104,7 @@ function ChatWindowPage({paper, reviewOID}: Props){
         setSelectedFile(undefined)
     }
 
-    return(
+    return (
         <div className={styles.container}>
             {/*JSON.stringify(paper)*/}
             {/*JSON.stringify(reviewOIDs)*/}
@@ -112,7 +114,8 @@ function ChatWindowPage({paper, reviewOID}: Props){
                     {reviewOIDs.map((review, index) => {
                         const buttonText = index === 0 ? 'Review A' : index === 1 ? 'Review B' : index === 2 ? 'Betreuer' : '';
                         return (
-                            <Button key={review.reviewOID} onClick={() => setSelectedReview(review.reviewOID || undefined)}>
+                            <Button key={review.reviewOID}
+                                    onClick={() => setSelectedReview(review.reviewOID || undefined)}>
                                 {buttonText}
                             </Button>
                         );
@@ -122,7 +125,7 @@ function ChatWindowPage({paper, reviewOID}: Props){
             <div className={styles.conversation}>
 
                 {chatmessages?.map((message, index) => {
-                    if(message.sender === user?.userOID){
+                    if (message.sender === user?.userOID) {
                         return <div key={index} className={styles.messageRight}>
                             <ChatMessage message={message}/>
                         </div>

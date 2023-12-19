@@ -7,7 +7,7 @@ const Paper = db.paper;
 const Concept = db.concept;
 
 /**
- * Returns the reviewer of a paper.
+ * Returns an array of reviewer user of a paper.
  * @param req
  * @param res
  * @returns {Promise<*>}
@@ -79,6 +79,8 @@ async function assignReviewer(seminarOID, t) {
 
     // for randomness, possible to mix studentsInSeminar-array here
 
+    // users do not review themselves: at least 3 students in the seminar
+    // users do not review each other: at least 4 students in the seminar
     let studentIndex = 0;
     for (const user1 of studentsInSeminar) {
         const newestPaper = await Paper.findOne({
@@ -131,6 +133,8 @@ async function assignReviewer(seminarOID, t) {
 
 /**
  * Returns all reviewOIDs of a paper with the given paperOID.
+ * If user is author of paper, all reviewOIDs of a paper are returned.
+ * If user is reviewer of paper, only reviewOID where user is reviewer are returned.
  * @param req
  * @param res
  * @returns {Promise<*>}

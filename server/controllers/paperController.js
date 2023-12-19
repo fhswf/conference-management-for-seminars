@@ -2,7 +2,7 @@ const db = require("../models");
 const attachmentController = require("./attachmentController");
 const pdf = require('pdf-parse');
 const {isValidPdf, replaceInFilename} = require("../util/PdfUtils");
-const {setPhase7PaperOID, setPhase4PaperOID} = require("./roleassignmentController");
+const {setPhase7PaperOID, setPhase3PaperOID} = require("./roleassignmentController");
 const {getCAdminsAndSupervisors, getUserWithOID} = require("./userController");
 const {sendMailPaperUploaded} = require("../mailer");
 const {getSeminarWithOID} = require("./seminarController");
@@ -60,9 +60,10 @@ async function uploadPaper(req, res) {
                 return res.status(409).json({error: 'Bad Request'});
             }
         }else if(currentPhase.phase === 3){
-            if(!await setPhase4PaperOID(t, paper.paperOID, userOID, seminarOID)){
-                return res.status(409).json({error: 'Bad Request'});
-            }
+            // TODO delete
+            //if(!await setPhase3PaperOID(t, paper.paperOID, userOID, seminarOID)){
+            //    return res.status(409).json({error: 'Bad Request'});
+            //}
         }
 
         // add created attachment to paper

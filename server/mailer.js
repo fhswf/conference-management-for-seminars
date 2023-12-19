@@ -52,6 +52,7 @@ const sendMail = async (to, subject, text) => {
  */
 const sendMailPhaseChanged = async (userArray, seminar) => {
     for(const user of userArray) {
+        await new Promise(resolve => setTimeout(resolve, 3000));
         const subject = 'Phase geändert';
         const emailText = `Hallo ${user.firstName} ${user.lastName},
                     \ndas Seminar ${seminar.description} ist in die ${seminar.phase} übergegangen.
@@ -121,6 +122,7 @@ const sendMailPaperUploaded = async (users, seminar, student) => {
     const subject = 'Paper hochgeladen';
 
     for(const user of users) {
+        await new Promise(resolve => setTimeout(resolve, 3000));
         const emailText = `Hallo ${user.firstName} ${user.lastName},
                     \nder Student ${student.firstName} ${student.lastName} hat ein Paper hochgeladen.
                     \nSeminar: ${seminar.description}

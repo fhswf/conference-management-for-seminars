@@ -20,8 +20,10 @@ services:
     environment:
       - EXPRESS_IP=${EXPRESS_IP}
       - FRONTEND_URL=${FRONTEND_URL}
+      - FRONTEND_PROTOCOL=${FRONTEND_PROTOCOL}
       - FRONTEND_PORT=${FRONTEND_PORT}
       - EXPRESS_PORT_HTTP=${EXPRESS_PORT_HTTP}
+      - COOKIE_SECRET=${COOKIE_SECRET}
       - DB_TYPE=${DB_TYPE}
       - DB_HOST=${DB_HOST}
       - DB_NAME=${DB_NAME}
@@ -56,9 +58,11 @@ services:
       context: .
       args:
         - VITE_BACKEND_URL=${VITE_BACKEND_URL}
+        - VITE_BACKEND_PROTOCOL=${VITE_BACKEND_PROTOCOL}
     restart: always
     environment:
       - VITE_BACKEND_URL=${VITE_BACKEND_URL}
+      - VITE_BACKEND_PROTOCOL=${VITE_BACKEND_PROTOCOL}
     ports:
       - 11001:11001
     networks:
