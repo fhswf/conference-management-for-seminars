@@ -25,8 +25,8 @@ function PaperOverviewPage() {
     const [showModal, setShowModal] = useState(false);
     const [showChat, setShowChat] = useState<Paper>();
     //const [uploadedPaper, setUploadedPaper] = useState<PaperObj[] | null>(null)
-    const {data: uploadedPaper, setData: setUploadedPaper} = useFetch<PaperType[]>(`https://${import.meta.env.VITE_BACKEND_URL}/paper/get-uploaded-paper/${seminarOID}`);
-    const {data: seminar} = useFetch<SeminarType>(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminar/${seminarOID}`);
+    const {data: uploadedPaper, setData: setUploadedPaper} = useFetch<PaperType[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/paper/get-uploaded-paper/${seminarOID}`);
+    const {data: seminar} = useFetch<SeminarType>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminar/${seminarOID}`);
 
     async function onUpload(file: any) {
         if (!file || !seminarOID) {
@@ -40,7 +40,7 @@ function PaperOverviewPage() {
         console.log(file);
 
         try {
-            const res = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/paper`, {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/paper`, {
                 method: 'POST',
                 credentials: 'include',
                 body: formData,
@@ -80,9 +80,9 @@ function PaperOverviewPage() {
                     {uploadedPaper && uploadedPaper.length > 0 ? (
                         uploadedPaper.map((paper: PaperType, index: number) => (
                             <Fragment key={index}>
-                                <a href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
+                                <a href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
                                 {seminar && seminar.phase && seminar.roleassignments.length > 0 ? (
-                                    paper.paperOID === seminar.roleassignments[0].phase4paperOID ? (
+                                    paper.paperOID === seminar.roleassignments[0].phase3paperOID ? (
                                         <>
                                             <p>Phase 4</p>
                                             <Button onClick={() => setShowChat(paper)} disabled={seminar.phase < 6}>Kommentare</Button>

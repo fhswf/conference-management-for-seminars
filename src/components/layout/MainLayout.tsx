@@ -43,7 +43,7 @@ function MainLayout({children}: Props) {
     const logout = () => {
         const leave = window.confirm("Wollen Sie sich wirklich abmelden?");
         if (leave) {
-            fetch(`https://${import.meta.env.VITE_BACKEND_URL}/logout`, {
+            fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/logout`, {
                 method: 'GET',
                 credentials: 'include',
             }).then(response => response.json())

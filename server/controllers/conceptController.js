@@ -161,8 +161,6 @@ async function conceptHasAttachment(attachmentOID) {
     return concept;
 }
 
-
-
 module.exports = {
     getNewestConceptOfCurrentUser,
     uploadConcept,

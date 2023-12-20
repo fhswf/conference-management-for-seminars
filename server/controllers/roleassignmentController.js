@@ -6,12 +6,12 @@ const Paper = db.paper;
 const Concept = db.concept;
 
 /**
- * Sets phase4paperOID for all students of a seminar to the newest paper they have uploaded.
+ * Sets phase3paperOID for all students of a seminar to the newest paper they have uploaded.
  * @param seminarOID
  * @param t
  * @returns {Promise<void>}
  */
-async function setPhase4PaperOID(seminarOID, t) {
+async function setPhase3PaperOID(seminarOID, t) {
     const user = await User.findAll({
         include: [{
             model: RoleAssignment,
@@ -35,7 +35,7 @@ async function setPhase4PaperOID(seminarOID, t) {
         });
         if (newestPaper) {
             await RoleAssignment.update({
-                phase4paperOID: newestPaper.paperOID
+                phase3paperoid: newestPaper.paperOID
             }, {
                 where: {
                     userOID: user1.userOID,
@@ -47,9 +47,9 @@ async function setPhase4PaperOID(seminarOID, t) {
 }
 
 /*
-async function setPhase4PaperOID(t, paperOID, userOID, seminarOID) {
+async function setPhase3PaperOID(t, paperOID, userOID, seminarOID) {
     await RoleAssignment.update({
-        phase4paperOID: paperOID
+        phase3paperoid: paperOID
     }, {
         where: {
             userOID: userOID,
@@ -152,7 +152,7 @@ async function userRoleIsCourseAdmin(userOID, seminarOID) {
 }
 
 module.exports = {
-    setPhase4PaperOID,
+    setPhase3PaperOID,
     setPhase7PaperOID,
     userIsMemberOfSeminar,
     userRoleIsStudent,

@@ -43,8 +43,8 @@ function SeminarDetailsPage() {
     const [showUserConcept, setShowUserConcept] = useState<UserO>();
     const [selectedRole, setSelectedRole] = useState<number | null>(null);
     //const [selectedSupervisor, setSelectedSupervisor] = useState<number | null>(null);
-    const {data: studentList, setData: setStudentList} = useFetch<StudentListResponse>(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/get-students-list/${seminarOID}`);
-    const {data: availableSupervisor} = useFetch<User[]>(`https://${import.meta.env.VITE_BACKEND_URL}/user/get-supervisor-list/${seminarOID}`);
+    const {data: studentList, setData: setStudentList} = useFetch<StudentListResponse>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/get-students-list/${seminarOID}`);
+    const {data: availableSupervisor} = useFetch<User[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/user/get-supervisor-list/${seminarOID}`);
 
     const roles = [
         {name: "Kurs-Admin", value: 1},
@@ -97,7 +97,7 @@ function SeminarDetailsPage() {
     async function onNextPhaseClicked() {
         // TODO
         console.log("next phase");
-        const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/go-to-next-phase/${seminarOID}`, {
+        const result = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/go-to-next-phase/${seminarOID}`, {
             method: 'POST',
             credentials: 'include'
         });
@@ -130,7 +130,7 @@ function SeminarDetailsPage() {
 
     }));
 
-    const p4paperCount = studentList?.roleassignments.filter(user => user.phase4paperOID !== null).length;
+    const p4paperCount = studentList?.roleassignments.filter(user => user.phase3paperOID !== null).length;
     const p7paperCount = studentList?.roleassignments.filter(user => user.phase7paperOID !== null).length;
     const conceptCount = studentList?.roleassignments.filter(user => user.userO.userOIDStudent_concepts[0]?.accepted === true).length;
     const studentCount = studentList?.roleassignments.filter(user => user.roleOID === 3).length;
@@ -141,7 +141,7 @@ function SeminarDetailsPage() {
         setIsEditMode(0);
 
         //TODO send changes
-        const result = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/update-user`, {
+        const result = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/update-user`, {
             method: 'POST',
             credentials: 'include',
             headers: {

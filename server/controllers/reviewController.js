@@ -7,13 +7,13 @@ const Paper = db.paper;
 const Concept = db.concept;
 
 /**
- * Returns the reviewer of a paper.
+ * Returns an array of reviewer user of a paper.
  * @param req
  * @param res
  * @returns {Promise<*>}
  */
 async function getReviewerUserOfPaper(req, res) {
-    try{
+    try {
         const paperOID = req.params.paperOID;
 
         const reviewer = await User.findAll({
@@ -30,7 +30,7 @@ async function getReviewerUserOfPaper(req, res) {
         });
 
         return res.status(200).json(reviewer);
-    }catch (e) {
+    } catch (e) {
         console.error(e);
         return res.status(500).json({error: 'Internal Server Error'});
     }
@@ -43,11 +43,8 @@ async function getReviewerUserOfPaper(req, res) {
  * @returns {Promise<void>}
  */
 async function assignReviewer(seminarOID, t) {
-    // Jeder User (Student) eines Seminars soll 2 Reviewer Einträge als Reviewer bekommen
+    // Jeder User (Student) eines Seminars soll 2 Reviewe Eintrag mit sich als Reviewer bekommen
     let assignment = [];
-    //let assignment: { paper, reviewer1, reviewer2, betreuer }[] = [];
-    let reviewerMap = new Map();
-    let reviewerCount = new Map();
 
     // all students in seminar who have a concept and a paper
     const studentsInSeminar = await User.findAll({
@@ -80,10 +77,11 @@ async function assignReviewer(seminarOID, t) {
         transaction: t
     });
 
-    for (const user1 of studentsInSeminar) {
-        reviewerCount.set(user1.userOID, 0);
-    }
+    // for randomness, possible to mix studentsInSeminar-array here
 
+    // users do not review themselves: at least 3 students in the seminar
+    // users do not review each other: at least 4 students in the seminar
+    let studentIndex = 0;
     for (const user1 of studentsInSeminar) {
         const newestPaper = await Paper.findOne({
             where: {
@@ -95,33 +93,13 @@ async function assignReviewer(seminarOID, t) {
             ]
         });
 
-        let reviewer1;
-        let reviewer2;
+        const reviewer1Index = (studentIndex + 1) % studentsInSeminar.length;
+        const reviewer2Index = (studentIndex + 2) % studentsInSeminar.length;
 
-        do {
-            // Durch mögliche UserIDs Iterieren die frei sind
-            const randomUser = studentsInSeminar[Math.floor(Math.random() * studentsInSeminar.length)];
-            const randomUser2 = studentsInSeminar[Math.floor(Math.random() * studentsInSeminar.length)];
+        const reviewer1 = studentsInSeminar[reviewer1Index];
+        const reviewer2 = studentsInSeminar[reviewer2Index];
 
-            reviewer1 = randomUser;
-            reviewer2 = randomUser2;
-            console.log("");
-            //...
-        } while (
-            reviewer1.userOID === newestPaper.authorOID ||
-            reviewer2.userOID === newestPaper.authorOID ||
-            reviewer1.userOID === reviewer2.userOID ||
-            reviewerMap.get(reviewer1.userOID) === reviewer2.userOID ||
-            reviewerMap.get(reviewer2.userOID) === reviewer1.userOID ||
-            reviewerCount.get(reviewer1.userOID) >= 2 ||
-            reviewerCount.get(reviewer2.userOID) >= 2
-            );
-
-        reviewerMap.set(reviewer1.userOID, reviewer2.userOID);
-        reviewerMap.set(reviewer2.userOID, reviewer1.userOID);
-
-        reviewerCount.set(reviewer1.userOID, reviewerCount.get(reviewer1.userOID) + 1);
-        reviewerCount.set(reviewer2.userOID, reviewerCount.get(reviewer2.userOID) + 1);
+        studentIndex = (studentIndex + 1) % studentsInSeminar.length;
 
         assignment.push({
             paper: newestPaper.paperOID,
@@ -134,6 +112,7 @@ async function assignReviewer(seminarOID, t) {
         console.log(studentsInSeminar);
     }
 
+    // for every assignment create three review entries
     for (const assignment1 of assignment) {
         await Review.create({
             paperOID: assignment1.paper,
@@ -154,6 +133,8 @@ async function assignReviewer(seminarOID, t) {
 
 /**
  * Returns all reviewOIDs of a paper with the given paperOID.
+ * If user is author of paper, all reviewOIDs of a paper are returned.
+ * If user is reviewer of paper, only reviewOID where user is reviewer are returned.
  * @param req
  * @param res
  * @returns {Promise<*>}
@@ -180,7 +161,7 @@ async function getReviewOIDsOfPaper(req, res) {
         if (paper.authorOID === req.user.userOID) {
             //return all reviewOIDs of paper
             return res.status(200).json(reviews);
-        }else{
+        } else {
             //return return reviewOID where current user is reviewer
             //filter
             const filteredReviews = reviews.filter(review => review.reviewerOID === req.user.userOID);
@@ -237,8 +218,8 @@ async function userIsReviewerOfReviewOID(reviewOID, userOID) {
     return review !== null;
 }
 
-async function rateReview(req, res){
-    try{
+async function rateReview(req, res) {
+    try {
         const reviewOID = req.body.reviewOID;
         const rating = req.body.rating;
 

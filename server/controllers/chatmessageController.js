@@ -15,7 +15,7 @@ const Paper = db.paper;
  * @param res
  */
 const getMessagesOfReview = async (req, res) => {
-    //TODO check if user is the who is revieded, then check if phase is 6
+    //TODO check if user is allowed to see messages of this review: if reviewer or author of paper if phase >= 6
     try {
         const userOID = req.user.userOID
         const reviewOID = req.params.reviewOID

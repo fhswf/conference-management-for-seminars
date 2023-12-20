@@ -38,24 +38,24 @@ function SeminarPage() {
     //const [showCommentsStrangerPaper, setShowCommentsStrangerPaper] = useState(false);
     const [showChat, setShowChat] = useState<PaperType>();
     const [showRating, setSetShowRating] = useState<PaperType>()
-    const {data: seminar} = useFetch<SeminarType>(`https://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminar/${seminarOID}`,);
+    const {data: seminar} = useFetch<SeminarType>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminar/${seminarOID}`,);
     // TODO only fetch if phase >= 2 and phase >= 5
     // and user is student
     const {
         data: concept,
         loading: loadingConcept,
         error: errorConcept
-    } = useFetch<ConceptType>(`https://${import.meta.env.VITE_BACKEND_URL}/concepts/newest/${seminarOID}`);
+    } = useFetch<ConceptType>(`http://${import.meta.env.VITE_BACKEND_URL}/concepts/newest/${seminarOID}`);
     const {
         data: assignedPaper,
         loading: loadingPaper,
         error: errorPaper
-    } = useFetch<PaperType[]>(`https://${import.meta.env.VITE_BACKEND_URL}/paper/get-assigned-paper/${seminarOID}`);
+    } = useFetch<PaperType[]>(`http://${import.meta.env.VITE_BACKEND_URL}/paper/get-assigned-paper/${seminarOID}`);
 
     //const [concept, setConcept] = useState<Concept | null>(null)
     //const [assignedPaper, setAssignedPaper] = useState<Paper[] | null>(null)
 
-    isStudent = seminar?.roleassignments && seminar?.roleassignments[0]?.roleOID === 3;
+    isStudent = seminar?.roleassignments[0]?.roleOID === 3;
 
     function isJsonEmpty(json: any) {
         for (var key in json) {
@@ -69,7 +69,7 @@ function SeminarPage() {
     async function handleRating(rating: string) {
         console.log(rating)
 
-        const response = await fetch(`https://${import.meta.env.VITE_BACKEND_URL}/review/rate`, {
+        const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/review/rate`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -103,7 +103,7 @@ function SeminarPage() {
                 <div>
                     <p>{seminarOID}</p>
                     {/*<pre>{JSON.stringify(concept, null, 2)}</pre>*/}
-                    {/*<p>{JSON.stringify(seminar)}</p>*/}
+                    <pre><p>{JSON.stringify(seminar, null, 2)}</p></pre>
                     {/*<pre>{JSON.stringify(assignedPaper, null, 2)}</pre>*/}
                 </div>
                 <div>
@@ -125,7 +125,7 @@ function SeminarPage() {
                         {/**/}
                         <div>
                             {(concept?.attachmentO?.filename) ? //if filename exists pdf exists
-                                <a href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${concept.attachmentOID}`}>{concept.attachmentO.filename}</a> :
+                                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/attachment/${concept.attachmentOID}`}>{concept.attachmentO.filename}</a> :
                                 <p>-</p>
                             }
                         </div>
@@ -171,7 +171,7 @@ function SeminarPage() {
                         if (paper.attachmentO) {
                             return (
                                 <Fragment key={index}>
-                                    <a href={`https://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
+                                    <a href={`http://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
                                     <p onClick={() => setSetShowRating(paper)}>{mapRatingToString(paper.reviews[0].rating)}</p>
                                     <Button onClick={() => setShowChat(paper)}>Kommentieren</Button>
                                 </Fragment>
