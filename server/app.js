@@ -60,8 +60,8 @@ app.use(session({
         //TODO
         //secure: false,
         //sameSite: true,
-        //secure: true,
-        //sameSite: 'none',
+        secure: true,
+        sameSite: 'none',
     }
 }))
 
