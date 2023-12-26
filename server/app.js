@@ -1,6 +1,6 @@
 require('dotenv').config();
 const PORT_HTTP = process.env.EXPRESS_PORT_HTTP || 3000;
-const PORT_HTTPS = process.env.EXPRESS_PORT_HTTPS || 3443;
+//const PORT_HTTPS = process.env.EXPRESS_PORT_HTTPS || 3443;
 
 const express = require('express');
 const cors = require('cors');
@@ -57,6 +57,7 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+        httpOnly: true, //default true
         //TODO
         //secure: false,
         //sameSite: true,

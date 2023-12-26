@@ -27,10 +27,6 @@ module.exports = function(sequelize, DataTypes) {
         key: 'roleOID'
       }
     },
-    grade: {
-      type: DataTypes.FLOAT,
-      allowNull: true
-    },
     phase3paperOID: {
       type: DataTypes.INTEGER,
       allowNull: true,

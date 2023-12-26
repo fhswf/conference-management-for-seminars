@@ -1,4 +1,5 @@
 const db = require("../models");
+const {mixArray} = require("../util/ArrayUtils");
 
 const Review = db.review;
 const User = db.user;
@@ -57,7 +58,7 @@ async function assignReviewer(seminarOID, t) {
             },
             include: [{
                 model: Paper,
-                as: "phase4paperO",
+                as: "phase3paperO",
                 required: true,
             }],
         }, {
@@ -78,6 +79,7 @@ async function assignReviewer(seminarOID, t) {
     });
 
     // for randomness, possible to mix studentsInSeminar-array here
+    //mixArray(studentsInSeminar)
 
     // users do not review themselves: at least 3 students in the seminar
     // users do not review each other: at least 4 students in the seminar

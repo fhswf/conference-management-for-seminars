@@ -53,10 +53,10 @@ function Table({header, data}: Props) {
                 <h5>Table</h5>
             </div>
             <div className="card">
-                <DataTable value={filteredData} header={headerT} showGridlines tableStyle={{minWidth: '50rem'}}>
+                <DataTable data-test="table"  value={filteredData} header={headerT} showGridlines tableStyle={{minWidth: '50rem'}}>
                     {header && header.map((h, index) => {
                         const isButton = h.field.startsWith("btn")
-                        return <Column sortable={!isButton} field={h.field} header={h.header} key={index}></Column>
+                        return <Column data-test="column" sortable={!isButton} field={h.field} header={h.header} key={index}></Column>
                     })}
                 </DataTable>
             </div>

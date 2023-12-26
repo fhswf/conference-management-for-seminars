@@ -103,7 +103,7 @@ function SeminarPage() {
                 <div>
                     <p>{seminarOID}</p>
                     {/*<pre>{JSON.stringify(concept, null, 2)}</pre>*/}
-                    <pre><p>{JSON.stringify(seminar, null, 2)}</p></pre>
+                    {/*<pre><p>{JSON.stringify(seminar, null, 2)}</p></pre>*/}
                     {/*<pre>{JSON.stringify(assignedPaper, null, 2)}</pre>*/}
                 </div>
                 <div>

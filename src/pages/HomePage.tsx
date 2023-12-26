@@ -49,9 +49,10 @@ function HomePage() {
         }} disabled={seminar.roleassignments[0].roleOID === 1}
         >➡</Button>,
         btnSeminarDetails: //(seminar.roleassignments[0].roleOID === 1) ?
-            <Button onClick={() => {
+            <Button data-test="administrate-btn"
+                onClick={() => {
             navigate(`/seminar-details/${seminar.seminarOID}`)
-        }} disabled={seminar.roleassignments[0].roleOID === 3} tooltip="Nur für Kurs-Admins/Betreuer" tooltipOptions={{ showOnDisabled: true }}>Verwalten</Button> /* TODO check if user is Admin */
+        }} disabled={seminar.roleassignments[0].roleOID === 3} tooltip="Nur für Kurs-Admins/Betreuer" tooltipOptions={{ showOnDisabled: true }}>Verwalten</Button>
             //: null
     }));
     /*const tableData = [
@@ -90,10 +91,10 @@ function HomePage() {
             <MainLayout>
                 {/*<pre>{JSON.stringify(assignedSeminars, null, 2)}</pre>*/}
                 <div>
-                    <h1>Sie sind in folgenden Seminaren eingeschrieben:</h1>
+                    <h1 data-test="heading">Sie sind in folgenden Seminaren eingeschrieben:</h1>
                     <div style={styles.enterSeminar}>
-                        <InputText id="seminarkey" name="seminarkey" placeholder="Einschreibeschlüssel" ref={inputRef}/>
-                        <Button label="Seminar beitreten" onClick={onEnterSeminar}/>
+                        <InputText data-test="key-input" id="seminarkey" name="seminarkey" placeholder="Einschreibeschlüssel" ref={inputRef}/>
+                        <Button data-test="enter-seminar" label="Seminar beitreten" onClick={onEnterSeminar}/>
                     </div>
                     <div>
                         <Table header={header} data={tableData}/>

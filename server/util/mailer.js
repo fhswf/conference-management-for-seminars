@@ -6,8 +6,9 @@ const smtpHost = process.env.SMTP_HOST;
 
 const transporter = nodemailer.createTransport({
     host: smtpHost,
-    port: 465,
-    secure: true,
+    port: 587,
+    //port: 465,
+    //secure: true,
     auth: {
         user: mailUsername,
         pass: mailPassword,
@@ -52,7 +53,7 @@ const sendMail = async (to, subject, text) => {
  */
 const sendMailPhaseChanged = async (userArray, seminar) => {
     for(const user of userArray) {
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        //await new Promise(resolve => setTimeout(resolve, 3000));
         const subject = 'Phase geändert';
         const emailText = `Hallo ${user.firstName} ${user.lastName},
                     \ndas Seminar ${seminar.description} ist in die ${seminar.phase} übergegangen.
@@ -99,8 +100,7 @@ const sendMailConceptUploaded = async (users, seminar, student) => {
     const subject = 'Neues Konzept hochgeladen';
 
     for(const user of users) {
-        //sleep(1000);
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        //await new Promise(resolve => setTimeout(resolve, 3000));
         const emailText = `Hallo ${user.firstName} ${user.lastName},
                     \nSeminar: ${seminar.description}
                     \nder Student ${student.firstName} ${student.lastName} hat ein Konzept eingereicht.
@@ -122,7 +122,7 @@ const sendMailPaperUploaded = async (users, seminar, student) => {
     const subject = 'Paper hochgeladen';
 
     for(const user of users) {
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        //await new Promise(resolve => setTimeout(resolve, 3000));
         const emailText = `Hallo ${user.firstName} ${user.lastName},
                     \nder Student ${student.firstName} ${student.lastName} hat ein Paper hochgeladen.
                     \nSeminar: ${seminar.description}
@@ -136,6 +136,7 @@ module.exports = {
     init: () => {
         return true;
     },
+    sendMail,
     sendMailPhaseChanged,
     sendMailConceptEvaluated,
     sendMailConceptUploaded,

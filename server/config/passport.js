@@ -123,6 +123,7 @@ async function addRoleAssignment(lti, user, seminar, t) {
     return assignment;
 }
 
+// TODO edit
 function mapLtiRoles(roles) {
     //if(roles[0] === 'Admin') return 1; //moodle role does not exist
     if (roles[0] === 'Instructor') return 2;
@@ -192,7 +193,7 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
             const user = await User.create({
                 firstName: profile.name?.givenName || "",
                 lastName: profile.name?.familyName || "",
-                mail: profile.emails && profile.emails[0]?.value || "",
+                mail: profile.emails && profile.emails[0]?.value,
                 isAdmin: false,
             }, {transaction: t});
 
@@ -212,7 +213,7 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
             defaults: {
                 firstName: profile.name?.givenName || "",
                 lastName: profile.name?.familyName || "",
-                mail: profile.emails && profile.emails[0]?.value || "",
+                mail: profile.emails && profile.emails[0]?.value,
                 isAdmin: false,
             }, transaction: t
         });

@@ -1,0 +1,42 @@
+[
+  {
+    "seminarOID": 1,
+    "description": "Bachelor WS 2023/24",
+    "phase": 2,
+    "roleassignments": [
+      {
+        "roleOID": 3
+      }
+    ]
+  },
+  {
+    "seminarOID": 2,
+    "description": "Bachelor SS 2023",
+    "phase": 5,
+    "roleassignments": [
+      {
+        "roleOID": 2
+      }
+    ]
+  },
+  {
+    "seminarOID": 4,
+    "description": "Bachelor SS 2022",
+    "phase": 5,
+    "roleassignments": [
+      {
+        "roleOID": 3
+      }
+    ]
+  },
+  {
+    "seminarOID": 5,
+    "description": "Bachelor WS 2021/22",
+    "phase": 7,
+    "roleassignments": [
+      {
+        "roleOID": 3
+      }
+    ]
+  }
+]

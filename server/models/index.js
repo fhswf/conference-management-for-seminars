@@ -26,7 +26,9 @@ sequelize.authenticate().then(() => {
 
 const db = initModels(sequelize, DataTypes);
 
+// TODO delete
 db.Sequelize = Sequelize;
+
 db.sequelize = sequelize;
 
 db.sequelize.sync({force: false})

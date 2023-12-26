@@ -1,4 +1,4 @@
-const {sendMailConceptUploaded} = require("../mailer");
+const {sendMailConceptUploaded} = require("../util/mailer");
 const db = require("../models");
 const attachmentController = require("./attachmentController");
 const path = require("path");

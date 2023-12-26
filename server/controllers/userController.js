@@ -164,11 +164,7 @@ async function getCAdminsAndSupervisors(seminarOID) {
  * @returns {Promise<Model|null>}
  */
 async function getUserWithOID(userOID) {
-    const user = await User.findOne({
-        where: {
-            userOID: userOID
-        },
-    });
+    const user = await User.findByPk(userOID);
 
     return user;
 }

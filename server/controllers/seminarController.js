@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const db = require("../models");
 const {setPhase3PaperOID} = require("./roleassignmentController");
 const {assignReviewer} = require("./reviewController");
-const {sendMailPhaseChanged, sendMailConceptEvaluated} = require("../mailer");
+const {sendMailPhaseChanged, sendMailConceptEvaluated} = require("../util/mailer");
 const {getUser, getUserWithConceptOID} = require("./userController");
 
 const Seminar = db.seminar;

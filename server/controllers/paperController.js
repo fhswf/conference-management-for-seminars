@@ -4,7 +4,7 @@ const pdf = require('pdf-parse');
 const {isValidPdf, replaceInFilename} = require("../util/PdfUtils");
 const {setPhase7PaperOID, setPhase3PaperOID} = require("./roleassignmentController");
 const {getCAdminsAndSupervisors, getUserWithOID} = require("./userController");
-const {sendMailPaperUploaded} = require("../mailer");
+const {sendMailPaperUploaded} = require("../util/mailer");
 const {getSeminarWithOID} = require("./seminarController");
 
 const Op = db.Sequelize.Op;
@@ -43,8 +43,11 @@ async function uploadPaper(req, res) {
             return res.status(415).json({error: 'Unsupported Media Type; Only PDF files are allowed'});
         }
         const currentPhase = await Seminar.findByPk(seminarOID, {attributes: ["phase"]});
-        // TODO
-        //file.name = replaceInFilename(file.name, ["xyz", "abc"]);
+
+        const student = await User.findByPk(userOID, {attributes: ["firstName", "lastName"]});
+
+        // TODO testen
+        file.name = replaceInFilename(file.name, [student.firstName, student.lastName]);
 
         let attachment = await attachmentController.createAttachment(file, t)
 
@@ -74,8 +77,8 @@ async function uploadPaper(req, res) {
 
         await t.commit();
 
+
         const users = await getCAdminsAndSupervisors(seminarOID);
-        const student = await getUserWithOID(userOID);
         const seminar = await getSeminarWithOID(seminarOID)
 
         sendMailPaperUploaded(users, seminar, student);
@@ -198,14 +201,14 @@ async function userIsAuthorOfPaper(userOID, paperOID ) {
  * @param attachmentOID
  * @returns {Promise<boolean>}
  */
-async function paperHasAttachmentAndUserIsAuthor(userOID, attachmentOID) {
-    const paper = await Paper.findOne({
-        where: {
-            attachmentOID: attachmentOID
-        }
-    });
-    return paper !== null;
-}
+//async function paperHasAttachmentAndUserIsAuthor(userOID, attachmentOID) {
+//    const paper = await Paper.findOne({
+//        where: {
+//            attachmentOID: attachmentOID
+//        }
+//    });
+//    return paper !== null;
+//}
 
 /**
  * Checks if a paper has an attachment.
@@ -237,7 +240,7 @@ module.exports = {
     getAssignedPaper,
     getUploadedPaper,
     userIsAuthorOfPaper,
-    paperHasAttachmentAndUserIsAuthor,
+    //paperHasAttachmentAndUserIsAuthor,
     paperHasAttachment,
     getSeminarOIDOfPaper
 }
