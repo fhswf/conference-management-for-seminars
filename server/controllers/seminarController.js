@@ -3,7 +3,7 @@ const db = require("../models");
 const {setPhase3PaperOID} = require("./roleassignmentController");
 const {assignReviewer} = require("./reviewController");
 const {sendMailPhaseChanged, sendMailConceptEvaluated} = require("../util/mailer");
-const {getUser, getUserWithConceptOID} = require("./userController");
+//const {getUser, getUserWithConceptOID} = require("./userController");
 
 const Seminar = db.seminar;
 const RoleAssignment = db.roleassignment;
@@ -100,7 +100,7 @@ const gotoNextPhase = async (req, res) => {
             currentPhase.phase++;
         }
 
-        const seminar = await Seminar.update({phase: currentPhase.phase + 1}, {where: {seminaroid: seminarOID}});
+        const seminar = await Seminar.update({phase: currentPhase.phase + 1}, {where: {seminaroid: seminarOID}, transaction: t});
 
         // TODO affectedRows prüfen
         if (seminar[0] === 1) {
@@ -214,8 +214,7 @@ const updateUserInSeminar = async (req, res) => {
         // 1. roleassignment
         const assignment = await RoleAssignment.update(
             {roleOID: roleOid},
-            {where: {userOID: userOid, seminarOID: seminarOid}},
-            {transaction: t}
+            {where: {userOID: userOid, seminarOID: seminarOid}, transaction: t},
         );
         // 2. user
         /*
@@ -276,8 +275,7 @@ const evaluateConcept = async (req, res) => {
             {where: {conceptOID: conceptOID}}
         );
         if (concept[0] === 1) {
-            // TODO move
-            const conc = await getConceptWithOID(conceptOID);
+            const conc = await getConceptInformation(conceptOID);
 
             sendMailConceptEvaluated(conc)
 
@@ -299,7 +297,7 @@ const evaluateConcept = async (req, res) => {
  * @param conceptOID - The conceptOID of the Concept to be found.
  * @returns {Promise<Model|null>}
  */
-async function getConceptWithOID(conceptOID) {
+async function getConceptInformation(conceptOID) {
     const concept = await Concept.findOne({
         where: {
             conceptOID: conceptOID

@@ -29,14 +29,14 @@ type PaperType = Paper & {
 
 function StudentDetailPage() {
     const {seminarOID, studentOID} = useParams();
-    const {data} = useFetch<UserType>(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/get-student/${seminarOID}/${studentOID}`);
+    const {data} = useFetch<UserType>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/get-student/${seminarOID}/${studentOID}`);
     const [reviewer, setReviewer] = useState<User[]>([]);
 
     useEffect(() => {
         if (data && data.userOID) {
             const fetchReviewer = async () => {
                 try {
-                    const response = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/review/get-reviewer-of-paper/${data.roleassignments[0].phase3paperOID}`,
+                    const response = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/review/get-reviewer-of-paper/${data.roleassignments[0].phase3paperOID}`,
                         {
                             credentials: "include",
                         });
@@ -72,7 +72,7 @@ function StudentDetailPage() {
         return {
             text: concept.text,
             pdf: concept.attachmentO ?
-                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/attachment/${concept.attachmentO?.attachmentOID}`}>{concept.attachmentO?.filename}</a> : "-",
+                <a href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${concept.attachmentO?.attachmentOID}`}>{concept.attachmentO?.filename}</a> : "-",
             supervisor: concept.userOIDSupervisor_user ? `${concept.userOIDSupervisor_user.firstName} ${concept.userOIDSupervisor_user.lastName}` : '-',
             feedback: concept.feedback || '-',
             status: mapConceptStatusToString(concept.accepted),
@@ -98,7 +98,7 @@ function StudentDetailPage() {
                     {data?.papers && data?.papers.length > 0 && data?.papers.map((paper: PaperType, index: number) => {
                         return (
                             <Fragment key={index}>
-                                <a href={`http://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.paperOID}`}>{paper.attachmentO.filename}</a>
+                                <a href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.paperOID}`}>{paper.attachmentO.filename}</a>
                                 <p>{paper.createdAt ? new Date(paper.createdAt).toLocaleString() : '-'}</p>
                                 {data.roleassignments.length > 0 ? (
                                     paper.paperOID === data.roleassignments[0].phase3paperOID ? (

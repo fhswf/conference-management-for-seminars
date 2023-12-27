@@ -188,7 +188,7 @@ function SeminarDetailsPage() {
                     {/*<pre>{JSON.stringify(studentList, null, 2)}</pre>*/}
                     <HiddenLabel text={studentList?.assignmentkey || ""}/>
                     <p>Eingereichte und angenommene Konzepte: {conceptCount}/{studentCount}</p>
-                    <p>Eingereichte Paper Phase 4: {p4paperCount}/{studentCount}</p>
+                    <p>Eingereichte Paper Phase 3: {p4paperCount}/{studentCount}</p>
                     <p>Eingereichte Paper Phase 7: {p7paperCount}/{studentCount}</p>
                     {!isEditMode ?
                         <Table header={header} data={tableData}/> :

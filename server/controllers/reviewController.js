@@ -8,7 +8,7 @@ const Paper = db.paper;
 const Concept = db.concept;
 
 /**
- * Returns an array of reviewer user of a paper.
+ * Returns an array user which review a paper.
  * @param req
  * @param res
  * @returns {Promise<*>}
@@ -39,6 +39,7 @@ async function getReviewerUserOfPaper(req, res) {
 
 /**
  * Assigns reviewers to papers according to the given rules
+ * Uses phase3paperOID of roleassignment to determine which paper is the newest.
  * @param seminarOID
  * @param t
  * @returns {Promise<void>}

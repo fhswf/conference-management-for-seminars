@@ -3,9 +3,9 @@ const attachmentController = require("./attachmentController");
 const pdf = require('pdf-parse');
 const {isValidPdf, replaceInFilename} = require("../util/PdfUtils");
 const {setPhase7PaperOID, setPhase3PaperOID} = require("./roleassignmentController");
-const {getCAdminsAndSupervisors, getUserWithOID} = require("./userController");
+//const {getCAdminsAndSupervisors, getUserWithOID} = require("./userController");
 const {sendMailPaperUploaded} = require("../util/mailer");
-const {getSeminarWithOID} = require("./seminarController");
+//const {getSeminarWithOID} = require("./seminarController");
 
 const Op = db.Sequelize.Op;
 const Paper = db.paper;
@@ -78,8 +78,21 @@ async function uploadPaper(req, res) {
         await t.commit();
 
 
-        const users = await getCAdminsAndSupervisors(seminarOID);
-        const seminar = await getSeminarWithOID(seminarOID)
+        //const users = await getCAdminsAndSupervisors(seminarOID);
+        const users = await User.findAll({
+            include: [{
+                model: RoleAssignment,
+                as: 'roleassignments',
+                where: {
+                    seminarOID: seminarOID,
+                    [Op.or]: [{ roleOID: 2 }, { roleOID: 1 }]
+                },
+                attributes: [],
+            }],
+        });
+
+        //const seminar = await getSeminarWithOID(seminarOID)
+        const seminar = await Seminar.findByPk(seminarOID);
 
         sendMailPaperUploaded(users, seminar, student);
 

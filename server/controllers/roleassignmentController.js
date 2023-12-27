@@ -35,7 +35,7 @@ async function setPhase3PaperOID(seminarOID, t) {
         });
         if (newestPaper) {
             await RoleAssignment.update({
-                phase3paperoid: newestPaper.paperOID
+                phase3paperOID: newestPaper.paperOID
             }, {
                 where: {
                     userOID: user1.userOID,

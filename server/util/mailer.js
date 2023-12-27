@@ -48,7 +48,6 @@ const sendMail = async (to, subject, text) => {
  * Sends an email to all users in the given userArray.
  * @param userArray - An array of user Models.
  * @param seminar - The seminar Model the phase was changed for.
- * @param phase {number} - The new phase of the seminar.
  * @returns {Promise<void>}
  */
 const sendMailPhaseChanged = async (userArray, seminar) => {
@@ -56,7 +55,7 @@ const sendMailPhaseChanged = async (userArray, seminar) => {
         //await new Promise(resolve => setTimeout(resolve, 3000));
         const subject = 'Phase geändert';
         const emailText = `Hallo ${user.firstName} ${user.lastName},
-                    \ndas Seminar ${seminar.description} ist in die ${seminar.phase} übergegangen.
+                    \ndas Seminar ${seminar.description} ist in die ${mapPhaseToString(seminar.phase)} übergegangen.
                     \nSeminar: ${seminar.description}
                     \n\nMit freundlichen Grüßen`;
 
@@ -66,9 +65,6 @@ const sendMailPhaseChanged = async (userArray, seminar) => {
 
 /**
  * Sends an email to the student that his concept was evaluated.
- * @param student - The student Model that uploaded the concept.
- * @param supervisor - The supervisor Model assigned to the concept.
- * @param seminar - The seminar Model the concept was uploaded for.
  * @param concept - The concept Model that was evaluated.
  * @returns {Promise<void>}
  */
@@ -93,7 +89,6 @@ const sendMailConceptEvaluated = async (concept) => {
  * @param users - An array of user Models to send the email to.
  * @param seminar - The seminar Model the concept was uploaded for.
  * @param student - The student Model that uploaded the concept.
- * @param conncept - The concept Model that was uploaded.
  * @returns {Promise<void>}
  */
 const sendMailConceptUploaded = async (users, seminar, student) => {
@@ -103,7 +98,7 @@ const sendMailConceptUploaded = async (users, seminar, student) => {
         //await new Promise(resolve => setTimeout(resolve, 3000));
         const emailText = `Hallo ${user.firstName} ${user.lastName},
                     \nSeminar: ${seminar.description}
-                    \nder Student ${student.firstName} ${student.lastName} hat ein Konzept eingereicht.
+                    \nder Student ${getStudentDisplayName(student)} hat ein Konzept eingereicht.
                     \n\nMit freundlichen Grüßen`;
 
         await sendMail(user.mail, subject, emailText);
@@ -112,10 +107,9 @@ const sendMailConceptUploaded = async (users, seminar, student) => {
 
 /**
  * Sends an email to all users in the given user array.
- * @param users
- * @param seminar
- * @param student
- * @param conncept
+ * @param users - An array of user Models to send the email to.
+ * @param seminar - The seminar Model the paper was uploaded for.
+ * @param student - The student Model that uploaded the paper.
  * @returns {Promise<void>}
  */
 const sendMailPaperUploaded = async (users, seminar, student) => {
@@ -124,11 +118,33 @@ const sendMailPaperUploaded = async (users, seminar, student) => {
     for(const user of users) {
         //await new Promise(resolve => setTimeout(resolve, 3000));
         const emailText = `Hallo ${user.firstName} ${user.lastName},
-                    \nder Student ${student.firstName} ${student.lastName} hat ein Paper hochgeladen.
+                    \nder Student ${getStudentDisplayName(student)} hat ein Paper hochgeladen.
                     \nSeminar: ${seminar.description}
                     \n\nMit freundlichen Grüßen`;
 
-        await sendMail(student.mail, subject, emailText);
+        await sendMail(user.mail, subject, emailText);
+    }
+}
+
+function mapPhaseToString(phase){
+    switch (phase) {
+        case 1: return 'Registrierung-Phase';
+        case 2: return 'Konzept-Upload-Phase';
+        case 3: return 'Paper-Upload-Phase';
+        case 4: return 'Reviewer-Zuordnung-Phase';
+        case 5: return 'Review-Phase';
+        case 6: return 'Reviews-lesen-Phase';
+        case 7: return 'Final-Paper-Upload-Phase';
+
+        default: return 'Phase ungültig';
+    }
+}
+
+function getStudentDisplayName(student) {
+    if (student.firstName && student.lastName) {
+        return `${student.firstName} ${student.lastName}`;
+    } else {
+        return student.mail;
     }
 }
 

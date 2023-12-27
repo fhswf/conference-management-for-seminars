@@ -2,13 +2,14 @@ const {sendMailConceptUploaded} = require("../util/mailer");
 const db = require("../models");
 const attachmentController = require("./attachmentController");
 const path = require("path");
-const {getUserWithOID, getCourseAdminUserInSeminar} = require("./userController");
-const {getSeminarWithOID} = require("./seminarController");
+//const {getUserWithOID, getCourseAdminUserInSeminar} = require("./userController");
+//const {getSeminarWithOID} = require("./seminarController");
 
 const Concept = db.concept;
 const User = db.user;
 const Attachment = db.attachment;
 const Seminar = db.seminar;
+const RoleAssignment = db.roleassignment;
 
 /**
  * Retrieves the newest Concept associated with the current user and the given seminar.
@@ -68,6 +69,12 @@ const uploadConcept = async (req, res) => {
         const supervisorOID = req.body?.supervisorOID || undefined;
         const file = req.files?.file || undefined;
 
+        const seminar = await Seminar.findByPk(seminarOID);
+
+        if(seminar.phase !== 2 && seminar.phase !== 3) {
+            return res.status(403).json({error: "You are not allowed to upload a Concept for this seminar."})
+        }
+
         if (!file && !text.trim()) {
             return res.status(400).json({error: "No text or file provided."})
         }
@@ -91,14 +98,23 @@ const uploadConcept = async (req, res) => {
             attachmentOID: attachment?.attachmentOID,
         }, {transaction: t});
 
+        const courseAdminUsers = await User.findAll({
+            include: [{
+                model: RoleAssignment,
+                as: 'roleassignments',
+                where: {
+                    seminarOID: seminarOID,
+                    roleOID: 1 // 1 = Course Admin
+                },
+                attributes: [],
+            }],
+        });
 
+        const student = await User.findByPk(userOID);
 
-        const users = await getCourseAdminUserInSeminar(seminarOID);
-        const student = await getUserWithOID(userOID);
-        const seminar = await getSeminarWithOID(seminarOID);
+        sendMailConceptUploaded(courseAdminUsers, seminar, student)
 
-        sendMailConceptUploaded(users, seminar, student)
-
+        //throw new Error("Test");
         await t.commit();
 
         return res.status(200).end();

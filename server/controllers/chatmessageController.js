@@ -120,7 +120,7 @@ const createMessage = async (req, res) => {
 
         createdMessage.attachmentO = createdAttachment;
 
-        // TODO optional: send mail to receiver
+        // optional: send mail to receiver
 
         return res.status(200).json({createdMessage, createdAttachment});
     } catch (e) {
