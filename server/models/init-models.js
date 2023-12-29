@@ -3,6 +3,7 @@ var _attachment = require("./attachment");
 var _chatmessage = require("./chatmessage");
 var _concept = require("./concept");
 var _contexttoseminar = require("./contexttoseminar");
+var _lticredentials = require("./lticredentials");
 var _ltiuser = require("./ltiuser");
 var _oidcuser = require("./oidcuser");
 var _paper = require("./paper");
@@ -17,6 +18,7 @@ function initModels(sequelize) {
   var chatmessage = _chatmessage(sequelize, DataTypes);
   var concept = _concept(sequelize, DataTypes);
   var contexttoseminar = _contexttoseminar(sequelize, DataTypes);
+  var lticredentials = _lticredentials(sequelize, DataTypes);
   var ltiuser = _ltiuser(sequelize, DataTypes);
   var oidcuser = _oidcuser(sequelize, DataTypes);
   var paper = _paper(sequelize, DataTypes);
@@ -76,6 +78,7 @@ function initModels(sequelize) {
     chatmessage,
     concept,
     contexttoseminar,
+    lticredentials,
     ltiuser,
     oidcuser,
     paper,

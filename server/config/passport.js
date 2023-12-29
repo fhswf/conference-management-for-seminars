@@ -1,4 +1,5 @@
 const passport = require('passport');
+const lti = require("ims-lti");
 const LTIStrategy = require('passport-lti');
 const OpenIDConnectStrategy = require('passport-openidconnect');
 
@@ -10,6 +11,7 @@ const Seminar = db.seminar;
 const OidcUser = db.oidcuser;
 const LtiUser = db.ltiuser
 const ContextToSeminar = db.contexttoseminar;
+const LtiCredentials = db.lticredentials;
 
 async function addOrUpdateUser(lti, t) {
     let ltiUser = await LtiUser.findOne({
@@ -69,9 +71,10 @@ async function addSeminar(lti, t) {
         }
     });
 
+    let seminar = null;
     if(!map){
         //1. erstelle seminar
-        const seminar = await Seminar.create({
+        seminar = await Seminar.create({
             description: lti.context_title,
             phase: 1,
             assignmentkey: key
@@ -85,13 +88,13 @@ async function addSeminar(lti, t) {
         }, {transaction: t});
 
         return seminar;
+    }else{
+        seminar = await Seminar.findOne({
+            where: {
+                seminarOID: map.seminarOID
+            }
+        });
     }
-
-    const seminar = await Seminar.findOne({
-        where: {
-            seminarOID: map.seminarOID
-        }
-    });
 
     // TODO delete
     // seminar.description = lti.context_title;
@@ -99,11 +102,6 @@ async function addSeminar(lti, t) {
     // await seminar.save({transaction: t});
 
     return seminar;
-}
-
-// TODO
-function getUserIdfromLti(lti) {
-
 }
 
 async function addRoleAssignment(lti, user, seminar, t) {
@@ -131,7 +129,7 @@ function mapLtiRoles(roles) {
     return null;
 }
 
-const ltiVerifyCallback = async (username, lti, done) => {
+const ltiVerifyCallback = async (req, lti, done) => {
     const t = await db.sequelize.transaction();
 
     try {
@@ -142,7 +140,7 @@ const ltiVerifyCallback = async (username, lti, done) => {
             //join seminar
             seminar = await Seminar.findOne({
                 where: {
-                    key: lti.custom_seminar_key
+                    assignmentkey: lti.custom_seminar_key
                 }
             });
             if (!seminar) {
@@ -158,7 +156,9 @@ const ltiVerifyCallback = async (username, lti, done) => {
 
         var userJson = {
             id: user.userOID,
-            lti: lti,
+            lti: {
+                launch_presentation_return_url: lti.launch_presentation_return_url
+            },
             authtype: "lti"
         };
 
@@ -172,11 +172,40 @@ const ltiVerifyCallback = async (username, lti, done) => {
     }
 }
 
+/*
+//first version
 const ltiStrategy = new LTIStrategy({
     consumerKey: process.env.CONSUMER_KEY,
     consumerSecret: process.env.CONSUMER_SECRET,
     passReqToCallback: true,
 }, ltiVerifyCallback);
+ */
+
+//second version
+const ltiStrategy = new LTIStrategy({
+    createProvider: function (req, done) {
+        LtiCredentials.findOne({
+            where: {
+                consumerKey: req.body.oauth_consumer_key
+            }
+        }).then(function (consumer) {
+            if (!consumer) {
+                return done("not_found");
+            }
+
+            if (consumer.isActive) {
+                const ltiProvider = new lti.Provider(consumer.consumerKey, consumer.consumerSecret);
+                return done(null, ltiProvider);
+            } else {
+                return done("not_authorized");
+            }
+        }).catch(function (err) {
+            return done(err);
+        });
+    },
+    passReqToCallback: true,
+}, ltiVerifyCallback);
+
 
 async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken, refreshToken, params, done) {
     const t = await db.sequelize.transaction();
@@ -247,9 +276,9 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
 }
 
 
-passport.use(ltiStrategy);
+passport.use("lti", ltiStrategy);
 
-passport.use(new OpenIDConnectStrategy({
+passport.use("openidconnect", new OpenIDConnectStrategy({
     issuer: process.env.ISSUER,
     authorizationURL: process.env.AUTHORIZATION_URL,
     tokenURL: process.env.TOKEN_URL,

@@ -61,6 +61,18 @@ db.sequelize.sync({force: false})
                 description: 'student'
             }
         });
+        // That at least one consumer is in the database at first start
+        db.lticredentials.findOrCreate({
+            where: {
+                consumerKey: process.env.CONSUMER_KEY,
+                consumerSecret: process.env.CONSUMER_SECRET
+            },
+            defaults: {
+                consumerKey: process.env.CONSUMER_KEY,
+                consumerSecret: process.env.CONSUMER_SECRET,
+                isActive: true
+            }
+        });
         console.log('Sync Database');
     })
 
