@@ -118,16 +118,12 @@ app.post('/conference/api/lti/launch', passport.authenticate('lti', {
     successRedirect: '/conference/api/success'
 }));
 
-
-
 app.get('/conference/api/login', passport.authenticate('openidconnect'));
-
 
 app.get('/conference/api/login/callback', passport.authenticate('openidconnect', {failureRedirect: `${process.env.FRONTEND_PROTOCOL}://${process.env.FRONTEND_URL}`}), function (req, res) {
         res.redirect('/conference/api/success');
     }
 );
-
 
 app.get('/conference/api/success', function (req, res) {
     //console.log(req.user);
@@ -140,6 +136,7 @@ app.get('/conference/api/error-lti', function (req, res) {
     console.log('Error during LTI launch.');
     res.status(401).send('Error during LTI launch.');
 });
+
 app.get('/conference/api/error-oidc', function (req, res) {
     console.log('Error during Login');
     res.status(401).send('Error during OIDC Login');
@@ -178,7 +175,7 @@ app.get('/conference/api/logout', isAuthenticated, (req, res) => {
     if (req.user.authtype === "lti") {
         redirectUrl = req.user.lti?.launch_presentation_return_url;
     } else if (req.user.authtype === "oidc") {
-        redirectUrl = process.env.ENDSESSION_ENDPOINT;
+        redirectUrl = process.env.ISSUER + "/protocol/openid-connect/logout";
     }
     req.logout(() => {
         //console.log(req.user);

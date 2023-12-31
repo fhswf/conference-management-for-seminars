@@ -1,6 +1,6 @@
 declare namespace Cypress {
     interface Chainable {
-        getByData(selector: string): Chainable<Element>;
+        getByData(dataTestAttribute: string): Chainable<JQuery<HTMLElement>>
         mockAuthStatus(): Chainable<void>;
     }
 }

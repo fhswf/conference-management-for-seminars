@@ -220,8 +220,8 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
         if (!cred) {
             // Create a new User
             const user = await User.create({
-                firstName: profile.name?.givenName || "",
-                lastName: profile.name?.familyName || "",
+                firstName: profile.name?.givenName,
+                lastName: profile.name?.familyName,
                 mail: profile.emails && profile.emails[0]?.value,
                 isAdmin: false,
             }, {transaction: t});
@@ -240,8 +240,8 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
                 userOID: cred.userOID
             },
             defaults: {
-                firstName: profile.name?.givenName || "",
-                lastName: profile.name?.familyName || "",
+                firstName: profile.name?.givenName,
+                lastName: profile.name?.familyName,
                 mail: profile.emails && profile.emails[0]?.value,
                 isAdmin: false,
             }, transaction: t
@@ -249,9 +249,9 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
 
         if (!created) {
             // update user
-            user.firstName = profile.name?.givenName || "";
-            user.lastName = profile.name?.familyName || "";
-            user.mail = profile.emails && profile.emails[0]?.value || "";
+            user.firstName = profile.name?.givenName;
+            user.lastName = profile.name?.familyName;
+            user.mail = profile.emails && profile.emails[0]?.value;
             await user.save({transaction: t});
         }
 
@@ -280,9 +280,9 @@ passport.use("lti", ltiStrategy);
 
 passport.use("openidconnect", new OpenIDConnectStrategy({
     issuer: process.env.ISSUER,
-    authorizationURL: process.env.AUTHORIZATION_URL,
-    tokenURL: process.env.TOKEN_URL,
-    userInfoURL: process.env.USERINFO_URL,
+    authorizationURL: process.env.ISSUER + "/protocol/openid-connect/auth",
+    tokenURL: process.env.ISSUER + "/protocol/openid-connect/token",
+    userInfoURL: process.env.ISSUER + "/protocol/openid-connect/userinfo",
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
     callbackURL: process.env.CALLBACK_URL

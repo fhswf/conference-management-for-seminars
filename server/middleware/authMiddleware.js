@@ -53,8 +53,17 @@ async function isAuthenticated(req, res, next) {
         if (isAccessTokenExpired(req.user.accessToken)) {
             console.log("refreshing token");
             try {
-                newAccessToken = await refreshAccessToken(req.user.refreshToken);
+                //set new tokens
+                const tokens = await refreshAccessToken(req.user.refreshToken);
+                newAccessToken = tokens.access_token;
+
                 req.session.passport.user.accessToken = newAccessToken;
+                if (tokens.refresh_token) {
+                    req.session.passport.user.refreshToken = tokens.refresh_token;
+                }
+                if (tokens.id_token) {
+                    req.session.passport.user.idToken = tokens.id_token;
+                }
             } catch (e) {
                 console.error(e);
                 req.logout(() => {
@@ -65,7 +74,7 @@ async function isAuthenticated(req, res, next) {
 
         // check if token is active
         //const tokenActive = newAccessToken ? await introspectToken(newAccessToken) : await introspectToken(req.user.accessToken);
-        // setted to true, because if the introspectToken failed the user will be logged out
+        // setted to true, because if the introspectToken is commented out
         const tokenActive = true;
 
         if (tokenActive) {

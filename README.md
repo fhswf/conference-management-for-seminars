@@ -15,12 +15,14 @@ To run this project you need to create two .env files.
 First one is in the root folder and it should contain the following:
   ```
   VITE_BACKEND_URL=""
+  VITE_BACKEND_PROTOCOL="https"
   ```
 Second one is in the server folder:
   ```
-  EXPRESS_IP=""
   FRONTEND_URL=""
   EXPRESS_PORT_HTTP=3000
+  COOKIE_SECRET=""
+  FRONTEND_PROTOCOL="https"
   
   DB_TYPE="mariadb"
   DB_HOST="dbserver"
@@ -31,6 +33,18 @@ Second one is in the server folder:
   
   CONSUMER_KEY=""
   CONSUMER_SECRET=""
+  
+  CLIENT_ID=""
+  CLIENT_SECRET=""
+  ISSUER=""
+  CALLBACK_URL=""
+
+  MAIL_USERNAME=""
+  MAIL_PASSWORD=""
+  #SMTP_HOST=""
+  SMTP_HOST=""
+  SENDER_MAIL=""
+
   ```
 
 If you build this project with docker you should pass following .env which contains all variables needed in the docker-compose script:
@@ -41,21 +55,30 @@ If you build this project with docker you should pass following .env which conta
   
   #Frontend
   VITE_BACKEND_URL="jupiter.fh-swf.de/conference/api"
+  VITE_BACKEND_PROTOCOL="https"
   
   #Backend
+  EXPRESS_IP="jupiter.fh-swf.de/conference/api"
   FRONTEND_URL="jupiter.fh-swf.de/conference/"
+  FRONTEND_PROTOCOL="https"
   FRONTEND_PORT=11001
   EXPRESS_PORT_HTTP=11000
-  
-  DB_TYPE="mariadb"
-  DB_HOST="dbserver"
-  DB_NAME=""
-  DB_USER=""
-  DB_PASSWORD=""
-  DB_PORT=3306
+  COOKIE_SECRET=""
   
   CONSUMER_KEY=""
   CONSUMER_SECRET=""
+  
+  #OIDC Server
+  CLIENT_ID=""
+  CLIENT_SECRET=""
+  ISSUER=""
+  CALLBACK_URL=""
+  
+  #Mail
+  MAIL_USERNAME=""
+  MAIL_PASSWORD=""
+  SMTP_HOST=""
+  SENDER_MAIL=""
   ```
 
 
@@ -67,16 +90,16 @@ If you are developing a production application, we recommend updating the config
 
 ```js
    parserOptions: {
-    ecmaVersion: 'latest',
-        sourceType
+  ecmaVersion: 'latest',
+          sourceType
 :
-    'module',
-        project
+  'module',
+          project
 :
-    ['./tsconfig.json', './tsconfig.node.json'],
-        tsconfigRootDir
+  ['./tsconfig.json', './tsconfig.node.json'],
+          tsconfigRootDir
 :
-    __dirname,
+  __dirname,
 }
 ,
 ```
