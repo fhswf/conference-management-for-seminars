@@ -2,6 +2,7 @@ const {sendMailConceptUploaded} = require("../util/mailer");
 const db = require("../models");
 const attachmentController = require("./attachmentController");
 const path = require("path");
+const {isValidPdf} = require("../util/PdfUtils");
 //const {getUserWithOID, getCourseAdminUserInSeminar} = require("./userController");
 //const {getSeminarWithOID} = require("./seminarController");
 
@@ -59,7 +60,6 @@ const getNewestConceptOfCurrentUser = async (req, res) => {
  * @returns {Promise<*>}
  */
 const uploadConcept = async (req, res) => {
-    // TODO move
     const t = await db.sequelize.transaction();
     try {
         const userOID = req.user.userOID;
@@ -84,6 +84,9 @@ const uploadConcept = async (req, res) => {
         }
 
         let attachment = null;
+        if(file && !await isValidPdf(file)){
+            return res.status(415).json({error: 'Unsupported Media Type; Only PDF files are allowed'});
+        }
         if (file) {
             attachment = await attachmentController.createAttachment(req.files?.file, t)
         }

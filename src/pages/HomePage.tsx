@@ -20,7 +20,7 @@ type AssignedSeminar = Seminar & {
 function HomePage() {
     const navigate = useNavigate();
     const { user, setUser } = useContext(AuthContext);
-    const {data: assignedSeminars} = useFetch<AssignedSeminar[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/get-assigned-seminars`);
+    const {data: assignedSeminars} = useFetch<AssignedSeminar[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/user/assigned-seminars`);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const styles = {

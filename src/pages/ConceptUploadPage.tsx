@@ -43,7 +43,7 @@ function ConceptUploadPage() {
         const oid = selectedSupervisor?.userOID;
 
         oid && formData.append('supervisorOID', oid.toString());
-        seminarOID && formData.append('seminarOID', seminarOID.toString()); //TODO change
+        seminarOID && formData.append('seminarOID', seminarOID.toString());
 
         console.log(text);
         console.log(selectedFile);
@@ -57,16 +57,15 @@ function ConceptUploadPage() {
                 body: formData,
             },);
 
-            //TODO res not working
-            console.log("=>" + res.status);
-
             if (res.ok) {
                 alert('Concept uploaded successfully.');
                 setText("");
                 navigate(`/seminar/${seminarOID}`);
                 setSelectedFile(null);
                 setSelectedSupervisor(undefined);
-            } else {
+            } else if(res.status === 415) {
+                alert("Bitte nur PDF-Dateien hochladen.")
+            }else{
                 alert('Error uploading concept. Please try again.');
             }
         } catch (error) {
@@ -79,7 +78,7 @@ function ConceptUploadPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/user/get-supervisor-list/${seminarOID}`,{
+                const result = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}/supervisor-list/`,{
                     method: 'GET',
                     credentials: 'include'
                 });

@@ -23,12 +23,12 @@ services:
 #      - FRONTEND_PORT=${FRONTEND_PORT}
       - EXPRESS_PORT_HTTP=${EXPRESS_PORT_HTTP}
       - COOKIE_SECRET=${COOKIE_SECRET}
-      - DB_TYPE="mariadb"
-      - DB_HOST="dbserver"
+      - DB_TYPE=mariadb
+      - DB_HOST=dbserver
       - DB_NAME=${MYSQL_DATABASE}
-      - DB_USER="root"
+      - DB_USER=root
       - DB_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - DB_PORT="3306"
+      - DB_PORT=3306
       - CONSUMER_KEY=${CONSUMER_KEY}
       - CONSUMER_SECRET=${CONSUMER_SECRET}
       - CLIENT_ID=${CLIENT_ID}

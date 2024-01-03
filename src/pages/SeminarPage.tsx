@@ -38,7 +38,7 @@ function SeminarPage() {
     //const [showCommentsStrangerPaper, setShowCommentsStrangerPaper] = useState(false);
     const [showChat, setShowChat] = useState<PaperType>();
     const [showRating, setSetShowRating] = useState<PaperType>()
-    const {data: seminar} = useFetch<SeminarType>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminar/${seminarOID}`,);
+    const {data: seminar} = useFetch<SeminarType>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}`,);
     // TODO only fetch if phase >= 2 and phase >= 5
     // and user is student
     const {

@@ -26,7 +26,7 @@ function PaperOverviewPage() {
     const [showChat, setShowChat] = useState<Paper>();
     //const [uploadedPaper, setUploadedPaper] = useState<PaperObj[] | null>(null)
     const {data: uploadedPaper, setData: setUploadedPaper} = useFetch<PaperType[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/paper/get-uploaded-paper/${seminarOID}`);
-    const {data: seminar} = useFetch<SeminarType>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminar/${seminarOID}`);
+    const {data: seminar} = useFetch<SeminarType>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}`);
 
     async function onUpload(file: any) {
         if (!file || !seminarOID) {

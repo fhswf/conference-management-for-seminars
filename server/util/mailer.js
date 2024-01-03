@@ -78,7 +78,7 @@ const sendMailConceptEvaluated = async (concept) => {
                 \n\nIhr Konzept wurde ${concept.accepted ? "angenommen" : "abgelehnt"}.
                 \n\nSeminar: ${seminar.description}
             ${concept.feedback ? "\n\nFeedback: " + concept.feedback : ""}
-            Sie wurden dem Betreuer ${supervisor.firstName} ${supervisor.lastName} zugewiesen.
+            Sie wurden dem Betreuer ${getUserDisplayName(supervisor)} zugewiesen.
             \n\nMit freundlichen Grüßen`;
 
     await sendMail(student.mail, subject, emailText);
@@ -98,7 +98,7 @@ const sendMailConceptUploaded = async (users, seminar, student) => {
         //await new Promise(resolve => setTimeout(resolve, 3000));
         const emailText = `Hallo ${user.firstName} ${user.lastName},
                     \nSeminar: ${seminar.description}
-                    \nder Student ${getStudentDisplayName(student)} hat ein Konzept eingereicht.
+                    \nder Student ${getUserDisplayName(student)} hat ein Konzept eingereicht.
                     \n\nMit freundlichen Grüßen`;
 
         await sendMail(user.mail, subject, emailText);
@@ -118,7 +118,7 @@ const sendMailPaperUploaded = async (users, seminar, student) => {
     for(const user of users) {
         //await new Promise(resolve => setTimeout(resolve, 3000));
         const emailText = `Hallo ${user.firstName} ${user.lastName},
-                    \nder Student ${getStudentDisplayName(student)} hat ein Paper hochgeladen.
+                    \nder Student ${getUserDisplayName(student)} hat ein Paper hochgeladen.
                     \nSeminar: ${seminar.description}
                     \n\nMit freundlichen Grüßen`;
 
@@ -140,7 +140,7 @@ function mapPhaseToString(phase){
     }
 }
 
-function getStudentDisplayName(student) {
+function getUserDisplayName(student) {
     if (student.firstName && student.lastName) {
         return `${student.firstName} ${student.lastName}`;
     } else {

@@ -5,12 +5,14 @@ const {assignReviewer} = require("./reviewController");
 const {sendMailPhaseChanged, sendMailConceptEvaluated} = require("../util/mailer");
 //const {getUser, getUserWithConceptOID} = require("./userController");
 
+const Op = db.Sequelize.Op;
 const Seminar = db.seminar;
 const RoleAssignment = db.roleassignment;
 const User = db.user;
 const Concept = db.concept;
 const Attachment = db.attachment;
 const Paper = db.paper;
+const OidcUser = db.oidcuser;
 
 /**
  * Returns the seminar with the given seminarOID.
@@ -133,6 +135,36 @@ const gotoNextPhase = async (req, res) => {
         return res.status(500).send({message: "Error while changing phase."});
     }
 }
+
+/**
+ * Returns a list of oidc users that can be assigned to a seminar.
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+const getAddableUsers = async (req, res) => {
+    try {
+        const seminarOID = req.params.seminarOID;
+        const users = await User.findAll({
+            where: {
+                userOID: {
+                    [Op.notIn]: db.sequelize.literal(`(SELECT userOID FROM roleassignment WHERE seminarOID = ${seminarOID})`)
+                }
+            },
+            include: [{
+                model: OidcUser,
+                as: 'oidcusers',
+                attributes: [],
+                required: true
+            }],
+            attributes: ["userOID", "firstName", "lastName", "mail"],
+        });
+        res.status(200).json(users);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({error: 'Internal Server Error'});
+    }
+};
 
 /**
  * Returns all users of a seminar with their roleassignments and newest concept, with given seminarOID.
@@ -359,39 +391,7 @@ const createSeminar = async (req, res) => {
     }
 }
 
-/**
- * Returns all seminars assigned to the current user with their roleassignments.
- * @param req
- * @param res
- * @returns {Promise<void>}
- */
-const getAssignedSeminars = async (req, res) => {
-    try {
-        const userOID = req.user.userOID;
 
-        if (!userOID) {
-            return res.status(400).send({message: "UserOID is missing."});
-        }
-
-        const seminars = await Seminar.findAll({
-            include: [{
-                model: RoleAssignment,
-                as: "roleassignments",
-                where: {userOID: userOID},
-                attributes: ["roleOID"],
-            }],
-            attributes: ["seminarOID", "description", "phase"]
-        });
-        if (seminars) {
-            res.status(200).send(seminars);
-        } else {
-            res.status(404).send({message: "Seminar not found."});
-        }
-    } catch (e) {
-        console.log(e);
-        res.status(500).send({message: "Error while retrieving seminar."});
-    }
-}
 
 /**
  * Returns a student with all uploaded concepts with attachments and paper with attachments.
@@ -517,6 +517,38 @@ const enterSeminar = async (req, res) => {
         res.status(500).json({error: 'Internal Server Error'});
     }
 }
+/**
+ * Returns a list of supervisors for a seminar with the given seminarOID.
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+const getSupervisorList = async (req, res) => {
+    try {
+        const seminarOID = req.params.seminarOID;
+
+        if (!seminarOID){
+            return res.status(400).json({error: 'Bad Request'});
+        }
+
+        const supervisors = await User.findAll({
+            include: [{
+                model: RoleAssignment,
+                as: 'roleassignments',
+                where: {
+                    seminarOID: seminarOID,
+                    roleOID: 2 // 2 = Supervisor
+                },
+                attributes: [],
+            }],
+            attributes: ["userOID", "firstName", "lastName"],
+        });
+        res.status(200).json(supervisors);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({error: 'Internal Server Error'});
+    }
+}
 
 async function getSeminarWithOID(seminarOID) {
     return await Seminar.findByPk(seminarOID);
@@ -526,12 +558,13 @@ module.exports = {
     gotoNextPhase,
     getSeminar,
     getSeminars,
+    getAddableUsers,
     getUserList,
     updateUserInSeminar,
     evaluateConcept,
     createSeminar,
-    getAssignedSeminars,
     getStudent,
     enterSeminar,
-    getSeminarWithOID
+    getSeminarWithOID,
+    getSupervisorList
 }

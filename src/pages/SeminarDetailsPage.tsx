@@ -43,8 +43,8 @@ function SeminarDetailsPage() {
     const [showUserConcept, setShowUserConcept] = useState<UserO>();
     const [selectedRole, setSelectedRole] = useState<number | null>(null);
     //const [selectedSupervisor, setSelectedSupervisor] = useState<number | null>(null);
-    const {data: studentList, setData: setStudentList} = useFetch<StudentListResponse>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/get-students-list/${seminarOID}`);
-    const {data: availableSupervisor} = useFetch<User[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/user/get-supervisor-list/${seminarOID}`);
+    const {data: studentList, setData: setStudentList} = useFetch<StudentListResponse>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}/participants`);
+    const {data: availableSupervisor} = useFetch<User[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}/supervisor-list`);
 
     const roles = [
         {name: "Kurs-Admin", value: 1},

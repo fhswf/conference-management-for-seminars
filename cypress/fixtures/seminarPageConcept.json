@@ -1,0 +1,20 @@
+{
+  "conceptOID": 2,
+  "text": "concept-text",
+  "userOIDSupervisor": 3,
+  "userOIDStudent": 1,
+  "feedback": "good",
+  "seminarOID": 1,
+  "accepted": true,
+  "attachmentOID": 2,
+  "createdAt": "2023-12-31T15:07:28.000Z",
+  "updatedAt": "2023-12-31T15:07:28.000Z",
+  "attachmentO": {
+    "filename": "test.pdf"
+  },
+  "userOIDSupervisor_user": {
+    "userOID": 3,
+    "firstname": "John",
+    "lastname": "Doe"
+  }
+}
