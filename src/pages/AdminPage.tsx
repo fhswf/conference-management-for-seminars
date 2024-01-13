@@ -9,9 +9,9 @@ import Modal from "../components/Modal.tsx";
 import AddUserForm from "../components/AddUserForm.tsx";
 import HiddenLabel from "../components/ToggleLabel.tsx";
 
-function SeminarAdminPage() {
+function AdminPage() {
     const [showAddUser, setShowAddUser] = useState<Seminar>()
-    const {data} = useFetch<Seminar[]>(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/get-seminars`);
+    const {data} = useFetch<Seminar[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/all`);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const styles = {
@@ -52,7 +52,7 @@ function SeminarAdminPage() {
             return
         }
 
-        const result = await fetch(`http://${import.meta.env.VITE_BACKEND_URL}/seminar/seminar`, {
+        const result = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar`, {
             method: "POST",
             credentials: 'include',
             headers: {
@@ -75,7 +75,7 @@ function SeminarAdminPage() {
     return (
         <MainLayout>
             <div>
-                <h1>SeminarAdminPage</h1>
+                <h1>Administration</h1>
                 <div style={styles.createSeminar}>
                     <InputText id="seminarName" name="seminarName" placeholder="Seminarname" ref={inputRef}/>
                     <Button label="Seminar erstellen" onClick={onCreateSeminar}/>
@@ -90,4 +90,4 @@ function SeminarAdminPage() {
     )
 }
 
-export default SeminarAdminPage;
+export default AdminPage;

@@ -1,4 +1,5 @@
 const passport = require('passport');
+const lti = require("ims-lti");
 const LTIStrategy = require('passport-lti');
 const OpenIDConnectStrategy = require('passport-openidconnect');
 
@@ -10,6 +11,7 @@ const Seminar = db.seminar;
 const OidcUser = db.oidcuser;
 const LtiUser = db.ltiuser
 const ContextToSeminar = db.contexttoseminar;
+const LtiCredentials = db.lticredentials;
 
 async function addOrUpdateUser(lti, t) {
     let ltiUser = await LtiUser.findOne({
@@ -22,8 +24,8 @@ async function addOrUpdateUser(lti, t) {
     if (!ltiUser) {
         // Create a new User
         const user = await User.create({
-            firstName: lti.lis_person_name_given,
-            lastName: lti.lis_person_name_family,
+            firstname: lti.lis_person_name_given,
+            lastname: lti.lis_person_name_family,
             mail: lti.lis_person_contact_email_primary,
             isAdmin: false,
         }, {transaction: t});
@@ -41,8 +43,8 @@ async function addOrUpdateUser(lti, t) {
             userOID: ltiUser.userOID
         },
         defaults: {
-            firstName: lti.lis_person_name_given,
-            lastName: lti.lis_person_name_family,
+            firstname: lti.lis_person_name_given,
+            lastname: lti.lis_person_name_family,
             mail: lti.lis_person_contact_email_primary,
             isAdmin: false,
         }, transaction: t
@@ -50,8 +52,8 @@ async function addOrUpdateUser(lti, t) {
 
     if (!created) {
         // update user
-        user.firstName = lti.lis_person_name_given || null;
-        user.lastName = lti.lis_person_name_family || null;
+        user.firstname = lti.lis_person_name_given || null;
+        user.lastname = lti.lis_person_name_family || null;
         user.mail = lti.lis_person_contact_email_primary;
         await user.save({transaction: t});
     }
@@ -69,9 +71,10 @@ async function addSeminar(lti, t) {
         }
     });
 
+    let seminar = null;
     if(!map){
         //1. erstelle seminar
-        const seminar = await Seminar.create({
+        seminar = await Seminar.create({
             description: lti.context_title,
             phase: 1,
             assignmentkey: key
@@ -85,13 +88,13 @@ async function addSeminar(lti, t) {
         }, {transaction: t});
 
         return seminar;
+    }else{
+        seminar = await Seminar.findOne({
+            where: {
+                seminarOID: map.seminarOID
+            }
+        });
     }
-
-    const seminar = await Seminar.findOne({
-        where: {
-            seminarOID: map.seminarOID
-        }
-    });
 
     // TODO delete
     // seminar.description = lti.context_title;
@@ -99,11 +102,6 @@ async function addSeminar(lti, t) {
     // await seminar.save({transaction: t});
 
     return seminar;
-}
-
-// TODO
-function getUserIdfromLti(lti) {
-
 }
 
 async function addRoleAssignment(lti, user, seminar, t) {
@@ -123,6 +121,7 @@ async function addRoleAssignment(lti, user, seminar, t) {
     return assignment;
 }
 
+// TODO edit
 function mapLtiRoles(roles) {
     //if(roles[0] === 'Admin') return 1; //moodle role does not exist
     if (roles[0] === 'Instructor') return 2;
@@ -130,7 +129,7 @@ function mapLtiRoles(roles) {
     return null;
 }
 
-const ltiVerifyCallback = async (username, lti, done) => {
+const ltiVerifyCallback = async (req, lti, done) => {
     const t = await db.sequelize.transaction();
 
     try {
@@ -141,7 +140,7 @@ const ltiVerifyCallback = async (username, lti, done) => {
             //join seminar
             seminar = await Seminar.findOne({
                 where: {
-                    key: lti.custom_seminar_key
+                    assignmentkey: lti.custom_seminar_key
                 }
             });
             if (!seminar) {
@@ -157,7 +156,9 @@ const ltiVerifyCallback = async (username, lti, done) => {
 
         var userJson = {
             id: user.userOID,
-            lti: lti,
+            lti: {
+                launch_presentation_return_url: lti.launch_presentation_return_url
+            },
             authtype: "lti"
         };
 
@@ -171,11 +172,40 @@ const ltiVerifyCallback = async (username, lti, done) => {
     }
 }
 
+/*
+//first version
 const ltiStrategy = new LTIStrategy({
     consumerKey: process.env.CONSUMER_KEY,
     consumerSecret: process.env.CONSUMER_SECRET,
     passReqToCallback: true,
 }, ltiVerifyCallback);
+ */
+
+//second version
+const ltiStrategy = new LTIStrategy({
+    createProvider: function (req, done) {
+        LtiCredentials.findOne({
+            where: {
+                consumerKey: req.body.oauth_consumer_key
+            }
+        }).then(function (consumer) {
+            if (!consumer) {
+                return done("not_found");
+            }
+
+            if (consumer.isActive) {
+                const ltiProvider = new lti.Provider(consumer.consumerKey, consumer.consumerSecret);
+                return done(null, ltiProvider);
+            } else {
+                return done("not_authorized");
+            }
+        }).catch(function (err) {
+            return done(err);
+        });
+    },
+    passReqToCallback: true,
+}, ltiVerifyCallback);
+
 
 async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken, refreshToken, params, done) {
     const t = await db.sequelize.transaction();
@@ -190,9 +220,9 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
         if (!cred) {
             // Create a new User
             const user = await User.create({
-                firstName: profile.name?.givenName || "",
-                lastName: profile.name?.familyName || "",
-                mail: profile.emails && profile.emails[0]?.value || "",
+                firstname: profile.name?.givenName,
+                lastname: profile.name?.familyName,
+                mail: profile.emails && profile.emails[0]?.value,
                 isAdmin: false,
             }, {transaction: t});
 
@@ -210,18 +240,18 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
                 userOID: cred.userOID
             },
             defaults: {
-                firstName: profile.name?.givenName || "",
-                lastName: profile.name?.familyName || "",
-                mail: profile.emails && profile.emails[0]?.value || "",
+                firstname: profile.name?.givenName,
+                lastname: profile.name?.familyName,
+                mail: profile.emails && profile.emails[0]?.value,
                 isAdmin: false,
             }, transaction: t
         });
 
         if (!created) {
             // update user
-            user.firstName = profile.name?.givenName || "";
-            user.lastName = profile.name?.familyName || "";
-            user.mail = profile.emails && profile.emails[0]?.value || "";
+            user.firstname = profile.name?.givenName;
+            user.lastname = profile.name?.familyName;
+            user.mail = profile.emails && profile.emails[0]?.value;
             await user.save({transaction: t});
         }
 
@@ -246,13 +276,13 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
 }
 
 
-passport.use(ltiStrategy);
+passport.use("lti", ltiStrategy);
 
-passport.use(new OpenIDConnectStrategy({
+passport.use("openidconnect", new OpenIDConnectStrategy({
     issuer: process.env.ISSUER,
-    authorizationURL: process.env.AUTHORIZATION_URL,
-    tokenURL: process.env.TOKEN_URL,
-    userInfoURL: process.env.USERINFO_URL,
+    authorizationURL: process.env.ISSUER + "/protocol/openid-connect/auth",
+    tokenURL: process.env.ISSUER + "/protocol/openid-connect/token",
+    userInfoURL: process.env.ISSUER + "/protocol/openid-connect/userinfo",
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
     callbackURL: process.env.CALLBACK_URL
@@ -284,8 +314,8 @@ passport.deserializeUser((serializedUser, done) => {
 
                 userJson.mail = user.mail;
                 userJson.isAdmin = user.isAdmin;
-                userJson.firstName = user.firstName;
-                userJson.lastName = user.lastName;
+                userJson.firstname = user.firstname;
+                userJson.lastname = user.lastname;
                 done(null, userJson);
             } else {
                 done(null, false);

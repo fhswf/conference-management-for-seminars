@@ -11,6 +11,7 @@ const Concept = db.concept;
  * @param t
  * @returns {Promise<void>}
  */
+
 async function setPhase3PaperOID(seminarOID, t) {
     const user = await User.findAll({
         include: [{
@@ -35,7 +36,7 @@ async function setPhase3PaperOID(seminarOID, t) {
         });
         if (newestPaper) {
             await RoleAssignment.update({
-                phase3paperoid: newestPaper.paperOID
+                phase3paperOID: newestPaper.paperOID
             }, {
                 where: {
                     userOID: user1.userOID,
@@ -49,7 +50,7 @@ async function setPhase3PaperOID(seminarOID, t) {
 /*
 async function setPhase3PaperOID(t, paperOID, userOID, seminarOID) {
     await RoleAssignment.update({
-        phase3paperoid: paperOID
+        phase3paperOID: paperOID
     }, {
         where: {
             userOID: userOID,
@@ -59,10 +60,11 @@ async function setPhase3PaperOID(t, paperOID, userOID, seminarOID) {
 
     return true;
 }
-* */
+*/
 
 /**
  * Sets phase7paperOID of a student to the given data.
+ * Returns false if the paper was already set.
  * @param t
  * @param paperOID
  * @param userOID
@@ -116,6 +118,7 @@ async function userRoleIsStudent(userOID, seminarOID) {
             seminarOID: seminarOID
         }
     });
+    if(!roleAssignment) return false;
     return roleAssignment.roleOID === 3;
 }
 
@@ -132,6 +135,7 @@ async function userRoleIsSupervisor(userOID, seminarOID) {
             seminarOID: seminarOID
         }
     });
+    if(!roleAssignment) return false;
     return roleAssignment.roleOID === 2;
 }
 
@@ -148,6 +152,7 @@ async function userRoleIsCourseAdmin(userOID, seminarOID) {
             seminarOID: seminarOID
         }
     });
+    if(!roleAssignment) return false;
     return roleAssignment.roleOID === 1;
 }
 

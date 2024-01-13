@@ -10,7 +10,6 @@ function useFetch<T>(url: string) {
             setLoading(true);
             setError(null);
 
-            //sleep TODO remove
             //await new Promise(resolve => setTimeout(resolve, 1000));
             try {
                 const response = await fetch(url, {

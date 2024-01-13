@@ -1,0 +1,27 @@
+[
+  {
+    "userOID": 1,
+    "firstname": "Max1",
+    "lastname": "Mustermann1"
+  },
+  {
+    "userOID": 2,
+    "firstname": "Max2",
+    "lastname": "Mustermann2"
+  },
+  {
+    "userOID": 3,
+    "firstname": "Max3",
+    "lastname": "Mustermann3"
+  },
+  {
+    "userOID": 4,
+    "firstname": "Max4",
+    "lastname": "Mustermann4"
+  },
+  {
+    "userOID": 5,
+    "firstname": "Max5",
+    "lastname": "Mustermann5"
+  },
+]

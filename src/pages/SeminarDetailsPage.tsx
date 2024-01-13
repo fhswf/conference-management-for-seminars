@@ -43,8 +43,8 @@ function SeminarDetailsPage() {
     const [showUserConcept, setShowUserConcept] = useState<UserO>();
     const [selectedRole, setSelectedRole] = useState<number | null>(null);
     //const [selectedSupervisor, setSelectedSupervisor] = useState<number | null>(null);
-    const {data: studentList, setData: setStudentList} = useFetch<StudentListResponse>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/get-students-list/${seminarOID}`);
-    const {data: availableSupervisor} = useFetch<User[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/user/get-supervisor-list/${seminarOID}`);
+    const {data: studentList, setData: setStudentList} = useFetch<StudentListResponse>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}/participants`);
+    const {data: availableSupervisor} = useFetch<User[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}/supervisor-list`);
 
     const roles = [
         {name: "Kurs-Admin", value: 1},
@@ -74,12 +74,12 @@ function SeminarDetailsPage() {
     ];
 
     const tableData = studentList?.roleassignments.map(user => ({
-        lname: user.userO.lastName || "-",
-        fname: user.userO.firstName || "-",
+        lname: user.userO.lastname || "-",
+        fname: user.userO.firstname || "-",
         mail: user.userO.mail || "-",
 
         role: user.roleOID && mapRoleToString(user.roleOID),
-        supervisor: !user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user ? "-" : user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.firstName + " " + user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.lastName || '-',
+        supervisor: !user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user ? "-" : user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.firstname + " " + user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.lastname || '-',
         concept: !user.userO.userOIDStudent_concepts[0] ? "-" : user.userO.userOIDStudent_concepts[0]?.accepted === null ? 'Bewertung ausstehend' : user.userO.userOIDStudent_concepts[0]?.accepted ? 'Angenommen' : 'Abgelehnt',
         btnEdit: <Button onClick={() => {
             //navigate(`/student-details/${seminarOID}/${user.userOID}`);
@@ -91,13 +91,13 @@ function SeminarDetailsPage() {
         }}>Edit</Button>,
         btnGoto: <Button onClick={() => setShowUserConcept(user.userO)}
                          disabled={!user.userO.userOIDStudent_concepts[0] || user.roleOID !== 3}>Bewerten</Button>,
-        btnDetails: <Button onClick={() => navigate(`/student-details/${seminarOID}/${user.userOID}`)}>Details</Button>
+        btnDetails: <Button onClick={() => navigate(`/seminar-details/${seminarOID}/user/${user.userOID}`)}>Details</Button>
     }));
 
     async function onNextPhaseClicked() {
         // TODO
         console.log("next phase");
-        const result = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/go-to-next-phase/${seminarOID}`, {
+        const result = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}/go-to-next-phase`, {
             method: 'POST',
             credentials: 'include'
         });
@@ -115,8 +115,8 @@ function SeminarDetailsPage() {
     }
 
     const tableDataEdit = studentList?.roleassignments.map(user => ({
-        lname: user.userO.lastName,
-        fname: user.userO.firstName,
+        lname: user.userO.lastname,
+        fname: user.userO.firstname,
         mail: user.userO.mail,
         role: isEditMode === user.userOID ?
             <Dropdown value={selectedRole} options={roles} optionLabel="name" placeholder="Rolle wählen"
@@ -124,8 +124,8 @@ function SeminarDetailsPage() {
         supervisor: /* isEditMode === user.userOID && user.roleOID === 3 ?
             <Dropdown showClear value={selectedSupervisor} options={availableSupervisor!} optionLabel="name"
                       placeholder="Betreuer wählen"
-                      onChange={(e) => setSelectedSupervisor(e.value)}/> : user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.firstName + " " + user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.lastName, */
-            !user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user ? "-" : user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.firstName + " " + user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.lastName || '-',
+                      onChange={(e) => setSelectedSupervisor(e.value)}/> : user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.firstname + " " + user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.lastname, */
+            !user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user ? "-" : user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.firstname + " " + user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user?.lastname || '-',
         concept: user.userO.userOIDStudent_concepts[0]?.accepted === null ? 'Bewertung ausstehend' : user.userO.userOIDStudent_concepts[0]?.accepted === false ? 'Abgelehnt' : 'Angenommen',
 
     }));
@@ -179,7 +179,7 @@ function SeminarDetailsPage() {
             <MainLayout>
                 <div>
                     <p>Seminar Details: “{studentList?.description || "-"}”</p>
-                    <p>{role}</p>
+                    {/*<p>{role}</p>*/}
                     {studentList?.phase && role === 1 && <p onClick={() => {
                         if (studentList?.phase && studentList?.phase < 7 && confirm(`Möchten Sie von "${mapPhaseToString(studentList?.phase)}" übergehen zu "${mapPhaseToString(studentList?.phase + 1)}"?`)) {
                             onNextPhaseClicked();
@@ -188,7 +188,7 @@ function SeminarDetailsPage() {
                     {/*<pre>{JSON.stringify(studentList, null, 2)}</pre>*/}
                     <HiddenLabel text={studentList?.assignmentkey || ""}/>
                     <p>Eingereichte und angenommene Konzepte: {conceptCount}/{studentCount}</p>
-                    <p>Eingereichte Paper Phase 4: {p4paperCount}/{studentCount}</p>
+                    <p>Eingereichte Paper Phase 3: {p4paperCount}/{studentCount}</p>
                     <p>Eingereichte Paper Phase 7: {p7paperCount}/{studentCount}</p>
                     {!isEditMode ?
                         <Table header={header} data={tableData}/> :

@@ -3,8 +3,8 @@ var _attachment = require("./attachment");
 var _chatmessage = require("./chatmessage");
 var _concept = require("./concept");
 var _contexttoseminar = require("./contexttoseminar");
+var _lticredentials = require("./lticredentials");
 var _ltiuser = require("./ltiuser");
-var _mailqueue = require("./mailqueue");
 var _oidcuser = require("./oidcuser");
 var _paper = require("./paper");
 var _review = require("./review");
@@ -18,8 +18,8 @@ function initModels(sequelize) {
   var chatmessage = _chatmessage(sequelize, DataTypes);
   var concept = _concept(sequelize, DataTypes);
   var contexttoseminar = _contexttoseminar(sequelize, DataTypes);
+  var lticredentials = _lticredentials(sequelize, DataTypes);
   var ltiuser = _ltiuser(sequelize, DataTypes);
-  var mailqueue = _mailqueue(sequelize, DataTypes);
   var oidcuser = _oidcuser(sequelize, DataTypes);
   var paper = _paper(sequelize, DataTypes);
   var review = _review(sequelize, DataTypes);
@@ -38,7 +38,7 @@ function initModels(sequelize) {
   attachment.hasMany(paper, { as: "papers", foreignKey: "attachmentOID"});
   review.belongsTo(paper, { as: "paperO", foreignKey: "paperOID"});
   paper.hasMany(review, { as: "reviews", foreignKey: "paperOID"});
-  roleassignment.belongsTo(paper, { as: "phase4paperO", foreignKey: "phase3paperOID"});
+  roleassignment.belongsTo(paper, { as: "phase3paperO", foreignKey: "phase3paperOID"});
   paper.hasMany(roleassignment, { as: "roleassignments", foreignKey: "phase3paperOID"});
   roleassignment.belongsTo(paper, { as: "phase7paperO", foreignKey: "phase7paperOID"});
   paper.hasMany(roleassignment, { as: "phase7paperO_roleassignments", foreignKey: "phase7paperOID"});
@@ -78,8 +78,8 @@ function initModels(sequelize) {
     chatmessage,
     concept,
     contexttoseminar,
+    lticredentials,
     ltiuser,
-    mailqueue,
     oidcuser,
     paper,
     review,

@@ -1,14 +1,14 @@
 require('dotenv').config();
 const PORT_HTTP = process.env.EXPRESS_PORT_HTTP || 3000;
-const PORT_HTTPS = process.env.EXPRESS_PORT_HTTPS || 3443;
+//const PORT_HTTPS = process.env.EXPRESS_PORT_HTTPS || 3443;
 
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const fs = require('fs');
-var path = require('path')
-var bodyParser = require('body-parser');
-var morgan = require('morgan')
+const path = require('path')
+const bodyParser = require('body-parser');
+const morgan = require('morgan')
 
 const fileUpload = require('express-fileupload');
 
@@ -31,9 +31,9 @@ app.use(fileUpload());
 
 // ------------------------------ session setup ------------------------------
 
-var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
 app.use(morgan('combined', { stream: accessLogStream }))
-app.use(morgan('dev'))
+//app.use(morgan('dev'))
 
 
 // ------------------------------ session setup ------------------------------
@@ -56,7 +56,8 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+        maxAge: 1000 * 60 * 60 * 24 * 3, // 3 days
+        httpOnly: true, //default true
         //TODO
         //secure: false,
         //sameSite: true,
@@ -113,21 +114,16 @@ app.use(function (req, res, next) {
  */
 
 app.post('/conference/api/lti/launch', passport.authenticate('lti', {
-    failureRedirect: '/conference/api/error',
-    successRedirect: '/conference/api/success',
-    session: true
+    failureRedirect: '/conference/api/error-lti',
+    successRedirect: '/conference/api/success'
 }));
 
-
-
 app.get('/conference/api/login', passport.authenticate('openidconnect'));
-
 
 app.get('/conference/api/login/callback', passport.authenticate('openidconnect', {failureRedirect: `${process.env.FRONTEND_PROTOCOL}://${process.env.FRONTEND_URL}`}), function (req, res) {
         res.redirect('/conference/api/success');
     }
 );
-
 
 app.get('/conference/api/success', function (req, res) {
     //console.log(req.user);
@@ -135,11 +131,13 @@ app.get('/conference/api/success', function (req, res) {
     res.redirect(`${process.env.FRONTEND_PROTOCOL}://${process.env.FRONTEND_URL}`);
 });
 
-app.get('/conference/api/error', function (req, res) {
+app.get('/conference/api/error-lti', function (req, res) {
+    // consumer key not found or not authorized
     console.log('Error during LTI launch.');
     res.status(401).send('Error during LTI launch.');
 });
-app.get('/conference/api/error-login', function (req, res) {
+
+app.get('/conference/api/error-oidc', function (req, res) {
     console.log('Error during Login');
     res.status(401).send('Error during OIDC Login');
 });
@@ -149,8 +147,8 @@ app.get('/conference/api/authstatus', (req, res) => {
     if (req.isAuthenticated()) {
         return res.status(200).json({
             user: {
-                firstName: req.user.firstName,
-                lastName: req.user.lastName,
+                firstname: req.user.firstname,
+                lastname: req.user.lastname,
                 mail: req.user.mail,
                 isAdmin: req.user.isAdmin,
                 userOID: req.user.userOID,
@@ -177,7 +175,7 @@ app.get('/conference/api/logout', isAuthenticated, (req, res) => {
     if (req.user.authtype === "lti") {
         redirectUrl = req.user.lti?.launch_presentation_return_url;
     } else if (req.user.authtype === "oidc") {
-        redirectUrl = process.env.ENDSESSION_ENDPOINT;
+        redirectUrl = process.env.ISSUER + "/protocol/openid-connect/logout";
     }
     req.logout(() => {
         //console.log(req.user);

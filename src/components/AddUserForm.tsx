@@ -16,7 +16,7 @@ function AssignUserPage({seminar, onClose}: Props) {
     const [selectedRole, setSelectedRole] = useState<number>();
     const [selectedUser, setSelectedUser] = useState<any>();
 
-    const userList = useFetch<User[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/user/get-addable-users/${seminar.seminarOID}`);
+    const userList = useFetch<User[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminar.seminarOID}/addable-users/`);
 
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
@@ -61,7 +61,7 @@ function AssignUserPage({seminar, onClose}: Props) {
     let usersJson: { name: string, userOID: number }[] = [];
 
     userList?.data?.map((user: User) => {
-        usersJson.push({name: `${user.lastName}, ${user.firstName}`, userOID: user.userOID!})
+        usersJson.push({name: `${user.lastname}, ${user.firstname}`, userOID: user.userOID!})
     });
 
 

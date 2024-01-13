@@ -22,10 +22,10 @@ function MainLayout({children}: Props) {
             }
         },
         user?.isAdmin && {
-            label: 'Seminarverwaltung',
+            label: 'Admininistration',
             icon: 'pi pi-fw pi-cog',
             command: () => {
-                navigate("/seminar-administration")
+                navigate("/administration")
             }
         }
     ].filter(Boolean) as MenuItem[]
@@ -34,7 +34,7 @@ function MainLayout({children}: Props) {
                        height="40" className="mr-2"></img>;
 
     const itemsSplit = [
-        {label: `${user?.firstName} ${user?.lastName}`},
+        {label: `${user?.firstname} ${user?.lastname}`},
         {label: `${user?.mail}`},
         user?.isAdmin && {label: `System-Admin`},
     ].filter(Boolean) as MenuItem[];

@@ -1,4 +1,5 @@
 const db = require("../models");
+const {mixArray} = require("../utils/ArrayUtils");
 
 const Review = db.review;
 const User = db.user;
@@ -7,7 +8,7 @@ const Paper = db.paper;
 const Concept = db.concept;
 
 /**
- * Returns an array of reviewer user of a paper.
+ * Returns an array user which review a paper.
  * @param req
  * @param res
  * @returns {Promise<*>}
@@ -15,6 +16,10 @@ const Concept = db.concept;
 async function getReviewerUserOfPaper(req, res) {
     try {
         const paperOID = req.params.paperOID;
+
+        if (!paperOID) {
+            return res.status(400).json({error: 'Bad Request'});
+        }
 
         const reviewer = await User.findAll({
             include: [{
@@ -26,7 +31,7 @@ async function getReviewerUserOfPaper(req, res) {
                 attributes: [],
                 required: true,
             }],
-            attributes: ['userOID', 'firstName', 'lastName', 'mail'],
+            attributes: ['userOID', 'firstname', 'lastname', 'mail'],
         });
 
         return res.status(200).json(reviewer);
@@ -38,13 +43,14 @@ async function getReviewerUserOfPaper(req, res) {
 
 /**
  * Assigns reviewers to papers according to the given rules
+ * Uses phase3paperOID of roleassignment to determine which paper is the newest.
  * @param seminarOID
  * @param t
  * @returns {Promise<void>}
  */
 async function assignReviewer(seminarOID, t) {
     // Jeder User (Student) eines Seminars soll 2 Reviewe Eintrag mit sich als Reviewer bekommen
-    let assignment = [];
+    let assignments = [];
 
     // all students in seminar who have a concept and a paper
     const studentsInSeminar = await User.findAll({
@@ -57,41 +63,30 @@ async function assignReviewer(seminarOID, t) {
             },
             include: [{
                 model: Paper,
-                as: "phase4paperO",
+                as: "phase3paperO",
                 required: true,
             }],
         }, {
             model: Concept,
             as: "userOIDStudent_concepts",
-            //Studenten könnten nur ein Konzept im Seminar haben, welches Akzeptiert ist
+            //Studenten könnten nur ein Konzept im Seminar haben, welches akzeptiert ist, sollte einen Betreuer haben, alternativ require: true
             where: {
                 seminarOID: seminarOID,
                 accepted: true,
             },
-            include: [{
-                model: User,
-                as: "userOIDSupervisor_user",
-            }],
         }
         ],
         transaction: t
     });
 
     // for randomness, possible to mix studentsInSeminar-array here
+    //mixArray(studentsInSeminar)
 
     // users do not review themselves: at least 3 students in the seminar
     // users do not review each other: at least 4 students in the seminar
     let studentIndex = 0;
-    for (const user1 of studentsInSeminar) {
-        const newestPaper = await Paper.findOne({
-            where: {
-                authorOID: user1.userOID,
-                seminarOID: seminarOID,
-            },
-            order: [
-                ['createdAt', 'DESC']
-            ]
-        });
+    for (const student of studentsInSeminar) {
+        // alternative: newest paper of student
 
         const reviewer1Index = (studentIndex + 1) % studentsInSeminar.length;
         const reviewer2Index = (studentIndex + 2) % studentsInSeminar.length;
@@ -101,30 +96,30 @@ async function assignReviewer(seminarOID, t) {
 
         studentIndex = (studentIndex + 1) % studentsInSeminar.length;
 
-        assignment.push({
-            paper: newestPaper.paperOID,
-            author: user1.userOID,
+        assignments.push({
+            paper: student.roleassignments[0].phase3paperOID,
+            author: student.userOID,
             reviewer1: reviewer1.userOID,
             reviewer2: reviewer2.userOID,
-            betreuer: user1.userOIDStudent_concepts[0].userOIDSupervisor_user.userOID
+            supervisor: student.userOIDStudent_concepts[0].userOIDSupervisor
         });
 
         console.log(studentsInSeminar);
     }
 
     // for every assignment create three review entries
-    for (const assignment1 of assignment) {
+    for (const assignment of assignments) {
         await Review.create({
-            paperOID: assignment1.paper,
-            reviewerOID: assignment1.reviewer1,
+            paperOID: assignment.paper,
+            reviewerOID: assignment.reviewer1,
         }, {transaction: t});
         await Review.create({
-            paperOID: assignment1.paper,
-            reviewerOID: assignment1.reviewer2,
+            paperOID: assignment.paper,
+            reviewerOID: assignment.reviewer2,
         }, {transaction: t});
         await Review.create({
-            paperOID: assignment1.paper,
-            reviewerOID: assignment1.betreuer,
+            paperOID: assignment.paper,
+            reviewerOID: assignment.supervisor,
         }, {transaction: t});
     }
 

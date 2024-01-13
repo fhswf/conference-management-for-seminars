@@ -2,15 +2,17 @@ const crypto = require('crypto');
 const db = require("../models");
 const {setPhase3PaperOID} = require("./roleassignmentController");
 const {assignReviewer} = require("./reviewController");
-const {sendMailPhaseChanged, sendMailConceptEvaluated} = require("../mailer");
-const {getUser, getUserWithConceptOID} = require("./userController");
+const {sendMailPhaseChanged, sendMailConceptEvaluated} = require("../utils/mailer");
+//const {getUser, getUserWithConceptOID} = require("./userController");
 
+const Op = db.Sequelize.Op;
 const Seminar = db.seminar;
 const RoleAssignment = db.roleassignment;
 const User = db.user;
 const Concept = db.concept;
 const Attachment = db.attachment;
 const Paper = db.paper;
+const OidcUser = db.oidcuser;
 
 /**
  * Returns the seminar with the given seminarOID.
@@ -100,10 +102,14 @@ const gotoNextPhase = async (req, res) => {
             currentPhase.phase++;
         }
 
-        const seminar = await Seminar.update({phase: currentPhase.phase + 1}, {where: {seminaroid: seminarOID}});
+        //throw new Error("Test");
+
+        //const seminar = await Seminar.update({phase: currentPhase.phase + 1}, {where: {seminaroid: seminarOID}, transaction: t});
+        const [updatedRows] = await Seminar.update({phase: currentPhase.phase + 1}, {where: {seminaroid: seminarOID}, transaction: t});
 
         // TODO affectedRows prüfen
-        if (seminar[0] === 1) {
+        //if (seminar[0] === 1) {
+        if (updatedRows === 1) {
             // TODO handle phase change
 
             const users = await User.findAll({
@@ -115,13 +121,13 @@ const gotoNextPhase = async (req, res) => {
                     },
                 }],
             });
-
+            await t.commit();
             const updatedSeminar = await Seminar.findByPk(seminarOID);
 
             sendMailPhaseChanged(users, updatedSeminar)
 
 
-            await t.commit();
+
             return res.status(200).send({message: "Phase successfully changed."});
         } else {
             await t.rollback();
@@ -133,6 +139,36 @@ const gotoNextPhase = async (req, res) => {
         return res.status(500).send({message: "Error while changing phase."});
     }
 }
+
+/**
+ * Returns a list of oidc users that can be assigned to a seminar.
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+const getAddableUsers = async (req, res) => {
+    try {
+        const seminarOID = req.params.seminarOID;
+        const users = await User.findAll({
+            where: {
+                userOID: {
+                    [Op.notIn]: db.sequelize.literal(`(SELECT userOID FROM roleassignment WHERE seminarOID = ${seminarOID})`)
+                }
+            },
+            include: [{
+                model: OidcUser,
+                as: 'oidcusers',
+                attributes: [],
+                required: true
+            }],
+            attributes: ["userOID", "firstname", "lastname", "mail"],
+        });
+        res.status(200).json(users);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({error: 'Internal Server Error'});
+    }
+};
 
 /**
  * Returns all users of a seminar with their roleassignments and newest concept, with given seminarOID.
@@ -162,7 +198,7 @@ const getUserList = async (req, res) => {
                             include: [{
                                 model: User,
                                 as: "userOIDSupervisor_user",
-                                attributes: ["userOID", "firstName", "lastName", "mail"],
+                                attributes: ["userOID", "firstname", "lastname", "mail"],
 
                             },
                                 {
@@ -214,8 +250,7 @@ const updateUserInSeminar = async (req, res) => {
         // 1. roleassignment
         const assignment = await RoleAssignment.update(
             {roleOID: roleOid},
-            {where: {userOID: userOid, seminarOID: seminarOid}},
-            {transaction: t}
+            {where: {userOID: userOid, seminarOID: seminarOid}, transaction: t},
         );
         // 2. user
         /*
@@ -267,7 +302,8 @@ const evaluateConcept = async (req, res) => {
             return res.status(400).send({message: "Missing required parameters."});
         }
 
-        const concept = await Concept.update(
+        //const concept = await Concept.update(
+        const [updatedRows] = await Concept.update(
             {
                 accepted: accepted,
                 feedback: feedback,
@@ -275,9 +311,9 @@ const evaluateConcept = async (req, res) => {
             },
             {where: {conceptOID: conceptOID}}
         );
-        if (concept[0] === 1) {
-            // TODO move
-            const conc = await getConceptWithOID(conceptOID);
+        //if (concept[0] === 1) {
+        if (updatedRows === 1) {
+            const conc = await getConceptInformation(conceptOID);
 
             sendMailConceptEvaluated(conc)
 
@@ -299,7 +335,7 @@ const evaluateConcept = async (req, res) => {
  * @param conceptOID - The conceptOID of the Concept to be found.
  * @returns {Promise<Model|null>}
  */
-async function getConceptWithOID(conceptOID) {
+async function getConceptInformation(conceptOID) {
     const concept = await Concept.findOne({
         where: {
             conceptOID: conceptOID
@@ -312,12 +348,12 @@ async function getConceptWithOID(conceptOID) {
             {
                 model: User,
                 as: 'userOIDSupervisor_user',
-                attributes: ["userOID", "firstName", "lastName"]
+                attributes: ["userOID", "firstname", "lastname"]
             },
             {
                 model: User,
                 as: 'userOIDStudent_user',
-                attributes: ["userOID", "firstName", "lastName", "mail"]
+                attributes: ["userOID", "firstname", "lastname", "mail"]
             },
             {
                 model: Seminar,
@@ -361,39 +397,7 @@ const createSeminar = async (req, res) => {
     }
 }
 
-/**
- * Returns all seminars assigned to the current user with their roleassignments.
- * @param req
- * @param res
- * @returns {Promise<void>}
- */
-const getAssignedSeminars = async (req, res) => {
-    try {
-        const userOID = req.user.userOID;
 
-        if (!userOID) {
-            return res.status(400).send({message: "UserOID is missing."});
-        }
-
-        const seminars = await Seminar.findAll({
-            include: [{
-                model: RoleAssignment,
-                as: "roleassignments",
-                where: {userOID: userOID},
-                attributes: ["roleOID"],
-            }],
-            attributes: ["seminarOID", "description", "phase"]
-        });
-        if (seminars) {
-            res.status(200).send(seminars);
-        } else {
-            res.status(404).send({message: "Seminar not found."});
-        }
-    } catch (e) {
-        console.log(e);
-        res.status(500).send({message: "Error while retrieving seminar."});
-    }
-}
 
 /**
  * Returns a student with all uploaded concepts with attachments and paper with attachments.
@@ -422,7 +426,7 @@ const getStudent = async (req, res) => {
                 include: [{
                     model: User,
                     as: "userOIDSupervisor_user",
-                    attributes: ["userOID", "firstName", "lastName", "mail"],
+                    attributes: ["userOID", "firstname", "lastname", "mail"],
 
                 },
                     {
@@ -519,21 +523,56 @@ const enterSeminar = async (req, res) => {
         res.status(500).json({error: 'Internal Server Error'});
     }
 }
+/**
+ * Returns a list of supervisors for a seminar with the given seminarOID.
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+const getSupervisorList = async (req, res) => {
+    try {
+        const seminarOID = req.params.seminarOID;
 
+        if (!seminarOID){
+            return res.status(400).json({error: 'Bad Request'});
+        }
+
+        const supervisors = await User.findAll({
+            include: [{
+                model: RoleAssignment,
+                as: 'roleassignments',
+                where: {
+                    seminarOID: seminarOID,
+                    roleOID: 2 // 2 = Supervisor
+                },
+                attributes: [],
+            }],
+            attributes: ["userOID", "firstname", "lastname", "mail"],
+        });
+        res.status(200).json(supervisors);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({error: 'Internal Server Error'});
+    }
+}
+
+/*
 async function getSeminarWithOID(seminarOID) {
     return await Seminar.findByPk(seminarOID);
 }
+ */
 
 module.exports = {
     gotoNextPhase,
     getSeminar,
     getSeminars,
+    getAddableUsers,
     getUserList,
     updateUserInSeminar,
     evaluateConcept,
     createSeminar,
-    getAssignedSeminars,
     getStudent,
     enterSeminar,
-    getSeminarWithOID
+    //getSeminarWithOID,
+    getSupervisorList
 }

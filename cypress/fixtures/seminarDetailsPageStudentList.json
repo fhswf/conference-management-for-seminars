@@ -1,0 +1,78 @@
+{
+  "seminarOID": 1,
+  "description": "Konferenz-Seminar-Test",
+  "phase": 2,
+  "assignmentkey": "89727b76-e004-403c-8a7b-31d76a908abd",
+  "createdAt": "2023-12-28T20:46:46.000Z",
+  "updatedAt": "2023-12-31T15:06:12.000Z",
+  "roleassignments": [
+    {
+      "userOID": 1,
+      "seminarOID": 1,
+      "roleOID": 3,
+      "phase3paperOID": null,
+      "phase7paperOID": null,
+      "userO": {
+        "userOID": 1,
+        "firstname": "Max1",
+        "lastname": "Mustermann1",
+        "mail": "mustermann1.max1@fh-swf.de",
+        "isAdmin": false,
+        "userOIDStudent_concepts": [
+          {
+            "conceptOID": 2,
+            "text": "concept-text",
+            "userOIDSupervisor": 3,
+            "userOIDStudent": 1,
+            "feedback": "good",
+            "seminarOID": 1,
+            "accepted": true,
+            "attachmentOID": 2,
+            "createdAt": "2023-12-31T15:07:28.000Z",
+            "updatedAt": "2023-12-31T15:07:28.000Z",
+            "userOIDSupervisor_user": {
+              "userOID": 3,
+              "firstname": "John",
+              "lastname": "Doe",
+              "mail": "doe.john@fh-swf.de"
+            },
+            "attachmentO": {
+              "attachmentOID": 2,
+              "filename": "test.pdf"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "userOID": 3,
+      "seminarOID": 1,
+      "roleOID": 2,
+      "phase3paperOID": null,
+      "phase7paperOID": null,
+      "userO": {
+        "userOID": 3,
+        "firstname": "Doe",
+        "lastname": "John",
+        "mail": "doe.john@fh-swf.de",
+        "isAdmin": false,
+        "userOIDStudent_concepts": []
+      }
+    },
+    {
+      "userOID": 4,
+      "seminarOID": 1,
+      "roleOID": 1,
+      "phase3paperOID": null,
+      "phase7paperOID": null,
+      "userO": {
+        "userOID": 4,
+        "firstname": "User",
+        "lastname": "Example",
+        "mail": "example.user@fh-swf.de",
+        "isAdmin": false,
+        "userOIDStudent_concepts": []
+      }
+    }
+  ]
+}

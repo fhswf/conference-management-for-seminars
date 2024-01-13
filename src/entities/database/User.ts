@@ -1,7 +1,7 @@
 type User = {
     userOID: number | null;
-    firstName: string | null;
-    lastName: string | null;
+    firstname: string | null;
+    lastname: string | null;
     mail: string | null;
     isAdmin: boolean | null;
 };

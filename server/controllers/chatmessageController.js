@@ -1,5 +1,5 @@
 const db = require("../models");
-const {isValidPdf} = require("../util/PdfUtils");
+const {isValidPdf} = require("../utils/PdfUtils");
 
 const Op = db.Sequelize.Op;
 const Review = db.review;
@@ -120,7 +120,7 @@ const createMessage = async (req, res) => {
 
         createdMessage.attachmentO = createdAttachment;
 
-        // TODO optional: send mail to receiver
+        // optional: send mail to receiver
 
         return res.status(200).json({createdMessage, createdAttachment});
     } catch (e) {

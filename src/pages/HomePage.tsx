@@ -20,7 +20,7 @@ type AssignedSeminar = Seminar & {
 function HomePage() {
     const navigate = useNavigate();
     const { user, setUser } = useContext(AuthContext);
-    const {data: assignedSeminars} = useFetch<AssignedSeminar[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/get-assigned-seminars`);
+    const {data: assignedSeminars} = useFetch<AssignedSeminar[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/user/assigned-seminars`);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const styles = {
@@ -49,9 +49,10 @@ function HomePage() {
         }} disabled={seminar.roleassignments[0].roleOID === 1}
         >➡</Button>,
         btnSeminarDetails: //(seminar.roleassignments[0].roleOID === 1) ?
-            <Button onClick={() => {
+            <Button data-test="administrate-btn"
+                onClick={() => {
             navigate(`/seminar-details/${seminar.seminarOID}`)
-        }} disabled={seminar.roleassignments[0].roleOID === 3} tooltip="Nur für Kurs-Admins/Betreuer" tooltipOptions={{ showOnDisabled: true }}>Verwalten</Button> /* TODO check if user is Admin */
+        }} disabled={seminar.roleassignments[0].roleOID === 3} tooltip="Nur für Kurs-Admins/Betreuer" tooltipOptions={{ showOnDisabled: true }}>Verwalten</Button>
             //: null
     }));
     /*const tableData = [
@@ -90,24 +91,15 @@ function HomePage() {
             <MainLayout>
                 {/*<pre>{JSON.stringify(assignedSeminars, null, 2)}</pre>*/}
                 <div>
-                    <h1>Sie sind in folgenden Seminaren eingeschrieben:</h1>
+                    <h1 data-test="heading">Sie sind in folgenden Seminaren eingeschrieben:</h1>
                     <div style={styles.enterSeminar}>
-                        <InputText id="seminarkey" name="seminarkey" placeholder="Einschreibeschlüssel" ref={inputRef}/>
-                        <Button label="Seminar beitreten" onClick={onEnterSeminar}/>
+                        <InputText data-test="key-input" id="seminarkey" name="seminarkey" placeholder="Einschreibeschlüssel" ref={inputRef}/>
+                        <Button data-test="enter-seminar" label="Seminar beitreten" onClick={onEnterSeminar}/>
                     </div>
                     <div>
                         <Table header={header} data={tableData}/>
                     </div>
                 </div>
-                <Button onClick={async () => {
-                    const result = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/authstatus`, {
-                        method: "GET",
-                        credentials: 'include',
-                    });
-                    const data = await result.json();
-                    console.log(data);
-                }}>Check Auth</Button>
-
             </MainLayout>
         </>
     );
@@ -115,3 +107,11 @@ function HomePage() {
 }
 
 export default HomePage;
+
+/*
+const {data, loading, error} = useFetch<AssignedSeminar[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/authstatus`);
+
+if(loading){ return <p>Is loading</p> }
+if(error ){ return <p>Is error</p> }
+return( <p>{data && data[0].description || "Keine Daten vorhanden"}</p> );}
+*/

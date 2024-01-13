@@ -35,8 +35,8 @@ function PaperUploadPage({seminarOID, phase, onUpload}: Props) {
                 </div>
             </div>
             <div className={styles.buttonDiv}>
-                {phase === 3 && <Button onClick={onClick}>Paper anonym einreichen!</Button>}
-                {phase === 7 && <Button onClick={onClick}>Paper einreichen!</Button>}
+                {phase === 3 && <Button onClick={onClick}>Paper anonym einreichen</Button>}
+                {phase === 7 && <Button onClick={onClick}>Finales Paper zur Bewertung einreichen</Button>}
             </div>
         </div>
     );

@@ -6,6 +6,6 @@ const {isReviewerOrAuthorOfPaper, isCourseAdminOrSupervisorInSeminar, isReviewer
 
 router.get('/get-reviewoids-from-paper/:paperOID', isReviewerOrAuthorOfPaper, reviewController.getReviewOIDsOfPaper);
 router.get('/get-reviewer-of-paper/:paperOID', isCourseAdminOrSupervisorInSeminar, reviewController.getReviewerUserOfPaper);
-router.post('/rate',  reviewController.rateReview);
+router.post('/rate', isReviewer, reviewController.rateReview);
 
 module.exports = router;

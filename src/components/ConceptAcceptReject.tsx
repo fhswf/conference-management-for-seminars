@@ -39,9 +39,16 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose, userRole}: P
     //];
 
     const supervisor = availableSupervisors.map((supervisor) => {
-        return {
-            ...supervisor,
-            name: supervisor.firstName + " " + supervisor.lastName,
+        if(supervisor.firstname && supervisor.lastname) {
+            return {
+                ...supervisor,
+                name: supervisor.firstname + " " + supervisor.lastname,
+            }
+        }else{
+            return {
+                ...supervisor,
+                name: supervisor.mail,
+            }
         }
     });
 
@@ -96,7 +103,7 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose, userRole}: P
             
             <h2>Konzept annehmen / ablehnen</h2>
             <h3>Autor:</h3>
-            <p>Name: {user0.firstName} {user0.lastName}</p>
+            <p>Name: {user0.firstname} {user0.lastname}</p>
             <p>Mail: {user0.mail}</p>
             <hr/>
             <h3>Konzept:</h3>
@@ -110,7 +117,6 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose, userRole}: P
             {/* if evaluation pending */}
             {(!user0.userOIDStudent_concepts[0].accepted) && userRole === 1 &&
                 <>
-                    <h4>TODO Beurteilung auf Kurs-Admin beschränken</h4>
                     Betreuer: <Dropdown value={selectedSupervisor} options={supervisor} optionLabel="name"
                                         placeholder="Betreuer wählen"
                                         onChange={(e) => setSelectedSupervisor(e.value)}/><br/>

@@ -16,9 +16,9 @@ import 'primeflex/primeflex.css';
 import React, {useEffect, useState} from "react";
 import {AuthContext} from "./context/AuthContext.ts";
 import PaperOverviewPage from "./pages/PaperOverviewPage.tsx";
-import StudentDetailPage from "./pages/StudentDetailPage.tsx";
+import MemberDetailPage from "./pages/MemberDetailPage.tsx";
 import User from "./entities/database/User.ts";
-import SeminarAdminPage from "./pages/SeminarAdminPage.tsx";
+import AdminPage from "./pages/AdminPage.tsx";
 
 
 function App() {
@@ -65,12 +65,13 @@ function App() {
                             <Route path="/" element={user ? <HomePage/> : <Navigate to="/login"/>}/>
                             <Route path="/seminar-details/:seminarOID"
                                    element={user ? <SeminarDetailsPage/> : <Navigate to="/login"/>}/>
-                            <Route path="/student-details/:seminarOID/:studentOID" element={user ? <StudentDetailPage/> : <Navigate to="/login"/>}/>
+                            <Route path="/seminar-details/:seminarOID/user/:studentOID" element={user ? <MemberDetailPage/> : <Navigate to="/login"/>}/>
                             <Route path="/seminar/:seminarOID" element={user ? <SeminarPage/> : <Navigate to="/login"/>}/>
-                            <Route path="/concept-upload/:seminarOID"
-                                   element={user ? <ConceptUploadPage/> : <Navigate to="/login"/>}/>
+                            {/*<Route path="/concept-upload/:seminarOID"
+                                   element={user ? <ConceptUploadPage/> : <Navigate to="/login"/>}/>*/}
                             <Route path="/paper-overview/:seminarOID" element={user ? <PaperOverviewPage/> : <Navigate to="/login"/>}/>
-                            <Route path="/seminar-administration" element={user?.isAdmin ? <SeminarAdminPage/> : <Navigate to="/"/>}/>
+                            <Route path="/administration" element={user?.isAdmin ? <AdminPage/> : <Navigate to="/"/>}/>
+                            <Route path="*" element={<Navigate to="/" replace/>}/>
                         </Routes>
                     </div>
                 </BrowserRouter>

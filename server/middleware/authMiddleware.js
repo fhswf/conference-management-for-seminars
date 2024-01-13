@@ -5,7 +5,7 @@ const Chatmessage = db.chatmessage;
 const Concept = db.concept;
 const Paper = db.paper;
 
-const {isAccessTokenExpired, refreshAccessToken, introspectToken} = require("../util/TokenUtils");
+const {isAccessTokenExpired, refreshAccessToken, introspectToken} = require("../utils/TokenUtils");
 const {
     userIsMemberOfSeminar,
     userRoleIsCourseAdmin,
@@ -53,8 +53,17 @@ async function isAuthenticated(req, res, next) {
         if (isAccessTokenExpired(req.user.accessToken)) {
             console.log("refreshing token");
             try {
-                newAccessToken = await refreshAccessToken(req.user.refreshToken);
+                //set new tokens
+                const tokens = await refreshAccessToken(req.user.refreshToken);
+                newAccessToken = tokens.access_token;
+
                 req.session.passport.user.accessToken = newAccessToken;
+                if (tokens.refresh_token) {
+                    req.session.passport.user.refreshToken = tokens.refresh_token;
+                }
+                if (tokens.id_token) {
+                    req.session.passport.user.idToken = tokens.id_token;
+                }
             } catch (e) {
                 console.error(e);
                 req.logout(() => {
@@ -65,7 +74,7 @@ async function isAuthenticated(req, res, next) {
 
         // check if token is active
         //const tokenActive = newAccessToken ? await introspectToken(newAccessToken) : await introspectToken(req.user.accessToken);
-        // setted to true, because if the introspectToken failed the user will be logged out
+        // setted to true, because if the introspectToken is commented out
         const tokenActive = true;
 
         if (tokenActive) {
@@ -80,6 +89,7 @@ async function isAuthenticated(req, res, next) {
 
 /**
  * Checks if the user is a student in the seminar.
+ * Needs the seminarOID in the request body or as a parameter.
  * @param req
  * @param res
  * @param next
@@ -107,6 +117,7 @@ async function isStudentInSeminar(req, res, next) {
 
 /**
  * Checks if the user is a supervisor in the seminar.
+ * Needs the seminarOID in the request body or as a parameter.
  * @param req
  * @param res
  * @param next
@@ -154,6 +165,7 @@ async function isCourseAdminInSeminar(req, res, next) {
 
 /**
  * Checks if the user is a course admin or a supervisor in the seminar with the given seminarOID or paperOID.
+ * Needs the seminarOID or paperOID in the request body or as a parameter.
  * @param req
  * @param res
  * @param next
@@ -181,6 +193,7 @@ async function isCourseAdminOrSupervisorInSeminar(req, res, next) {
 
 /**
  * Checks if the user is the author of the concept with the given conceptOID.
+ * Needs the conceptOID in the request body or as a parameter.
  * @param req
  * @param res
  * @param next
@@ -203,6 +216,7 @@ async function isConceptAuthor(req, res, next) {
 
 /**
  * Checks if the user is permitted to access the file with the given attachmentOID.
+ * Needs the attachmentOID as a parameter.
  * @param req
  * @param res
  * @param next
@@ -240,22 +254,11 @@ async function isPermittedToAccessFile(req, res, next) {
     }
 
     return res.status(403).json({msg: "Not authorized"});
-
-
-    //const conc = await conceptHasAttachment(attachmentOID);
-    //const paper = await paperHasAttachment(attachmentOID);
-
-    //if ((!!conc && (await userIsAuthorOfConcept(userOID, conc.conceptOID) || userRoleIsCourseAdmin(userOID, conc.seminarOID) || userRoleIsSupervisor(userOID, conc.seminarOID))) ||
-    //    (!!paper && (await userIsAuthorOfPaper(userOID, paper.paperOID) /*||  user is course admin  || user is Supervisor of paper || user is ReviewerofPaper*/)) ||
-    //    await userIsChatParticipant(userOID, attachmentOID)) {
-    //    return next();
-    //} else {
-    //    return res.status(403).json({msg: "Not authorized"});
-    //}
 }
 
 /**
  * Checks if the user is a member of the seminar with the given seminarOID.
+ * Needs the seminarOID in the request body or as a parameter.
  * @param req
  * @param res
  * @param next
@@ -282,10 +285,13 @@ async function isSystemAdmin(req, res, next) {
     if(await userIsSystemAdmin(userOID)) {
         return next();
     }
+
+    return res.status(403).json({msg: "Not authorized"});
 }
 
 /**
  * Checks if the user is a participant of the chat with the given chatmessageOID or reviewOID.
+ * Needs the chatmessageOID and reviewOID in the request body or as a parameter.
  * @param req
  * @param res
  * @param next

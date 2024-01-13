@@ -38,7 +38,7 @@ const createAttachment = async (file, t) => {
 const getAttachment = async (req, res) => {
     try {
         if(!req.params.attachmentOID){
-            return res.status(404).json({error: 'Not Found'});
+            return res.status(400).json({error: 'Bad Request'});
         }
 
         const paper = await Attachment.findByPk(req.params.attachmentOID);

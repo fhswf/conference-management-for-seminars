@@ -1,0 +1,8 @@
+{
+  "user": {
+    "firstname": "Max",
+    "lastname": "Mustermann",
+    "mail": "mustermann.max@fh-swf.de",
+    "isAdmin": false
+  }
+}

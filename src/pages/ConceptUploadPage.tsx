@@ -8,10 +8,14 @@ import {Button} from "primereact/button";
 import {useNavigate, useParams} from "react-router-dom";
 import User from "../entities/database/User.ts";
 
+interface Props {
+    seminarOID: string;
+    onClose?: () => void;
+}
 
-function ConceptUploadPage() {
+function ConceptUploadPage({seminarOID, onClose}: Props) {
     const navigate = useNavigate();
-    const { seminarOID } = useParams();
+    //const { seminarOID } = useParams();
     const [text, setText] = useState<string>("")
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [availableSupervisor, setAvailableSupervisor] = useState<User[]>([])
@@ -43,7 +47,7 @@ function ConceptUploadPage() {
         const oid = selectedSupervisor?.userOID;
 
         oid && formData.append('supervisorOID', oid.toString());
-        seminarOID && formData.append('seminarOID', seminarOID.toString()); //TODO change
+        seminarOID && formData.append('seminarOID', seminarOID.toString());
 
         console.log(text);
         console.log(selectedFile);
@@ -57,16 +61,18 @@ function ConceptUploadPage() {
                 body: formData,
             },);
 
-            //TODO res not working
-            console.log("=>" + res.status);
-
             if (res.ok) {
                 alert('Concept uploaded successfully.');
-                setText("");
-                navigate(`/seminar/${seminarOID}`);
-                setSelectedFile(null);
-                setSelectedSupervisor(undefined);
-            } else {
+
+                //setText("");
+                //navigate(`/seminar/${seminarOID}`);
+                //setSelectedFile(null);
+                //setSelectedSupervisor(undefined);
+
+                onClose && onClose();
+            } else if(res.status === 415) {
+                alert("Bitte nur PDF-Dateien hochladen.")
+            }else{
                 alert('Error uploading concept. Please try again.');
             }
         } catch (error) {
@@ -79,7 +85,7 @@ function ConceptUploadPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/user/get-supervisor-list/${seminarOID}`,{
+                const result = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}/supervisor-list/`,{
                     method: 'GET',
                     credentials: 'include'
                 });
@@ -87,7 +93,11 @@ function ConceptUploadPage() {
                 const availableSupervisor: any = [];
                 const data = await result.json();
                 data.map((supervisor: any) => {
-                    availableSupervisor.push({name: supervisor.lastName+", "+ supervisor.firstName, userOID: supervisor.userOID});
+                    if (supervisor.lastname && supervisor.firstname){
+                        availableSupervisor.push({name: supervisor.lastname+", "+ supervisor.firstname, userOID: supervisor.userOID});
+                    }else{
+                        availableSupervisor.push({name: supervisor.mail, userOID: supervisor.userOID});
+                    }
                 } )
                 setAvailableSupervisor(availableSupervisor);
                 console.log(availableSupervisor);
@@ -100,41 +110,39 @@ function ConceptUploadPage() {
 
     return (
         <div>
-            <MainLayout>
-                <p>ConceptUploadPage</p>
+            <h1>Konzept Upload</h1>
 
-                <form onSubmit={onSubmit}>
-                    <div>
-                        <div className={styles.container}>
-                            <p>Text</p>
-                            <InputTextarea value={text} onChange={(e) => setText(e.target.value)}/>
+            <form onSubmit={onSubmit}>
+                <div>
+                    <div className={styles.container}>
+                        <p>Text</p>
+                        <InputTextarea value={text} onChange={(e) => setText(e.target.value)}/>
+                    </div>
+                    <div className={styles.container}>
+                        <p>Anhang (PDF)</p>
+                        <div className="card">
+                            <FileUpload customUpload
+                                        uploadHandler={() => {}}
+                                        onSelect={(event: FileUploadSelectEvent)=>setSelectedFile(event.files[0])}
+                                        onClear={()=>setSelectedFile(null)}
+                                        onRemove={()=>setSelectedFile(null)}
+                                        accept="application/pdf"
+                                        maxFileSize={16000000}
+                                        emptyTemplate={<p>Drag and drop files to here to upload.</p>} />
                         </div>
-                        <div className={styles.container}>
-                            <p>Anhang (PDF)</p>
-                            <div className="card">
-                                <FileUpload customUpload
-                                            uploadHandler={() => {}}
-                                            onSelect={(event: FileUploadSelectEvent)=>setSelectedFile(event.files[0])}
-                                            onClear={()=>setSelectedFile(null)}
-                                            onRemove={()=>setSelectedFile(null)}
-                                            accept="application/pdf"
-                                            maxFileSize={16000000}
-                                            emptyTemplate={<p>Drag and drop files to here to upload.</p>} />
-                            </div>
-                            {/* <Button type="button" onClick={()=>console.log(selectedFile[0])} label="show" /> */}
-                        </div>
-                        <div className={styles.container}>
-                            <p>Betreuer</p>
-                            <Dropdown id="seminar" value={selectedSupervisor} onChange={(e) => setSelectedSupervisor(e.value)}
-                                      showClear options={availableSupervisor} placeholder="Betreuer wählen..." optionLabel="name"/><br/>
+                        {/* <Button type="button" onClick={()=>console.log(selectedFile[0])} label="show" /> */}
+                    </div>
+                    <div className={styles.container}>
+                        <p>Betreuer</p>
+                        <Dropdown id="seminar" value={selectedSupervisor} onChange={(e) => setSelectedSupervisor(e.value)}
+                                  showClear options={availableSupervisor} placeholder="Betreuer wählen..." optionLabel="name"/><br/>
 
-                        </div>
                     </div>
-                    <div className={styles.buttonContainer}>
-                        <Button type="submit" label="Speichern" />
-                    </div>
-                </form>
-            </MainLayout>
+                </div>
+                <div className={styles.buttonContainer}>
+                    <Button type="submit" label="Speichern" />
+                </div>
+            </form>
         </div>
     );
 }

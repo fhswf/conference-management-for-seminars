@@ -37,12 +37,7 @@ Second one is in the server folder:
   CLIENT_ID=""
   CLIENT_SECRET=""
   ISSUER=""
-  AUTHORIZATION_URL=""
-  TOKEN_URL=""
-  USERINFO_URL=""
   CALLBACK_URL=""
-  INTROSPECT_URL=""
-  ENDSESSION_ENDPOINT=""  
 
   MAIL_USERNAME=""
   MAIL_PASSWORD=""
@@ -63,17 +58,12 @@ If you build this project with docker you should pass following .env which conta
   VITE_BACKEND_PROTOCOL="https"
   
   #Backend
-  EXPRESS_IP="v220231079563241857.nicesrv.de/conference/api"
+  EXPRESS_IP="jupiter.fh-swf.de/conference/api"
   FRONTEND_URL="jupiter.fh-swf.de/conference/"
   FRONTEND_PROTOCOL="https"
   FRONTEND_PORT=11001
   EXPRESS_PORT_HTTP=11000
   COOKIE_SECRET=""
-  
-  DB_TYPE="mariadb"
-  DB_HOST="dbserver"
-  DB_USER="root"
-  DB_PORT=3306
   
   CONSUMER_KEY=""
   CONSUMER_SECRET=""
@@ -81,14 +71,8 @@ If you build this project with docker you should pass following .env which conta
   #OIDC Server
   CLIENT_ID=""
   CLIENT_SECRET=""
-  
   ISSUER=""
-  AUTHORIZATION_URL=""
-  TOKEN_URL=""
-  USERINFO_URL=""
   CALLBACK_URL=""
-  INTROSPECT_URL=""
-  ENDSESSION_ENDPOINT=""
   
   #Mail
   MAIL_USERNAME=""
@@ -106,16 +90,16 @@ If you are developing a production application, we recommend updating the config
 
 ```js
    parserOptions: {
-    ecmaVersion: 'latest',
-        sourceType
+  ecmaVersion: 'latest',
+          sourceType
 :
-    'module',
-        project
+  'module',
+          project
 :
-    ['./tsconfig.json', './tsconfig.node.json'],
-        tsconfigRootDir
+  ['./tsconfig.json', './tsconfig.node.json'],
+          tsconfigRootDir
 :
-    __dirname,
+  __dirname,
 }
 ,
 ```

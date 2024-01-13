@@ -8,19 +8,23 @@ const {
     isCourseAdminOrSupervisorInSeminar
 } = require('../middleware/authMiddleware');
 
-router.get('/get-seminar/:seminarOID', isMemberOfSeminar, seminarController.getSeminar);
-router.get('/get-seminars', isSystemAdmin, seminarController.getSeminars);
-router.post('/go-to-next-phase/:seminarOID', isCourseAdminInSeminar, seminarController.gotoNextPhase);
+
+router.get('/all', isSystemAdmin, seminarController.getSeminars);
+router.get('/:seminarOID', isMemberOfSeminar, seminarController.getSeminar);
+router.post('/:seminarOID/go-to-next-phase/', isCourseAdminInSeminar, seminarController.gotoNextPhase);
 
 
 router.post('/update-user', isCourseAdminOrSupervisorInSeminar, seminarController.updateUserInSeminar);
 
-router.get('/get-students-list/:seminarOID', isCourseAdminOrSupervisorInSeminar, seminarController.getUserList);
+router.get('/:seminarOID/participants', isCourseAdminOrSupervisorInSeminar, seminarController.getUserList);
 router.post('/evaluate-concept', isCourseAdminInSeminar, seminarController.evaluateConcept);
-router.post('/seminar', isSystemAdmin, seminarController.createSeminar);
-router.get('/get-assigned-seminars', seminarController.getAssignedSeminars);
+router.post('/', isSystemAdmin, seminarController.createSeminar);
+
 router.get('/get-student/:seminarOID/:userOID', isCourseAdminOrSupervisorInSeminar, seminarController.getStudent);
 router.post('/enter-seminar/:assignmentkey', seminarController.enterSeminar);
+router.get('/:seminarOID/supervisor-list', isMemberOfSeminar, seminarController.getSupervisorList);
+
+router.get('/:seminarOID/addable-users/', isSystemAdmin, seminarController.getAddableUsers);
 
 
 module.exports = router;
