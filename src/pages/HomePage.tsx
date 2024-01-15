@@ -77,8 +77,8 @@ function HomePage() {
 
         if(result.ok) {
             const data = await result.json();
-            console.log(data);
-            navigate(`/seminar/${data}`);
+            console.log(data.seminarOID);
+            navigate(`/seminar/${data.seminarOID}`);
         } else if (result.status === 404){
             alert("Seminar nicht gefunden");
         } else if(result.status === 400) {
@@ -100,15 +100,6 @@ function HomePage() {
                         <Table header={header} data={tableData}/>
                     </div>
                 </div>
-                <Button onClick={async () => {
-                    const result = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/authstatus`, {
-                        method: "GET",
-                        credentials: 'include',
-                    });
-                    const data = await result.json();
-                    console.log(data);
-                }}>Check Auth</Button>
-
             </MainLayout>
         </>
     );
@@ -116,3 +107,11 @@ function HomePage() {
 }
 
 export default HomePage;
+
+/*
+const {data, loading, error} = useFetch<AssignedSeminar[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/authstatus`);
+
+if(loading){ return <p>Is loading</p> }
+if(error ){ return <p>Is error</p> }
+return( <p>{data && data[0].description || "Keine Daten vorhanden"}</p> );}
+*/

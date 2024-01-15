@@ -13,8 +13,6 @@ function MainLayout({children}: Props) {
     const navigate = useNavigate();
     const {user, setUser} = useContext(AuthContext);
 
-    //console.log(user)
-
     const items = [
         {
             label: 'Startseite', icon: 'pi pi-fw pi-home', command: () => {
@@ -22,24 +20,28 @@ function MainLayout({children}: Props) {
             }
         },
         user?.isAdmin && {
-            label: 'Seminarverwaltung',
+            label: 'Administration',
             icon: 'pi pi-fw pi-cog',
             command: () => {
-                navigate("/seminar-administration")
+                navigate("/administration")
             }
         }
-    ].filter(Boolean) as MenuItem[]
+    ].filter(Boolean) as MenuItem[];
 
-    const start = <img alt="logo" src="https://www.fh-swf.de/media/_tech__fhswf/layout__fhswf/images__fhswf/Logo.png"
-                       height="40" className="mr-2"></img>;
+    const start = <img
+        alt="logo"
+        src="https://www.fh-swf.de/media/_tech__fhswf/layout__fhswf/images__fhswf/Logo.png"
+        height="40"
+        className="mr-2"
+        data-test="main-layout-logo"
+    ></img>;
 
     const itemsSplit = [
-        {label: `${user?.firstName} ${user?.lastName}`},
+        (user?.firstname || user?.lastname) && {label: `${user?.firstname || ""} ${user?.lastname || ""}`},
         {label: `${user?.mail}`},
         user?.isAdmin && {label: `System-Admin`},
     ].filter(Boolean) as MenuItem[];
 
-    // TODO move to service class
     const logout = () => {
         const leave = window.confirm("Wollen Sie sich wirklich abmelden?");
         if (leave) {
@@ -59,12 +61,24 @@ function MainLayout({children}: Props) {
         }
     };
 
-    const end = <SplitButton text onClick={logout} label="Logout" icon="pi pi-fw pi-sign-out" model={itemsSplit}
-                             className="p-button-secondary"></SplitButton>;
+    const end = <SplitButton
+        text
+        onClick={logout}
+        label="Logout"
+        icon="pi pi-fw pi-sign-out"
+        model={itemsSplit}
+        className="p-button-secondary"
+        data-test="main-layout-logout"
+    ></SplitButton>;
 
     return (
-        <div>
-            <Menubar model={items} start={start} end={end}/>
+        <div data-test="main-layout">
+            <Menubar
+                model={items}
+                start={start}
+                end={end}
+                data-test="main-layout-menubar"
+            />
             <div>{children}</div>
         </div>
     );

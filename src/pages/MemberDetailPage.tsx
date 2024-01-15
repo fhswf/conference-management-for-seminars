@@ -27,7 +27,7 @@ type PaperType = Paper & {
 };
 
 
-function StudentDetailPage() {
+function MemberDetailPage() {
     const {seminarOID, studentOID} = useParams();
     const {data} = useFetch<UserType>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/get-student/${seminarOID}/${studentOID}`);
     const [reviewer, setReviewer] = useState<User[]>([]);
@@ -73,7 +73,7 @@ function StudentDetailPage() {
             text: concept.text,
             pdf: concept.attachmentO ?
                 <a href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${concept.attachmentO?.attachmentOID}`}>{concept.attachmentO?.filename}</a> : "-",
-            supervisor: concept.userOIDSupervisor_user ? `${concept.userOIDSupervisor_user.firstName} ${concept.userOIDSupervisor_user.lastName}` : '-',
+            supervisor: concept.userOIDSupervisor_user ? `${concept.userOIDSupervisor_user.firstname} ${concept.userOIDSupervisor_user.lastname}` : '-',
             feedback: concept.feedback || '-',
             status: mapConceptStatusToString(concept.accepted),
             createdAt: concept.createdAt ? new Date(concept.createdAt).toLocaleString() : '-',
@@ -85,9 +85,10 @@ function StudentDetailPage() {
             <div>
                 {/*<pre>{JSON.stringify(data, null, 2)}</pre>*/}
                 {/*<pre>{JSON.stringify(reviewer, null, 2)}</pre>*/}
-                <h1>Student Detail Page</h1>
-                <p>Seminar: ... {seminarOID}</p>
-                <p>Student: {data?.firstName} {data?.lastName}</p>
+                <h1>Teilnehmer Details</h1>
+                <p>Seminar-ID: {seminarOID}</p>
+                {/* TODO Mail anzeigen bei leeren Namen*/}
+                <p>Student: {data?.firstname} {data?.lastname}</p>
                 <h2>Eingereichte Konzepte</h2>
                 <Table header={header} data={tableData}/>
                 <h2>Hochgeladene Paper</h2>
@@ -98,11 +99,11 @@ function StudentDetailPage() {
                     {data?.papers && data?.papers.length > 0 && data?.papers.map((paper: PaperType, index: number) => {
                         return (
                             <Fragment key={index}>
-                                <a href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.paperOID}`}>{paper.attachmentO.filename}</a>
+                                <a href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
                                 <p>{paper.createdAt ? new Date(paper.createdAt).toLocaleString() : '-'}</p>
                                 {data.roleassignments.length > 0 ? (
                                     paper.paperOID === data.roleassignments[0].phase3paperOID ? (
-                                        <p>Phase 4</p>
+                                        <p>Phase 3</p>
                                     ) : paper.paperOID === data.roleassignments[0].phase7paperOID ? (
                                         <p>Phase 7</p>
                                     ) : (
@@ -120,7 +121,7 @@ function StudentDetailPage() {
                     <ul>
                         {reviewer?.map((reviewer) => {
                             return (
-                                <li key={reviewer.userOID}>{reviewer.firstName} {reviewer.lastName}</li>
+                                <li key={reviewer.userOID}>{reviewer.firstname} {reviewer.lastname}</li>
                             );
                         })}
                     </ul>
@@ -130,4 +131,4 @@ function StudentDetailPage() {
     )
 }
 
-export default StudentDetailPage;
+export default MemberDetailPage;

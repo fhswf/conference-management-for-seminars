@@ -1,3 +1,3 @@
-describe('SeminarAdminPage', () => {
+describe('AdminPage', () => {
 
 });

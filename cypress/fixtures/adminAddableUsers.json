@@ -1,0 +1,56 @@
+[
+  {
+    "userOID": 5,
+    "firstname": "Max",
+    "lastname": null,
+    "mail": "wagner.max@fh-swf.de"
+  },
+  {
+    "userOID": 6,
+    "firstname": null,
+    "lastname": "Wagner",
+    "mail": "wagner.max@fh-swf.de"
+  },
+  {
+    "userOID": 7,
+    "firstname": null,
+    "lastname": null,
+    "mail": "wagner.max@fh-swf.de"
+  },
+  {
+    "userOID": 8,
+    "firstname": "Laura",
+    "lastname": "Bauer",
+    "mail": "bauer.laura@fh-swf.de"
+  },
+  {
+    "userOID": 10,
+    "firstname": "Elena",
+    "lastname": "Müller",
+    "mail": "mueller.elena@fh-swf.de"
+  },
+  {
+    "userOID": 15,
+    "firstname": "Thomas",
+    "lastname": "Schulz",
+    "mail": "schulz.thomas@fh-swf.de"
+  },
+  {
+    "userOID": 20,
+    "firstname": "Lisa",
+    "lastname": "Koch",
+    "mail": "koch.lisa@fh-swf.de"
+  },
+  {
+    "userOID": 25,
+    "firstname": "Felix",
+    "lastname": "Becker",
+    "mail": "becker.felix@fh-swf.de"
+  },
+  {
+    "userOID": 30,
+    "firstname": "Anna",
+    "lastname": "Schmidt",
+    "mail": "schmidt.anna@fh-swf.de"
+  }
+]

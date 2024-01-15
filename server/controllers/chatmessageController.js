@@ -1,5 +1,5 @@
 const db = require("../models");
-const {isValidPdf} = require("../util/PdfUtils");
+const {isValidPdf} = require("../utils/PdfUtils");
 
 const Op = db.Sequelize.Op;
 const Review = db.review;

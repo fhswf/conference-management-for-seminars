@@ -24,8 +24,8 @@ async function addOrUpdateUser(lti, t) {
     if (!ltiUser) {
         // Create a new User
         const user = await User.create({
-            firstName: lti.lis_person_name_given,
-            lastName: lti.lis_person_name_family,
+            firstname: lti.lis_person_name_given,
+            lastname: lti.lis_person_name_family,
             mail: lti.lis_person_contact_email_primary,
             isAdmin: false,
         }, {transaction: t});
@@ -43,8 +43,8 @@ async function addOrUpdateUser(lti, t) {
             userOID: ltiUser.userOID
         },
         defaults: {
-            firstName: lti.lis_person_name_given,
-            lastName: lti.lis_person_name_family,
+            firstname: lti.lis_person_name_given,
+            lastname: lti.lis_person_name_family,
             mail: lti.lis_person_contact_email_primary,
             isAdmin: false,
         }, transaction: t
@@ -52,8 +52,8 @@ async function addOrUpdateUser(lti, t) {
 
     if (!created) {
         // update user
-        user.firstName = lti.lis_person_name_given || null;
-        user.lastName = lti.lis_person_name_family || null;
+        user.firstname = lti.lis_person_name_given || null;
+        user.lastname = lti.lis_person_name_family || null;
         user.mail = lti.lis_person_contact_email_primary;
         await user.save({transaction: t});
     }
@@ -220,8 +220,8 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
         if (!cred) {
             // Create a new User
             const user = await User.create({
-                firstName: profile.name?.givenName,
-                lastName: profile.name?.familyName,
+                firstname: profile.name?.givenName,
+                lastname: profile.name?.familyName,
                 mail: profile.emails && profile.emails[0]?.value,
                 isAdmin: false,
             }, {transaction: t});
@@ -240,8 +240,8 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
                 userOID: cred.userOID
             },
             defaults: {
-                firstName: profile.name?.givenName,
-                lastName: profile.name?.familyName,
+                firstname: profile.name?.givenName,
+                lastname: profile.name?.familyName,
                 mail: profile.emails && profile.emails[0]?.value,
                 isAdmin: false,
             }, transaction: t
@@ -249,8 +249,8 @@ async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken
 
         if (!created) {
             // update user
-            user.firstName = profile.name?.givenName;
-            user.lastName = profile.name?.familyName;
+            user.firstname = profile.name?.givenName;
+            user.lastname = profile.name?.familyName;
             user.mail = profile.emails && profile.emails[0]?.value;
             await user.save({transaction: t});
         }
@@ -314,8 +314,8 @@ passport.deserializeUser((serializedUser, done) => {
 
                 userJson.mail = user.mail;
                 userJson.isAdmin = user.isAdmin;
-                userJson.firstName = user.firstName;
-                userJson.lastName = user.lastName;
+                userJson.firstname = user.firstname;
+                userJson.lastname = user.lastname;
                 done(null, userJson);
             } else {
                 done(null, false);

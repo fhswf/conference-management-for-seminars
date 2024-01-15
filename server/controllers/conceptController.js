@@ -1,8 +1,8 @@
-const {sendMailConceptUploaded} = require("../util/mailer");
+const {sendMailConceptUploaded} = require("../utils/mailer");
 const db = require("../models");
 const attachmentController = require("./attachmentController");
 const path = require("path");
-const {isValidPdf} = require("../util/PdfUtils");
+const {isValidPdf} = require("../utils/PdfUtils");
 //const {getUserWithOID, getCourseAdminUserInSeminar} = require("./userController");
 //const {getSeminarWithOID} = require("./seminarController");
 

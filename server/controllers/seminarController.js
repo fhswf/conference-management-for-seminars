@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const db = require("../models");
 const {setPhase3PaperOID} = require("./roleassignmentController");
 const {assignReviewer} = require("./reviewController");
-const {sendMailPhaseChanged, sendMailConceptEvaluated} = require("../util/mailer");
+const {sendMailPhaseChanged, sendMailConceptEvaluated} = require("../utils/mailer");
 //const {getUser, getUserWithConceptOID} = require("./userController");
 
 const Op = db.Sequelize.Op;
@@ -102,10 +102,14 @@ const gotoNextPhase = async (req, res) => {
             currentPhase.phase++;
         }
 
-        const seminar = await Seminar.update({phase: currentPhase.phase + 1}, {where: {seminaroid: seminarOID}, transaction: t});
+        //throw new Error("Test");
+
+        //const seminar = await Seminar.update({phase: currentPhase.phase + 1}, {where: {seminaroid: seminarOID}, transaction: t});
+        const [updatedRows] = await Seminar.update({phase: currentPhase.phase + 1}, {where: {seminaroid: seminarOID}, transaction: t});
 
         // TODO affectedRows prüfen
-        if (seminar[0] === 1) {
+        //if (seminar[0] === 1) {
+        if (updatedRows === 1) {
             // TODO handle phase change
 
             const users = await User.findAll({
@@ -117,13 +121,13 @@ const gotoNextPhase = async (req, res) => {
                     },
                 }],
             });
-
+            await t.commit();
             const updatedSeminar = await Seminar.findByPk(seminarOID);
 
             sendMailPhaseChanged(users, updatedSeminar)
 
 
-            await t.commit();
+
             return res.status(200).send({message: "Phase successfully changed."});
         } else {
             await t.rollback();
@@ -157,7 +161,7 @@ const getAddableUsers = async (req, res) => {
                 attributes: [],
                 required: true
             }],
-            attributes: ["userOID", "firstName", "lastName", "mail"],
+            attributes: ["userOID", "firstname", "lastname", "mail"],
         });
         res.status(200).json(users);
     } catch (error) {
@@ -194,7 +198,7 @@ const getUserList = async (req, res) => {
                             include: [{
                                 model: User,
                                 as: "userOIDSupervisor_user",
-                                attributes: ["userOID", "firstName", "lastName", "mail"],
+                                attributes: ["userOID", "firstname", "lastname", "mail"],
 
                             },
                                 {
@@ -298,7 +302,8 @@ const evaluateConcept = async (req, res) => {
             return res.status(400).send({message: "Missing required parameters."});
         }
 
-        const concept = await Concept.update(
+        //const concept = await Concept.update(
+        const [updatedRows] = await Concept.update(
             {
                 accepted: accepted,
                 feedback: feedback,
@@ -306,7 +311,8 @@ const evaluateConcept = async (req, res) => {
             },
             {where: {conceptOID: conceptOID}}
         );
-        if (concept[0] === 1) {
+        //if (concept[0] === 1) {
+        if (updatedRows === 1) {
             const conc = await getConceptInformation(conceptOID);
 
             sendMailConceptEvaluated(conc)
@@ -342,12 +348,12 @@ async function getConceptInformation(conceptOID) {
             {
                 model: User,
                 as: 'userOIDSupervisor_user',
-                attributes: ["userOID", "firstName", "lastName"]
+                attributes: ["userOID", "firstname", "lastname"]
             },
             {
                 model: User,
                 as: 'userOIDStudent_user',
-                attributes: ["userOID", "firstName", "lastName", "mail"]
+                attributes: ["userOID", "firstname", "lastname", "mail"]
             },
             {
                 model: Seminar,
@@ -368,6 +374,16 @@ async function getConceptInformation(conceptOID) {
  */
 const createSeminar = async (req, res) => {
     try {
+        const name = req.body.name;
+
+        if (!name) {
+            return res.status(400).send({message: "Name is missing."});
+        }
+
+        if (name.length > 32) {
+            return res.status(400).send({message: "Name is too long."});
+        }
+
         let existingSeminar = null;
         let key = null;
         do {
@@ -420,7 +436,7 @@ const getStudent = async (req, res) => {
                 include: [{
                     model: User,
                     as: "userOIDSupervisor_user",
-                    attributes: ["userOID", "firstName", "lastName", "mail"],
+                    attributes: ["userOID", "firstname", "lastname", "mail"],
 
                 },
                     {
@@ -508,7 +524,7 @@ const enterSeminar = async (req, res) => {
         }
 
         if (roleassignment) {
-            res.status(200).json(roleassignment.seminarOID);
+            res.status(200).json({seminarOID: roleassignment.seminarOID});
         } else {
             res.status(500).json({error: 'Internal Server Error'});
         }
@@ -541,7 +557,7 @@ const getSupervisorList = async (req, res) => {
                 },
                 attributes: [],
             }],
-            attributes: ["userOID", "firstName", "lastName"],
+            attributes: ["userOID", "firstname", "lastname", "mail"],
         });
         res.status(200).json(supervisors);
     } catch (error) {
@@ -550,9 +566,11 @@ const getSupervisorList = async (req, res) => {
     }
 }
 
+/*
 async function getSeminarWithOID(seminarOID) {
     return await Seminar.findByPk(seminarOID);
 }
+ */
 
 module.exports = {
     gotoNextPhase,
@@ -565,6 +583,6 @@ module.exports = {
     createSeminar,
     getStudent,
     enterSeminar,
-    getSeminarWithOID,
+    //getSeminarWithOID,
     getSupervisorList
 }

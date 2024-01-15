@@ -91,7 +91,7 @@ function ChatWindowPage({paper, reviewOID}: Props) {
         const jsondata: { createdMessage: Message, createdAttachment: Attachment | null } = await response.json()
 
         if (response.status === 415) {
-            alert("Nur PDF Dateien sind erlaubt!")
+            alert("Bitte nur PDF-Dateien hochladen.")
             return
         }
 
@@ -107,12 +107,13 @@ function ChatWindowPage({paper, reviewOID}: Props) {
     return (
         <div className={styles.container}>
             {/*JSON.stringify(paper)*/}
-            {/*JSON.stringify(reviewOIDs)*/}
-            {/*JSON.stringify(reviewOIDs)*/}
+            {/*<pre>{JSON.stringify(reviewOIDs, null, 2)}</pre>*/}
             {reviewOIDs && (
                 <div className={styles.buttonContainer}>
                     {reviewOIDs.map((review, index) => {
-                        const buttonText = index === 0 ? 'Review A' : index === 1 ? 'Review B' : index === 2 ? 'Betreuer' : '';
+                        {/* Aktuell erfolgt die Zuordnung anhand der Sortierung der Review-IDs eines Papers. Hierbei wird ausgegangend, dass die Betreuer die dritte ID ist,
+                        was durch die Reihengolge der Review-Zuordnung der Fall wäre*/}
+                        const buttonText = index === 0 ? 'Reviewer A' : index === 1 ? 'Reviewer B' : index === 2 ? 'Betreuer' : '';
                         return (
                             <Button key={review.reviewOID}
                                     onClick={() => setSelectedReview(review.reviewOID || undefined)}>
@@ -123,7 +124,6 @@ function ChatWindowPage({paper, reviewOID}: Props) {
                 </div>
             )}
             <div className={styles.conversation}>
-
                 {chatmessages?.map((message, index) => {
                     if (message.sender === user?.userOID) {
                         return <div key={index} className={styles.messageRight}>
@@ -138,7 +138,7 @@ function ChatWindowPage({paper, reviewOID}: Props) {
             </div>
             <div className={styles.textfieldAndButton}>
                 <InputTextarea value={text} onChange={(e) => setText(e.target.value)}/>
-                <CustomFileUpload onSelectionChanged={(file) => setSelectedFile(file || undefined)}/>
+                <CustomFileUpload accept="application/pdf" onSelectionChanged={(file) => setSelectedFile(file || undefined)}/>
                 <Button onClick={onSendClicked} label="➡" disabled={!text && !selectedFile}/>
             </div>
         </div>

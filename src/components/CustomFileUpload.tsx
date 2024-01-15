@@ -4,9 +4,10 @@ import {Button} from "primereact/button";
 
 interface Props {
     onSelectionChanged: (file: File | null) => void;
+    accept?: string;
 }
 
-function CustomFileUpload({onSelectionChanged}: Props) {
+function CustomFileUpload({onSelectionChanged, accept}: Props) {
     const fileUploadRef = useRef<FileUpload | null>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -19,6 +20,7 @@ function CustomFileUpload({onSelectionChanged}: Props) {
     return (
         <>
             <FileUpload
+                accept={accept}
                 ref={fileUploadRef}
                 mode="basic"
                 customUpload

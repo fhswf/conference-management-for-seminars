@@ -1,10 +1,10 @@
 const db = require("../models");
 const attachmentController = require("./attachmentController");
 const pdf = require('pdf-parse');
-const {isValidPdf, replaceInFilename} = require("../util/PdfUtils");
+const {isValidPdf, replaceInFilename} = require("../utils/PdfUtils");
 const {setPhase7PaperOID, setPhase3PaperOID} = require("./roleassignmentController");
 //const {getCAdminsAndSupervisors, getUserWithOID} = require("./userController");
-const {sendMailPaperUploaded} = require("../util/mailer");
+const {sendMailPaperUploaded} = require("../utils/mailer");
 //const {getSeminarWithOID} = require("./seminarController");
 
 const Op = db.Sequelize.Op;
@@ -23,7 +23,6 @@ const RoleAssignment = db.roleassignment;
  * Sends an email notification to admin and supervisor.
  * @param req
  * @param res
- * @throws {Error} if the user has already uploaded a paper in phase 7
  * @returns {Promise<*>}
  */
 async function uploadPaper(req, res) {
@@ -44,10 +43,15 @@ async function uploadPaper(req, res) {
         }
         const currentPhase = await Seminar.findByPk(seminarOID, {attributes: ["phase"]});
 
-        const student = await User.findByPk(userOID, {attributes: ["firstName", "lastName"]});
+        const student = await User.findByPk(userOID, {attributes: ["firstname", "lastname"]});
 
-        // TODO testen
-        file.name = replaceInFilename(file.name, [student.firstName, student.lastName]);
+        if(currentPhase.phase !== 3 && currentPhase.phase !== 7){
+            return res.status(400).json({error: 'Current phase is not 3 or 7'});
+        }
+
+        if (currentPhase.phase === 3) {
+            file.name = replaceInFilename(file.name, [student.firstname, student.lastname]);
+        }
 
         let attachment = await attachmentController.createAttachment(file, t)
 
@@ -60,10 +64,10 @@ async function uploadPaper(req, res) {
         if(currentPhase.phase === 7){
             // TODO
             if(!await setPhase7PaperOID(t, paper.paperOID, userOID, seminarOID)){
-                return res.status(409).json({error: 'Bad Request'});
+                await t.rollback();
+                return res.status(409).json({error: 'Already uploaded a paper'});
             }
         }else if(currentPhase.phase === 3){
-            // TODO delete
             //if(!await setPhase3PaperOID(t, paper.paperOID, userOID, seminarOID)){
             //    return res.status(409).json({error: 'Bad Request'});
             //}
@@ -77,8 +81,6 @@ async function uploadPaper(req, res) {
 
         await t.commit();
 
-
-        //const users = await getCAdminsAndSupervisors(seminarOID);
         const users = await User.findAll({
             include: [{
                 model: RoleAssignment,

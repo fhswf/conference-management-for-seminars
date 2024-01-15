@@ -58,6 +58,10 @@ function PaperOverviewPage() {
                     seminar.roleassignments[0].phase7paperOID = data.paperOID;
                 }
 
+            } else if (res.status === 415) {
+                alert("Bitte nur PDF-Dateien hochladen.")
+            } if(res.status === 409){
+                alert("Sie haben bereits ein Paper zur Bewertung eingereicht")
             } else {
                 alert('Error uploading paper. Please try again.');
             }
@@ -75,7 +79,7 @@ function PaperOverviewPage() {
                 <p>Ihre eingereichten Paper:</p>
                 <div className={styles.container}>
                     <p>Datei:</p>
-                    <p>Anonym</p>
+                    <p>Eingereicht:</p>
                     <p></p>
                     {uploadedPaper && uploadedPaper.length > 0 ? (
                         uploadedPaper.map((paper: PaperType, index: number) => (
@@ -84,13 +88,13 @@ function PaperOverviewPage() {
                                 {seminar && seminar.phase && seminar.roleassignments.length > 0 ? (
                                     paper.paperOID === seminar.roleassignments[0].phase3paperOID ? (
                                         <>
-                                            <p>Phase 4</p>
+                                            <p>Phase 3</p>
                                             <Button onClick={() => setShowChat(paper)} disabled={seminar.phase < 6}>Kommentare</Button>
                                         </>
                                     ) : paper.paperOID === seminar.roleassignments[0].phase7paperOID ? (
                                         <>
                                             <p>Phase 7</p>
-                                            <Button onClick={() => setShowChat(paper)}>Kommentare</Button>
+                                            <p></p>
                                         </>
                                     ) : (
                                         <>

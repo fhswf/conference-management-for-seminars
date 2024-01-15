@@ -6,9 +6,9 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const fs = require('fs');
-var path = require('path')
-var bodyParser = require('body-parser');
-var morgan = require('morgan')
+const path = require('path')
+const bodyParser = require('body-parser');
+const morgan = require('morgan')
 
 const fileUpload = require('express-fileupload');
 
@@ -19,7 +19,7 @@ app.set('trust proxy', true);
 const {isAuthenticated} = require("./middleware/authMiddleware");
 
 app.use(cors({
-    origin: `${process.env.FRONTEND_PROTOCOL}://${process.env.FRONTEND_URL}`,
+    origin: `${process.env.FRONTEND_PROTOCOL}://${process.env.FRONTEND_IP}`,
     credentials: true
 }));
 
@@ -31,7 +31,7 @@ app.use(fileUpload());
 
 // ------------------------------ session setup ------------------------------
 
-var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
 app.use(morgan('combined', { stream: accessLogStream }))
 app.use(morgan('dev'))
 
@@ -56,7 +56,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+        maxAge: 1000 * 60 * 60 * 24 * 3, // 3 days
         httpOnly: true, //default true
         //TODO
         //secure: false,
@@ -120,7 +120,7 @@ app.post('/conference/api/lti/launch', passport.authenticate('lti', {
 
 app.get('/conference/api/login', passport.authenticate('openidconnect'));
 
-app.get('/conference/api/login/callback', passport.authenticate('openidconnect', {failureRedirect: `${process.env.FRONTEND_PROTOCOL}://${process.env.FRONTEND_URL}`}), function (req, res) {
+app.get('/conference/api/login/callback', passport.authenticate('openidconnect', {failureRedirect: `${process.env.FRONTEND_PROTOCOL}://${process.env.FRONTEND_IP}`}), function (req, res) {
         res.redirect('/conference/api/success');
     }
 );
@@ -128,7 +128,7 @@ app.get('/conference/api/login/callback', passport.authenticate('openidconnect',
 app.get('/conference/api/success', function (req, res) {
     //console.log(req.user);
     //console.log(req.session);
-    res.redirect(`${process.env.FRONTEND_PROTOCOL}://${process.env.FRONTEND_URL}`);
+    res.redirect(`${process.env.FRONTEND_PROTOCOL}://${process.env.FRONTEND_IP}`);
 });
 
 app.get('/conference/api/error-lti', function (req, res) {
@@ -147,8 +147,8 @@ app.get('/conference/api/authstatus', (req, res) => {
     if (req.isAuthenticated()) {
         return res.status(200).json({
             user: {
-                firstName: req.user.firstName,
-                lastName: req.user.lastName,
+                firstname: req.user.firstname,
+                lastname: req.user.lastname,
                 mail: req.user.mail,
                 isAdmin: req.user.isAdmin,
                 userOID: req.user.userOID,

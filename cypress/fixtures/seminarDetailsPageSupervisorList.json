@@ -1,27 +1,27 @@
 [
   {
     "userOID": 1,
-    "firstName": "Max1",
-    "lastName": "Mustermann1"
+    "firstname": "Max1",
+    "lastname": "Mustermann1"
   },
   {
     "userOID": 2,
-    "firstName": "Max2",
-    "lastName": "Mustermann2"
+    "firstname": "Max2",
+    "lastname": "Mustermann2"
   },
   {
     "userOID": 3,
-    "firstName": "Max3",
-    "lastName": "Mustermann3"
+    "firstname": "Max3",
+    "lastname": "Mustermann3"
   },
   {
     "userOID": 4,
-    "firstName": "Max4",
-    "lastName": "Mustermann4"
+    "firstname": "Max4",
+    "lastname": "Mustermann4"
   },
   {
     "userOID": 5,
-    "firstName": "Max5",
-    "lastName": "Mustermann5"
+    "firstname": "Max5",
+    "lastname": "Mustermann5"
   },
 ]

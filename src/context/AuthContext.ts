@@ -8,5 +8,5 @@ type AuthContextType = {
 
 export const AuthContext = createContext<AuthContextType>({
     user: null,
-    setUser: () => {}, // empty function as a placeholder
+    setUser: () => {},
 });

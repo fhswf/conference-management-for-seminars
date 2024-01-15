@@ -31,7 +31,6 @@ function AssignUserPage({seminar, onClose}: Props) {
             body: JSON.stringify({
                 seminarOID: seminar.seminarOID,
                 userOID: selectedUser.userOID,
-                //index
                 roleOID: selectedRole,
             }),
             headers: {
@@ -60,8 +59,19 @@ function AssignUserPage({seminar, onClose}: Props) {
     // TODO anpassen
     let usersJson: { name: string, userOID: number }[] = [];
 
-    userList?.data?.map((user: User) => {
-        usersJson.push({name: `${user.lastName}, ${user.firstName}`, userOID: user.userOID!})
+    Array.isArray(userList.data) && userList?.data?.map((user: User) => {
+        if (user?.firstname || user?.lastname) {
+            const name = `${user.lastname || ''}${user.lastname && user.firstname ? ', ' : ''}${user.firstname || ''}`;
+            usersJson.push({
+                name: name,
+                userOID: user.userOID!
+            });
+        }else if(user?.mail){
+            usersJson.push({
+                name: user.mail,
+                userOID: user.userOID!
+            });
+        }
     });
 
 
@@ -69,13 +79,13 @@ function AssignUserPage({seminar, onClose}: Props) {
         <div className={styles.container}>
             <h1>OIDC User Seminar zuordnen</h1>
             <form onSubmit={handleSubmit}>
-                <Dropdown id="users" value={selectedUser} onChange={(e) => setSelectedUser(e.value)} options={usersJson}
+                <Dropdown data-test="users" id="users" value={selectedUser} onChange={(e) => setSelectedUser(e.value)} options={usersJson}
                           optionLabel="name" placeholder="User wählen" filter/><br/>
-                <Dropdown id="role" value={selectedRole} onChange={(e) => setSelectedRole(e.value)} options={rollen}
+                <Dropdown data-test="roles" id="role" value={selectedRole} onChange={(e) => setSelectedRole(e.value)} options={rollen}
                           placeholder="Rolle wählen" optionLabel="name"/><br/>
-                <p>Seminar: {seminar.description}</p>
+                <p data-test="seminar">Seminar: {seminar.description}</p>
 
-                <Button type="submit" label="Nutzer eintragen"/>
+                <Button data-test="assign-user" type="submit" label="Nutzer eintragen"/>
                 {/*<p>{JSON.stringify(userList?.data)}</p>*/}
             </form>
         </div>

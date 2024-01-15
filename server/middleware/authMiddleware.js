@@ -5,7 +5,7 @@ const Chatmessage = db.chatmessage;
 const Concept = db.concept;
 const Paper = db.paper;
 
-const {isAccessTokenExpired, refreshAccessToken, introspectToken} = require("../util/TokenUtils");
+const {isAccessTokenExpired, refreshAccessToken, introspectToken} = require("../utils/TokenUtils");
 const {
     userIsMemberOfSeminar,
     userRoleIsCourseAdmin,
@@ -285,6 +285,8 @@ async function isSystemAdmin(req, res, next) {
     if(await userIsSystemAdmin(userOID)) {
         return next();
     }
+
+    return res.status(403).json({msg: "Not authorized"});
 }
 
 /**

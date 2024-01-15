@@ -16,9 +16,6 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendMail = async (to, subject, text) => {
-    
-        //TODO evtl Intervall einfügen
-
         console.log(to);
         console.log(subject);
         console.log(text);
@@ -54,7 +51,7 @@ const sendMailPhaseChanged = async (userArray, seminar) => {
     for(const user of userArray) {
         //await new Promise(resolve => setTimeout(resolve, 3000));
         const subject = 'Phase geändert';
-        const emailText = `Hallo ${user.firstName} ${user.lastName},
+        const emailText = `Hallo ${getUserDisplayName(user)},
                     \ndas Seminar ${seminar.description} ist in die ${mapPhaseToString(seminar.phase)} übergegangen.
                     \nSeminar: ${seminar.description}
                     \n\nMit freundlichen Grüßen`;
@@ -74,11 +71,11 @@ const sendMailConceptEvaluated = async (concept) => {
     const seminar = concept.seminarO;
 
     const subject = 'Konzept bewertet';
-    const emailText = `Hallo ${student.firstName} ${student.lastName} ,
+    const emailText = `Hallo ${getUserDisplayName(student)} ,
                 \n\nIhr Konzept wurde ${concept.accepted ? "angenommen" : "abgelehnt"}.
                 \n\nSeminar: ${seminar.description}
             ${concept.feedback ? "\n\nFeedback: " + concept.feedback : ""}
-            Sie wurden dem Betreuer ${getUserDisplayName(supervisor)} zugewiesen.
+            ${supervisor && concept.accepted? `Sie wurden dem Betreuer ${getUserDisplayName(supervisor)} zugewiesen.` : ""}
             \n\nMit freundlichen Grüßen`;
 
     await sendMail(student.mail, subject, emailText);
@@ -96,7 +93,7 @@ const sendMailConceptUploaded = async (users, seminar, student) => {
 
     for(const user of users) {
         //await new Promise(resolve => setTimeout(resolve, 3000));
-        const emailText = `Hallo ${user.firstName} ${user.lastName},
+        const emailText = `Hallo ${getUserDisplayName(user)},
                     \nSeminar: ${seminar.description}
                     \nder Student ${getUserDisplayName(student)} hat ein Konzept eingereicht.
                     \n\nMit freundlichen Grüßen`;
@@ -117,7 +114,7 @@ const sendMailPaperUploaded = async (users, seminar, student) => {
 
     for(const user of users) {
         //await new Promise(resolve => setTimeout(resolve, 3000));
-        const emailText = `Hallo ${user.firstName} ${user.lastName},
+        const emailText = `Hallo ${getUserDisplayName(user)},
                     \nder Student ${getUserDisplayName(student)} hat ein Paper hochgeladen.
                     \nSeminar: ${seminar.description}
                     \n\nMit freundlichen Grüßen`;
@@ -141,9 +138,14 @@ function mapPhaseToString(phase){
 }
 
 function getUserDisplayName(student) {
-    if (student.firstName && student.lastName) {
-        return `${student.firstName} ${student.lastName}`;
-    } else {
+    try {
+        if (student.firstname && student.lastname) {
+            return `${student.firstname} ${student.lastname}`;
+        } else {
+            return student.mail;
+        }
+    } catch (e) {
+        console.error(e);
         return student.mail;
     }
 }
@@ -152,7 +154,7 @@ module.exports = {
     init: () => {
         return true;
     },
-    sendMail,
+    //sendMail,
     sendMailPhaseChanged,
     sendMailConceptEvaluated,
     sendMailConceptUploaded,

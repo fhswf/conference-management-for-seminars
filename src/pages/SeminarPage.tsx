@@ -15,6 +15,7 @@ import Concept from "../entities/database/Concept.ts";
 import User from "../entities/database/User.ts";
 import Review from "../entities/database/Review.ts";
 import PaperRating from "../components/PaperRating.tsx";
+import ConceptUploadPage from "./ConceptUploadPage.tsx";
 
 type SeminarType = Seminar & {
     roleassignments: RoleAssignment[];
@@ -38,6 +39,7 @@ function SeminarPage() {
     //const [showCommentsStrangerPaper, setShowCommentsStrangerPaper] = useState(false);
     const [showChat, setShowChat] = useState<PaperType>();
     const [showRating, setSetShowRating] = useState<PaperType>()
+    const [showConceptUpload, setShowConceptUpload] = useState(false)
     const {data: seminar} = useFetch<SeminarType>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}`,);
     // TODO only fetch if phase >= 2 and phase >= 5
     // and user is student
@@ -55,7 +57,7 @@ function SeminarPage() {
     //const [concept, setConcept] = useState<Concept | null>(null)
     //const [assignedPaper, setAssignedPaper] = useState<Paper[] | null>(null)
 
-    isStudent = seminar?.roleassignments[0]?.roleOID === 3;
+    isStudent = Array.isArray(seminar?.roleassignments) && seminar?.roleassignments[0]?.roleOID === 3;
 
     function isJsonEmpty(json: any) {
         for (var key in json) {
@@ -101,16 +103,16 @@ function SeminarPage() {
         <div>
             <MainLayout>
                 <div>
-                    <p>{seminarOID}</p>
+                    {/*<p>{seminarOID}</p>*/}
                     {/*<pre>{JSON.stringify(concept, null, 2)}</pre>*/}
                     {/*<pre><p>{JSON.stringify(seminar, null, 2)}</p></pre>*/}
                     {/*<pre>{JSON.stringify(assignedPaper, null, 2)}</pre>*/}
                 </div>
                 <div>
-                    <p>Übersicht</p>
+                    <h1>Seminar Übersicht</h1>
                     <p>Seminarname: {seminar?.description || "-"}</p>
                     <p>Phase: {seminar && mapPhaseToString(seminar.phase!) || "-"}</p>
-                    <p>Rolle: {seminar?.roleassignments[0]?.roleOID && mapRoleToString(seminar?.roleassignments[0]?.roleOID)}</p>
+                    <p>Rolle: {Array.isArray(seminar?.roleassignments) && seminar?.roleassignments[0]?.roleOID && mapRoleToString(seminar?.roleassignments[0]?.roleOID)}</p>
                 </div>
                 <br/>
                 {isStudent && <> <p>Konzept:</p>
@@ -131,7 +133,7 @@ function SeminarPage() {
                         </div>
                         <div>
                             {(concept?.userOIDSupervisor_user) ?
-                                <p>{concept.userOIDSupervisor_user.firstName} {concept.userOIDSupervisor_user.lastName}</p> :
+                                <p>{concept.userOIDSupervisor_user.firstname} {concept.userOIDSupervisor_user.lastname}</p> :
                                 <p>-</p>
                             }
                         </div>
@@ -146,7 +148,8 @@ function SeminarPage() {
                         </div>
                         <div>  {/* TODO edit disabled rule */}
                             <Button onClick={() => {
-                                navigate(`/concept-upload/${seminarOID}`)
+                                //navigate(`/concept-upload/${seminarOID}`)
+                                setShowConceptUpload(true)
                             }}
                                 /*disabled = {(concept && (concept?.accepted === null || concept?.accepted)) || (!concept && (seminar && seminar.phase! <= 3))}*/
                                     disabled={!isJsonEmpty(concept) && (concept?.accepted === null || concept?.accepted || seminar?.phase !== 2) && concept?.accepted !== false}
@@ -184,6 +187,9 @@ function SeminarPage() {
                     paper={showChat} /*reviewOID={showChat}*//></Modal>}
                 {showRating?.reviews[0] && <Modal isOpen={!!showRating} onClose={() => setSetShowRating(undefined)}>
                     <PaperRating onSaveClicked={handleRating} value={showRating?.reviews[0].rating}/>
+                </Modal>}
+                {showConceptUpload && seminarOID && <Modal isOpen={showConceptUpload} onClose={() => setShowConceptUpload(false)}>
+                    <ConceptUploadPage seminarOID={seminarOID} onClose={() => setShowConceptUpload(false)}/>
                 </Modal>}
             </MainLayout>
         </div>

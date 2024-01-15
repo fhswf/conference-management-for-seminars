@@ -1,0 +1,20 @@
+[
+  {
+    "firstname": "Max",
+    "mail": "mustermann.max@fh-swf.de",
+    "isAdmin": false
+  },
+  {
+    "lastname": "Mustermann",
+    "mail": "mustermann.max@fh-swf.de",
+    "isAdmin": true
+  },
+  {
+    "mail": "mustermann.max@fh-swf.de",
+    "isAdmin": true
+  },
+  {
+    "mail": "mustermann.max@fh-swf.de",
+    "isAdmin": false
+  }
+]

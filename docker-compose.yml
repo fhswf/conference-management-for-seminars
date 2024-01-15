@@ -18,7 +18,7 @@ services:
     depends_on:
       - dbserver
     environment:
-      - FRONTEND_URL=${FRONTEND_URL}
+      - FRONTEND_IP=${FRONTEND_IP}
       - FRONTEND_PROTOCOL=${FRONTEND_PROTOCOL}
 #      - FRONTEND_PORT=${FRONTEND_PORT}
       - EXPRESS_PORT_HTTP=${EXPRESS_PORT_HTTP}
@@ -63,3 +63,4 @@ services:
 networks:
   conference-management:
     driver: bridge
+
