@@ -2,7 +2,7 @@ import Table from "../components/Table.tsx";
 import useFetch from "../hooks/useFetch.ts";
 import {useParams} from "react-router-dom";
 import React, {Fragment, useEffect, useState} from "react";
-import {mapConceptStatusToString} from "../utils/helpers.ts";
+import {formatUserName, mapConceptStatusToString} from "../utils/helpers.ts";
 import User from "../entities/database/User.ts";
 import Concept from "../entities/database/Concept.ts";
 import Attachment from "../entities/database/Attachment.ts";
@@ -58,6 +58,19 @@ function MemberDetailPage() {
             alignItems: "center"
         },
     };
+    /*
+    const styles = {
+        uploadedPaper: {
+            display: "grid",
+            gridTemplateColumns: "20% 20% 20%",
+            alignItems: "center"
+        },
+        uploadPaperItem: {
+            padding: "10px",
+            textAlign: "left"
+        }
+    };
+    * */
 
     const header = [
         {field: 'text', header: 'Text'},
@@ -85,43 +98,43 @@ function MemberDetailPage() {
             <div>
                 {/*<pre>{JSON.stringify(data, null, 2)}</pre>*/}
                 {/*<pre>{JSON.stringify(reviewer, null, 2)}</pre>*/}
-                <h1>Teilnehmer Details</h1>
-                <p>Seminar-ID: {seminarOID}</p>
-                {/* TODO Mail anzeigen bei leeren Namen*/}
-                <p>Student: {data?.firstname} {data?.lastname}</p>
-                <h2>Eingereichte Konzepte</h2>
-                <Table header={header} data={tableData}/>
-                <h2>Hochgeladene Paper</h2>
-                <div style={styles.uploadedPaper}>
+                <h1 data-test="header">Teilnehmer Details</h1>
+                <p data-test="seminar-id">Seminar-ID: {seminarOID}</p>
+                <p data-test="student-name">Student: {data && formatUserName(data)}</p>
+                <h2 data-test="header-concepts">Eingereichte Konzepte</h2>
+                <Table  data-test="table-concepts" header={header} data={tableData}/>
+                <h2 data-test="header-papers">Hochgeladene Paper</h2>
+                <div data-test="papers" style={styles.uploadedPaper}>
                     <p>Datei:</p>
                     <p>Datum:</p>
                     <p>Final Paper:</p>
                     {data?.papers && data?.papers.length > 0 && data?.papers.map((paper: PaperType, index: number) => {
+                        /* make Fragment to div for testing */
                         return (
-                            <Fragment key={index}>
-                                <a href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
-                                <p>{paper.createdAt ? new Date(paper.createdAt).toLocaleString() : '-'}</p>
+                            <Fragment key={paper.paperOID}>
+                                <a  data-test="attachment-href" href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
+                                <p  data-test="date-paper">{paper.createdAt ? new Date(paper.createdAt).toLocaleString() : '-'}</p>
                                 {data.roleassignments.length > 0 ? (
                                     paper.paperOID === data.roleassignments[0].phase3paperOID ? (
-                                        <p>Phase 3</p>
+                                        <p data-test="phase-paper">Phase 3</p>
                                     ) : paper.paperOID === data.roleassignments[0].phase7paperOID ? (
-                                        <p>Phase 7</p>
+                                        <p data-test="phase-paper">Phase 7</p>
                                     ) : (
-                                        <p>-</p>
+                                        <p data-test="phase-paper">-</p>
                                     )
                                 ) : (
-                                    <p>-</p>
+                                    <p data-test="phase-paper">-</p>
                                 )}
                             </Fragment>
                         )
                     })}
                 </div>
                 {reviewer && reviewer.length > 0 && <div>
-                    <h2>Reviewer:</h2>
-                    <ul>
+                    <h2 data-test="header-reviewer">Reviewer:</h2>
+                    <ul data-test="reviewer-list">
                         {reviewer?.map((reviewer) => {
                             return (
-                                <li key={reviewer.userOID}>{reviewer.firstname} {reviewer.lastname}</li>
+                                <li key={reviewer.userOID}>{formatUserName(reviewer)}</li>
                             );
                         })}
                     </ul>

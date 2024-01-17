@@ -421,7 +421,7 @@ const getStudent = async (req, res) => {
             include: [{
                 model: Concept,
                 as: "userOIDStudent_concepts",
-                attributes: ["conceptOID", "accepted", "userOIDSupervisor", "text", "attachmentOID", "feedback", "createdAt"],
+                attributes: ["conceptOID", "accepted", "userOIDSupervisor", "text", "attachmentOID", "feedback", "createdAt", "seminarOID"],
                 where: {seminarOID: seminarOID},
                 required: false,
                 include: [{
@@ -434,7 +434,7 @@ const getStudent = async (req, res) => {
                         model: Attachment,
                         as: "attachmentO",
                         attributes: ["attachmentOID", "filename"]
-                    }
+                    },
                 ],
             },
                 {
