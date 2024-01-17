@@ -5,10 +5,11 @@ import {Dropdown} from "primereact/dropdown";
 import User from "../entities/database/User.ts";
 import Attachment from "../entities/database/Attachment.ts";
 import Concept from "../entities/database/Concept.ts";
+import {formatUserName} from "../utils/helpers.ts";
 
 type ConceptType = Concept & {
-    userOIDSupervisor_user: User | null;
-    attachmentO: Attachment | null;
+    userOIDSupervisor_user: User,
+    attachmentO: Attachment
 }
 
 type UserType = User & {
@@ -20,9 +21,11 @@ interface Props {
     availableSupervisors: User[];
     onClose?: () => void;
     userRole: number;
+    //onEvaluated function with concept as return value
+    onEvaluated?: (concept: ConceptType) => void;
 }
 
-function ConceptAcceptReject({user0, availableSupervisors, onClose, userRole}: Props) {
+function ConceptAcceptReject({user0, availableSupervisors, onClose, userRole, onEvaluated}: Props) {
     const [selectedSupervisor, setSelectedSupervisor] = useState<User | null>(null)
     const [inputText, setInputText] = useState("")
     const styles = {
@@ -39,16 +42,9 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose, userRole}: P
     //];
 
     const supervisor = availableSupervisors.map((supervisor) => {
-        if(supervisor.firstname && supervisor.lastname) {
-            return {
-                ...supervisor,
-                name: supervisor.firstname + " " + supervisor.lastname,
-            }
-        }else{
-            return {
-                ...supervisor,
-                name: supervisor.mail,
-            }
+        return {
+            ...supervisor,
+            name: formatUserName(supervisor)
         }
     });
 
@@ -59,7 +55,7 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose, userRole}: P
     async function onEvaluate(accepted: boolean) {
         //print text area
         //alert(inputText + " " + accepted);
-        if(accepted && !selectedSupervisor) {
+        if (accepted && !selectedSupervisor) {
             alert("Bitte wählen Sie einen Betreuer aus.");
             return;
         }
@@ -81,8 +77,12 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose, userRole}: P
             body: JSON.stringify(body),
         });
 
-        if(response.ok) {
+        if (response.ok) {
             alert("Erfolgreich");
+            //onClose && onClose();
+            const concept = await response.json();
+
+            onEvaluated && onEvaluated(concept);
         } else {
             alert("Fehler");
         }
@@ -100,31 +100,34 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose, userRole}: P
                 <pre>{JSON.stringify(concept, null, 2)}</pre>
                 <pre>{JSON.stringify(availableSupervisors, null, 2)}</pre>
             <br/>*/}
-            
-            <h2>Konzept annehmen / ablehnen</h2>
+
+            <h2 data-test="header-evaluate">Konzept annehmen / ablehnen</h2>
             <h3>Autor:</h3>
-            <p>Name: {user0.firstname} {user0.lastname}</p>
-            <p>Mail: {user0.mail}</p>
+            <p data-test="name-evaluate">Name: {user0.firstname} {user0.lastname}</p>
+            <p data-test="mail-evaluate">Mail: {user0.mail}</p>
             <hr/>
             <h3>Konzept:</h3>
-            <p>Text: {user0.userOIDStudent_concepts[0].text || "-"}</p>
-            <p>Anhang: {user0.userOIDStudent_concepts[0].attachmentO ? <a
+            <p data-test="text-evaluate">Text: {user0.userOIDStudent_concepts[0].text || "-"}</p>
+            <p data-test="attachment-evaluate">Anhang: {user0.userOIDStudent_concepts[0].attachmentO ? <a
                 href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${user0.userOIDStudent_concepts[0].attachmentO.attachmentOID}`}>{user0.userOIDStudent_concepts[0].attachmentO.filename}</a> : "-"}
             </p>
-            <p>Status: {user0.userOIDStudent_concepts[0].accepted === null ? "Bewertung ausstehend" : user0.userOIDStudent_concepts[0].accepted ? "Angenommen" : "Abgelehnt"}</p>
-            <p>Feedback: {user0.userOIDStudent_concepts[0].feedback || "-"}</p>
+            <p data-test="status-evaluate">Status: {user0.userOIDStudent_concepts[0].accepted === null ? "Bewertung ausstehend" : user0.userOIDStudent_concepts[0].accepted ? "Angenommen" : "Abgelehnt"}</p>
+            <p data-test="feedback-evaluate">Feedback: {user0.userOIDStudent_concepts[0].feedback || "-"}</p>
 
             {/* if evaluation pending */}
             {(!user0.userOIDStudent_concepts[0].accepted) && userRole === 1 &&
                 <>
-                    Betreuer: <Dropdown value={selectedSupervisor} options={supervisor} optionLabel="name"
+                    Betreuer: <Dropdown data-test="supervisors-evaluate" value={selectedSupervisor} options={supervisor}
+                                        optionLabel="name"
                                         placeholder="Betreuer wählen"
                                         onChange={(e) => setSelectedSupervisor(e.value)}/><br/>
-                    <InputTextarea style={styles.inputArea} rows={5} cols={40} onChange={(e) => {
-                        setInputText(e.target.value)
-                    }}/><br/>
-                    <Button label="Annehmen" onClick={() => onEvaluate(true)}/>
-                    <Button label="Ablehnen" onClick={() => onEvaluate(false)} disabled={user0.userOIDStudent_concepts[0].accepted === false}/>
+                    <InputTextarea data-test="textfield-evaluate" style={styles.inputArea} rows={5} cols={40}
+                                   onChange={(e) => {
+                                       setInputText(e.target.value)
+                                   }}/><br/>
+                    <Button data-test="accept-evaluate" label="Annehmen" onClick={() => onEvaluate(true)}/>
+                    <Button data-test="reject-evaluate" label="Ablehnen" onClick={() => onEvaluate(false)}
+                            disabled={user0.userOIDStudent_concepts[0].accepted === false}/>
                 </>
             }
         </div>

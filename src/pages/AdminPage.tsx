@@ -80,7 +80,7 @@ function AdminPage() {
                     <InputText data-test="textfield-admin" id="seminarName" name="seminarName" placeholder="Seminarname" ref={inputRef} maxLength={32}/>
                     <Button data-test="button-admin" label="Seminar erstellen" onClick={onCreateSeminar}/>
                 </div>
-                <Table header={header} data={tableData}/>
+                <Table data-test="seminar-table" header={header} data={tableData}/>
             </div>
             {showAddUser?.seminarOID && showAddUser?.description && <Modal isOpen={!!showAddUser} onClose={() => {
                 setShowAddUser(undefined)

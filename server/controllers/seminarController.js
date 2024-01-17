@@ -240,38 +240,28 @@ const updateUserInSeminar = async (req, res) => {
         const userOid = req.body.userOID;
         const roleOid = req.body.roleOID;
         const seminarOid = req.body.seminarOID;
-        //const supervisorOid = req.body.supervisorOID;
 
         if (!userOid || !roleOid || !seminarOid) {
             return res.status(400).send({message: "Missing required parameters."});
         }
 
-        //change:
-        // 1. roleassignment
+        const phase = await Seminar.findByPk(seminarOid, {attributes: ["phase"]});
+
+        const supervisorHasAssignedConcepts = await Concept.findOne({
+            where: {
+                userOIDSupervisor: userOid,
+                seminarOID: seminarOid
+            }
+        });
+
+        if (supervisorHasAssignedConcepts) {
+            return res.status(409).send({message: "Supervisor has already assigned concepts."});
+        }
+
         const assignment = await RoleAssignment.update(
             {roleOID: roleOid},
             {where: {userOID: userOid, seminarOID: seminarOid}, transaction: t},
         );
-        // 2. user
-        /*
-        const user = await User.update(
-            {comment: comment},
-            {where: {useroid: userOid}},
-            {transaction: t}
-        );
-         */
-        //3. concept
-        //const newestConcept = await Concept.findOne({
-        //    where: {userOIDStudent: userOid},
-        //    order: [['createdAt', 'DESC']],
-        //});
-        //if (newestConcept && supervisorOid) {
-        //    const concept = await Concept.update(
-        //        {userOIDSupervisor: supervisorOid},
-        //        {where: {conceptoid: newestConcept.conceptoid}},
-        //        {transaction: t}
-        //    );
-        //}
 
         await t.commit();
         return res.status(200).send({message: "user successfully changed."});
@@ -317,8 +307,9 @@ const evaluateConcept = async (req, res) => {
 
             sendMailConceptEvaluated(conc)
 
+            const concept = await Concept.findByPk(conceptOID);
 
-            return res.status(200).send({message: "Concept successfully evaluated."});
+            return res.status(200).send(concept);
         } else {
             return res.status(500).send({message: "Error while evaluating concept."});
         }

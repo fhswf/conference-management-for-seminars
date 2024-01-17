@@ -41,6 +41,11 @@
 Cypress.Commands.add("getByData", (selector) => {
     return cy.get(`[data-test=${selector}]`);
 } );
+Cypress.Commands.add("findByData", { prevSubject: 'element' }, (subject, selector) => {
+    return cy.wrap(subject).find(`[data-test="${selector}"]`);
+});
+
+
 
 Cypress.Commands.add('mockAuthStatus', () => {
     cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/authstatus`, {

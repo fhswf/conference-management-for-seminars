@@ -35,15 +35,14 @@ describe('AdminPage', () => {
     it('Should contain textfield, button and table', function () {
         cy.getByData('textfield-admin').should('exist');
         cy.getByData('button-admin').should('exist');
-        cy.getByData('table').should('exist');
+        cy.getByData('seminar-table').should('exist');
     });
 
     it('should display correct table header', function () {
-        cy.getByData('table').should('exist');
+        cy.getByData('seminar-table').should('exist');
         cy.wait(500);
 
         cy.get('table').find('thead tr').should('exist').within(() => {
-            // Hier können Sie die Texte in den Header-Zellen überprüfen
             cy.get('th').eq(0).should('have.text', 'ID');
             cy.get('th').eq(1).should('have.text', 'Bezeichnung');
             cy.get('th').eq(2).should('have.text', 'Phase');
@@ -54,7 +53,7 @@ describe('AdminPage', () => {
     });
 
     it('should display existing seminar correctly', function () {
-        cy.getByData('table').should('exist');
+        cy.getByData('seminar-table').should('exist');
         cy.wait(500);
 
         cy.get('table tbody tr').each((row, index) => {
@@ -81,7 +80,6 @@ describe('AdminPage', () => {
     describe('Create Seminar', () => {
         it('Should display an alert if seminar created successfully', function () {
             cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar`, (req) => {
-                // Hier können Sie den req.body-Inhalt überprüfen
                 expect(req.body).to.deep.equal({name: 'Test Seminar'});
                 req.reply({
                     statusCode: 200,
@@ -96,9 +94,8 @@ describe('AdminPage', () => {
                 expect(alertText).to.equal('Seminar erstellt');
             });
         });
-        it.only('Should update seminar table if created successfully', function () {
+        it('Should update seminar table if created successfully', function () {
             cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar`, (req) => {
-                // Hier können Sie den req.body-Inhalt überprüfen
                 expect(req.body).to.deep.equal({name: 'Test Seminar'});
                 req.reply({
                     statusCode: 200,
@@ -128,7 +125,7 @@ describe('AdminPage', () => {
 
     describe('Assign User', () => {
         it('should show a modal if add-button clicked with correct content', function () {
-            cy.getByData('table').should('exist');
+            cy.getByData('seminar-table').should('exist');
             cy.wait(500);
 
             cy.get('table tbody tr').each((row, index) => {
@@ -146,7 +143,7 @@ describe('AdminPage', () => {
             });
         });
         it('should show all received user in dropdown list', function () {
-            cy.getByData('table').should('exist');
+            cy.getByData('seminar-table').should('exist');
             cy.wait(500);
 
             cy.get('table tbody tr').each((row, index) => {
@@ -178,7 +175,7 @@ describe('AdminPage', () => {
             });
         });
         it('should show three roles in dropdown list', function () {
-            cy.getByData('table').should('exist');
+            cy.getByData('seminar-table').should('exist');
             cy.wait(500);
 
             cy.get('table tbody tr').each((row, index) => {
@@ -203,7 +200,7 @@ describe('AdminPage', () => {
         });
 
         it('should show alert if user could not be assigned', function () {
-            cy.getByData('table').should('exist');
+            cy.getByData('seminar-table').should('exist');
             cy.wait(500);
 
             cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/user/assign-to-seminar`, (req) => {
@@ -246,7 +243,6 @@ describe('AdminPage', () => {
                     const roleOID = randomIndexRole + 1;
 
                     cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/user/assign-to-seminar`, (req) => {
-                        // Hier können Sie den req.body-Inhalt überprüfen
                         expect(req.body).to.deep.equal({seminarOID, userOID, roleOID});
                         req.reply({
                             statusCode: 200,

@@ -16,9 +16,10 @@ interface RowData {
 interface Props {
     header: HeaderData[] | undefined;
     data: RowData[] | undefined;
+    'data-test'?: string;
 }
 
-function Table({header, data}: Props) {
+function Table({header, data, ['data-test']: dataTest}: Props) {
     const [globalFilter, setGlobalFilter] = useState<string | null>(null);
 
     const onGlobalFilterChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -53,7 +54,7 @@ function Table({header, data}: Props) {
                 <h5>Table</h5>
             </div>
             <div className="card">
-                <DataTable data-test="table"  value={filteredData} header={headerT} showGridlines tableStyle={{minWidth: '50rem'}}>
+                <DataTable data-test={dataTest}  value={filteredData} header={headerT} showGridlines tableStyle={{minWidth: '50rem'}}>
                     {header && header.map((h, index) => {
                         const isButton = h.field.startsWith("btn")
                         return <Column data-test="column" sortable={!isButton} field={h.field} header={h.header} key={index}></Column>

@@ -29,7 +29,7 @@ type PaperType = Paper & {
 
 function MemberDetailPage() {
     const {seminarOID, studentOID} = useParams();
-    const {data} = useFetch<UserType>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/get-student/${seminarOID}/${studentOID}`);
+    const {data} = useFetch<UserType>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}/get-student/${studentOID}`);
     const [reviewer, setReviewer] = useState<User[]>([]);
 
     useEffect(() => {
@@ -68,7 +68,7 @@ function MemberDetailPage() {
         {field: 'createdAt', header: 'Eingereicht am'},
     ];
 
-    const tableData = data?.userOIDStudent_concepts.map((concept) => {
+    const tableData = Array.isArray(data?.userOIDStudent_concepts) && data?.userOIDStudent_concepts.map((concept) => {
         return {
             text: concept.text,
             pdf: concept.attachmentO ?

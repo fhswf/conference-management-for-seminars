@@ -46,11 +46,10 @@ describe('HomePage', () => {
     });
 
     it('should display correct table header', function () {
-        cy.getByData('table').should('exist');
+        cy.getByData('seminars-table').should('exist');
         cy.wait(500);
 
         cy.get('table').find('thead tr').should('exist').within(() => {
-            // Hier können Sie die Texte in den Header-Zellen überprüfen
             cy.get('th').eq(0).should('have.text', 'Bezeichnung');
             cy.get('th').eq(1).should('have.text', 'Ihre Rolle');
             cy.get('th').eq(2).should('have.text', 'Phase');
@@ -62,7 +61,7 @@ describe('HomePage', () => {
     it('should display the assigned seminars correctly', function () {
         cy.getByData('heading').should('contain', 'Sie sind in folgenden Seminaren eingeschrieben:');
 
-        cy.getByData('table').should('exist');
+        cy.getByData('seminars-table').should('exist');
         cy.wait(500);
 
         cy.get('table tbody tr').each((row, index) => {
@@ -94,7 +93,7 @@ describe('HomePage', () => {
     });
 
     it('Should redirect to seminarPage on Arrow Click in first row', function () {
-        cy.getByData('table').should('exist');
+        cy.getByData('seminars-table').should('exist');
         cy.wait(500);
 
         const rowIndex = 1;
@@ -110,7 +109,7 @@ describe('HomePage', () => {
     });
 
     it('Should redirect to seminarDetailsPage on Administrate Click in first row', function () {
-        cy.getByData('table').should('exist');
+        cy.getByData('seminars-table').should('exist');
         cy.wait(500);
 
         const rowIndex = 1;

@@ -20,7 +20,7 @@ router.get('/:seminarOID/participants', isCourseAdminOrSupervisorInSeminar, semi
 router.post('/evaluate-concept', isCourseAdminInSeminar, seminarController.evaluateConcept);
 router.post('/', isSystemAdmin, seminarController.createSeminar);
 
-router.get('/get-student/:seminarOID/:userOID', isCourseAdminOrSupervisorInSeminar, seminarController.getStudent);
+router.get('/:seminarOID/get-student/:userOID', isCourseAdminOrSupervisorInSeminar, seminarController.getStudent);
 router.post('/enter-seminar/:assignmentkey', seminarController.enterSeminar);
 router.get('/:seminarOID/supervisor-list', isMemberOfSeminar, seminarController.getSupervisorList);
 

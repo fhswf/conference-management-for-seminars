@@ -8,7 +8,7 @@ interface Props {
 function ToggleLabel({text}: Props) {
 
     return (
-        <Password value={text} toggleMask readOnly feedback={false}/>
+        <Password data-test="password" value={text} toggleMask readOnly feedback={false}/>
     );
 }
 

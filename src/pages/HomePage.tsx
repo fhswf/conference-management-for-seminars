@@ -97,7 +97,7 @@ function HomePage() {
                         <Button data-test="enter-seminar" label="Seminar beitreten" onClick={onEnterSeminar}/>
                     </div>
                     <div>
-                        <Table header={header} data={tableData}/>
+                        <Table data-test="seminars-table" header={header} data={tableData}/>
                     </div>
                 </div>
             </MainLayout>
