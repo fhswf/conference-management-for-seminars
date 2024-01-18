@@ -91,7 +91,7 @@ const uploadConcept = async (req, res) => {
             attachment = await attachmentController.createAttachment(req.files?.file, t)
         }
 
-        await Concept.create({
+        const concept = await Concept.create({
             text: text,
             userOIDSupervisor: supervisorOID,
             userOIDStudent: userOID,
@@ -120,7 +120,7 @@ const uploadConcept = async (req, res) => {
         //throw new Error("Test");
         await t.commit();
 
-        return res.status(200).end();
+        return res.status(200).json(concept);
     } catch (error) {
         await t.rollback();
         console.error("Error :" + error);

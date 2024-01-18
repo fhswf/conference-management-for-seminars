@@ -322,7 +322,7 @@ async function isChatParticipant(req, res, next) {
  */
 async function isReviewerOrAuthorOfPaper(req, res, next) {
     if(!req.user.userOID || (!req.params.paperOID && !req.params.reviewOID) && (!req.body.paperOID && !req.body.reviewOID)) {
-        return res.status(400).json({msg: "No userOID or paperOID or reviewOID"});
+        return res.status(400).json({msg: "No userOID or paperOID or reviewOID given in request"});
     }
 
     if(req.params.reviewOID){

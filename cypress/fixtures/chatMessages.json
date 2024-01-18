@@ -1,0 +1,26 @@
+[
+  {
+    "message": "Hallo Welt",
+    "createdAt": "2024-01-18T00:16:54.000Z",
+    "sender": 1,
+    "attachmentO": null
+  },
+  {
+    "message": "Kommentare im Anhang",
+    "createdAt": "2024-01-18T00:21:03.000Z",
+    "sender": 1,
+    "attachmentO": {
+      "attachmentOID": 4,
+      "filename": "kommentare.pdf"
+    }
+  },
+  {
+    "message": null,
+    "createdAt": "2024-01-18T00:21:03.000Z",
+    "sender": 1,
+    "attachmentO": {
+      "attachmentOID": 4,
+      "filename": "kommentare2.pdf"
+    }
+  }
+]

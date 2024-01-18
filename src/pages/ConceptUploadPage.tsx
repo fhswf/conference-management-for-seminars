@@ -11,9 +11,10 @@ import User from "../entities/database/User.ts";
 interface Props {
     seminarOID: string;
     onClose?: () => void;
+    onConceptUpload: (concept: any) => void;
 }
 
-function ConceptUploadPage({seminarOID, onClose}: Props) {
+function ConceptUploadPage({seminarOID, onClose, onConceptUpload}: Props) {
     const navigate = useNavigate();
     //const { seminarOID } = useParams();
     const [text, setText] = useState<string>("")
@@ -26,8 +27,6 @@ function ConceptUploadPage({seminarOID, onClose}: Props) {
     //    {name: "Betreuer B"},
     //    {name: "Betreuer C"},
     //];
-
-    // TODO check if user is allowed to upload concept: if last one was rejected or if no concept was uploaded yet
 
     async function onSubmit(event: any) {
         event.preventDefault();
@@ -69,7 +68,9 @@ function ConceptUploadPage({seminarOID, onClose}: Props) {
                 //setSelectedFile(null);
                 //setSelectedSupervisor(undefined);
 
-                onClose && onClose();
+                const concept = await res.json();
+                onConceptUpload(concept);
+                //onClose && onClose();
             } else if(res.status === 415) {
                 alert("Bitte nur PDF-Dateien hochladen.")
             }else{
@@ -116,12 +117,13 @@ function ConceptUploadPage({seminarOID, onClose}: Props) {
                 <div>
                     <div className={styles.container}>
                         <p>Text</p>
-                        <InputTextarea value={text} onChange={(e) => setText(e.target.value)}/>
+                        <InputTextarea data-test="concept-upload-text" value={text} onChange={(e) => setText(e.target.value)}/>
                     </div>
                     <div className={styles.container}>
                         <p>Anhang (PDF)</p>
                         <div className="card">
-                            <FileUpload customUpload
+                            <FileUpload data-test="concept-upload-fileupload"
+                                        customUpload
                                         uploadHandler={() => {}}
                                         onSelect={(event: FileUploadSelectEvent)=>setSelectedFile(event.files[0])}
                                         onClear={()=>setSelectedFile(null)}
@@ -134,13 +136,13 @@ function ConceptUploadPage({seminarOID, onClose}: Props) {
                     </div>
                     <div className={styles.container}>
                         <p>Betreuer</p>
-                        <Dropdown id="seminar" value={selectedSupervisor} onChange={(e) => setSelectedSupervisor(e.value)}
+                        <Dropdown data-test="concept-upload-supervisor" id="seminar" value={selectedSupervisor} onChange={(e) => setSelectedSupervisor(e.value)}
                                   showClear options={availableSupervisor} placeholder="Betreuer wählen..." optionLabel="name"/><br/>
 
                     </div>
                 </div>
                 <div className={styles.buttonContainer}>
-                    <Button type="submit" label="Speichern" />
+                    <Button data-test="concept-upload-submit" type="submit" label="Konzept einreichen" />
                 </div>
             </form>
         </div>

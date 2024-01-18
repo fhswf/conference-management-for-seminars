@@ -1,1 +1,32 @@
-[]
+[
+  {
+    "paperOID": 1,
+    "attachmentO": {
+      "attachmentOID": 1,
+      "filename": "test.pdf"
+    },
+    "reviews": [
+      {
+        "reviewOID": 1,
+        "paperOID": 1,
+        "reviewerOID": 1,
+        "rating": 4
+      }
+    ]
+  },
+  {
+    "paperOID": 13,
+    "attachmentO": {
+      "attachmentOID": 1,
+      "filename": "test.pdf"
+    },
+    "reviews": [
+      {
+        "reviewOID": 35,
+        "paperOID": 13,
+        "reviewerOID": 1,
+        "rating": null
+      }
+    ]
+  }
+]

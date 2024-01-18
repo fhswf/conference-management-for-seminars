@@ -65,8 +65,6 @@ function ChatWindowPage({paper, reviewOID}: Props) {
             return
         }
 
-        console.log("set " + reviewOIDs[0].reviewOID);
-
         setSelectedReview(reviewOIDs[0].reviewOID || undefined)
     }, [reviewOIDs]);
 
@@ -108,14 +106,15 @@ function ChatWindowPage({paper, reviewOID}: Props) {
         <div className={styles.container}>
             {/*JSON.stringify(paper)*/}
             {/*<pre>{JSON.stringify(reviewOIDs, null, 2)}</pre>*/}
+            {/*<pre>{JSON.stringify(chatmessages, null, 2)}</pre>*/}
             {reviewOIDs && (
-                <div className={styles.buttonContainer}>
-                    {reviewOIDs.map((review, index) => {
+                <div data-test="reviewer-selection" className={styles.buttonContainer}>
+                    {Array.isArray(reviewOIDs) && reviewOIDs.map((review, index) => {
                         {/* Aktuell erfolgt die Zuordnung anhand der Sortierung der Review-IDs eines Papers. Hierbei wird ausgegangend, dass die Betreuer die dritte ID ist,
                         was durch die Reihengolge der Review-Zuordnung der Fall wäre*/}
                         const buttonText = index === 0 ? 'Reviewer A' : index === 1 ? 'Reviewer B' : index === 2 ? 'Betreuer' : '';
                         return (
-                            <Button key={review.reviewOID}
+                            <Button data-test="reviewer-button" key={review.reviewOID}
                                     onClick={() => setSelectedReview(review.reviewOID || undefined)}>
                                 {buttonText}
                             </Button>
@@ -123,23 +122,23 @@ function ChatWindowPage({paper, reviewOID}: Props) {
                     })}
                 </div>
             )}
-            <div className={styles.conversation}>
+            <div data-test="messages-div" className={styles.conversation}>
                 {chatmessages?.map((message, index) => {
                     if (message.sender === user?.userOID) {
-                        return <div key={index} className={styles.messageRight}>
-                            <ChatMessage message={message}/>
+                        return <div data-test="ChatMessage-div" key={index} className={styles.messageRight}>
+                            <ChatMessage data-test="chat-message-item" message={message}/>
                         </div>
                     } else {
-                        return <div key={index} className={styles.messageLeft}>
-                            <ChatMessage message={message}/>
+                        return <div data-test="ChatMessage-div" key={index} className={styles.messageLeft}>
+                            <ChatMessage data-test="chat-message-item" message={message}/>
                         </div>
                     }
                 })}
             </div>
             <div className={styles.textfieldAndButton}>
-                <InputTextarea value={text} onChange={(e) => setText(e.target.value)}/>
+                <InputTextarea data-test="review-textfield" value={text} onChange={(e) => setText(e.target.value)}/>
                 <CustomFileUpload accept="application/pdf" onSelectionChanged={(file) => setSelectedFile(file || undefined)}/>
-                <Button onClick={onSendClicked} label="➡" disabled={!text && !selectedFile}/>
+                <Button data-test="review-send" onClick={onSendClicked} label="➡" disabled={!text && !selectedFile}/>
             </div>
         </div>
     )

@@ -57,3 +57,12 @@ export function mapRatingToString(rating: number | null){
         default: return 'Nicht bewertet';
     }
 }
+
+export function isJsonEmpty(json: any) {
+    for (var key in json) {
+        if (json.hasOwnProperty(key)) {
+            return false;
+        }
+    }
+    return true;
+}

@@ -1,0 +1,16 @@
+{
+    "createdMessage": {
+        "chatmessageOID": 10,
+        "message": "test123",
+        "attachmentOID": 6,
+        "reviewOID": "35",
+        "sender": 1,
+        "updatedAt": "2024-01-18T14:58:59.286Z",
+        "createdAt": "2024-01-18T14:58:59.286Z"
+    },
+    "createdAttachment": {
+        "attachmentOID": 6,
+        "mimetype": "application/pdf",
+        "filename": "conceptTest.pdf"
+    }
+}
