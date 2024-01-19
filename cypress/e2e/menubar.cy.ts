@@ -27,7 +27,7 @@ describe('Menubar test', () => {
         cy.getByData('main-layout-logout').should('be.visible');
     });
 
-    it.only('administration-button should be visible and redirect to admin-page if user is system admin', function () {
+    it('administration-button should be visible and redirect to admin-page if user is system admin', function () {
         cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/authstatus`, {
             statusCode: 200,
             body: {

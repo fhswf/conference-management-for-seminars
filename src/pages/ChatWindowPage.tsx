@@ -41,9 +41,6 @@ function ChatWindowPage({paper, reviewOID}: Props) {
         const jsondata = await response.json()
         const messages = jsondata as Message[]
 
-        console.log(jsondata)
-        console.log(messages)
-
         setChatmessages(messages)
     }
 
@@ -95,7 +92,6 @@ function ChatWindowPage({paper, reviewOID}: Props) {
 
         const newMessage = jsondata.createdMessage as Message;
         newMessage.attachmentO = jsondata.createdAttachment;
-        console.log(newMessage)
 
         setChatmessages([...chatmessages, newMessage])
         setText("")

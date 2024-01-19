@@ -36,7 +36,6 @@ export function mapConceptStatusToString(accepted: boolean | null){
 
 
 export function formatUserName(user: User){
-    console.log(user);
     if (user.firstname && user.lastname) {
         return `${user.firstname} ${user.lastname}`;
     } else if (user.firstname || user.lastname) {

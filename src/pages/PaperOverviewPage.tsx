@@ -26,7 +26,7 @@ function PaperOverviewPage() {
     const [showChat, setShowChat] = useState<Paper>();
     //const [uploadedPaper, setUploadedPaper] = useState<PaperObj[] | null>(null)
     const {data: uploadedPaper, setData: setUploadedPaper} = useFetch<PaperType[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/paper/get-uploaded-paper/${seminarOID}`);
-    const {data: seminar} = useFetch<SeminarType>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}`);
+    const {data: seminar, setData: setDataSeminar} = useFetch<SeminarType>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}`);
 
     async function onUpload(file: any) {
         if (!file || !seminarOID) {
@@ -47,23 +47,26 @@ function PaperOverviewPage() {
             },);
 
             if (res.status === 200) {
-                alert('Paper uploaded successfully.');
+                alert('Paper erfolgreich hochgeladen.');
                 //setSelectedFile(null);
                 setShowModal(false);
                 const data = await res.json();
                 console.log(data);
                 setUploadedPaper([...uploadedPaper!, data]);
+                //change phase3paperOID or phase7paperOID
 
                 if(seminar?.phase === 7){
                     seminar.roleassignments[0].phase7paperOID = data.paperOID;
+                }else if(seminar?.phase === 3){
+                    seminar.roleassignments[0].phase3paperOID = data.paperOID;
                 }
 
             } else if (res.status === 415) {
                 alert("Bitte nur PDF-Dateien hochladen.")
             } if(res.status === 409){
                 alert("Sie haben bereits ein Paper zur Bewertung eingereicht")
-            } else {
-                alert('Error uploading paper. Please try again.');
+            } else if (res.status === 500) {
+                alert('Fehler beim Hochladen des Papers.');
             }
         } catch (error) {
             console.error("Error uploading paper:", error);
@@ -76,29 +79,31 @@ function PaperOverviewPage() {
             <MainLayout>
                 {/*<pre>{JSON.stringify(uploadedPaper, null, 2)}</pre>*/}
                 {/*<pre>{JSON.stringify(seminar, null, 2)}</pre>*/}
-                <p>Ihre eingereichten Paper:</p>
-                <div className={styles.container}>
-                    <p>Datei:</p>
-                    <p>Eingereicht:</p>
-                    <p></p>
+                <h1>Eingereichte Paper:</h1>
+                <div data-test="uploaded-papers-div" className={styles.container}>
+                    <div data-test="header">
+                        <p>Datei:</p>
+                        <p>Eingereicht:</p>
+                        <p></p>
+                    </div>
                     {uploadedPaper && uploadedPaper.length > 0 ? (
                         uploadedPaper.map((paper: PaperType, index: number) => (
-                            <Fragment key={index}>
-                                <a href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
+                            <div data-test="uploaded-paper-row" key={index}>
+                                <a data-test="uploaded-paper-file" href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
                                 {seminar && seminar.phase && seminar.roleassignments.length > 0 ? (
                                     paper.paperOID === seminar.roleassignments[0].phase3paperOID ? (
                                         <>
-                                            <p>Phase 3</p>
-                                            <Button onClick={() => setShowChat(paper)} disabled={seminar.phase < 6}>Kommentare</Button>
+                                            <p data-test="uploaded-paper-phase">Phase 3</p>
+                                            <Button data-test="uploaded-paper-comments" onClick={() => setShowChat(paper)} disabled={seminar.phase < 6}>Kommentare</Button>
                                         </>
                                     ) : paper.paperOID === seminar.roleassignments[0].phase7paperOID ? (
                                         <>
-                                            <p>Phase 7</p>
+                                            <p data-test="uploaded-paper-phase">Phase 7</p>
                                             <p></p>
                                         </>
                                     ) : (
                                         <>
-                                            <p>-</p>
+                                            <p data-test="uploaded-paper-phase">-</p>
                                             <p></p>
                                         </>
                                     )
@@ -109,13 +114,13 @@ function PaperOverviewPage() {
                                     </>
                                 )}
 
-                            </Fragment>
+                            </div>
                         ))
                     ) : (
                         <p>Keine Paper vorhanden.</p>
                     )}
                     <p></p>
-                    <Button onClick={() => setShowModal(true)}
+                    <Button data-test="upload-paper-button" onClick={() => setShowModal(true)}
                             disabled={seminar?.phase !== 3 && (seminar?.phase !== 7 || !!seminar?.roleassignments[0].phase7paperOID)}>Hochladen</Button>
                     <p></p>
                 </div>

@@ -6,7 +6,14 @@ import ChatWindowPage from "./ChatWindowPage.tsx";
 import MainLayout from "../components/layout/MainLayout.tsx";
 import {Button} from "primereact/button";
 import useFetch from "../hooks/useFetch.ts";
-import {formatUserName, isJsonEmpty, mapPhaseToString, mapRatingToString, mapRoleToString} from "../utils/helpers.ts";
+import {
+    formatUserName,
+    isJsonEmpty,
+    mapConceptStatusToString,
+    mapPhaseToString,
+    mapRatingToString,
+    mapRoleToString
+} from "../utils/helpers.ts";
 import RoleAssignment from "../entities/database/RoleAssignment.ts";
 import Seminar from "../entities/database/Seminar.ts";
 import Paper from "../entities/database/Paper.ts";
@@ -109,7 +116,7 @@ function SeminarPage() {
                     {/*<p>{seminarOID}</p>*/}
                     {/*<pre>{JSON.stringify(concept, null, 2)}</pre>*/}
                     {/*<pre><p>{JSON.stringify(seminar, null, 2)}</p></pre>*/}
-                    <pre>{JSON.stringify(assignedPaper, null, 2)}</pre>
+                    {/*<pre>{JSON.stringify(assignedPaper, null, 2)}</pre>*/}
                 </div>
                 <div>
                     <h1 data-test="header">Seminar Übersicht</h1>
@@ -126,7 +133,7 @@ function SeminarPage() {
                         <div><p>Feedback</p></div>
                         <div><p>Status</p></div>
                         <div></div>
-                        <div data-test="concept-text"><p>{(concept) ? concept.text : "-"}</p></div>
+                        <div data-test="concept-text"><p>{(concept && concept.text) ? concept.text : "-"}</p></div>
                         {/**/}
                         <div data-test="concept-attachment">
                             {(concept?.attachmentO?.filename) ? //if filename exists pdf exists
@@ -147,7 +154,7 @@ function SeminarPage() {
                             }
                         </div>
                         <div data-test="concept-status">
-                            <p>{concept?.accepted === null ? "Bewertung ausstehend" : concept?.accepted ? "Angenommen" : "Abgelehnt"}</p>
+                            <p>{concept?.accepted !== undefined ? mapConceptStatusToString(concept.accepted) : "-"}</p>
                         </div>
                         <div  data-test="concept-upload-btn">  {/* TODO edit disabled rule */}
                             <Button onClick={() => {

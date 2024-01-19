@@ -24,7 +24,8 @@ function PaperUploadPage({seminarOID, phase, onUpload}: Props) {
             <div className={styles.upload}>
                 <p>Paper (PDF)</p>
                 <div className="card">
-                    <FileUpload customUpload
+                    <FileUpload data-test="fileupload-component"
+                                customUpload
                                 uploadHandler={() => {}}
                                 onSelect={(event: FileUploadSelectEvent)=>setSelectedFile(event.files[0])}
                                 onClear={()=>setSelectedFile(null)}
@@ -35,8 +36,8 @@ function PaperUploadPage({seminarOID, phase, onUpload}: Props) {
                 </div>
             </div>
             <div className={styles.buttonDiv}>
-                {phase === 3 && <Button onClick={onClick}>Paper anonym einreichen</Button>}
-                {phase === 7 && <Button onClick={onClick}>Finales Paper zur Bewertung einreichen</Button>}
+                {phase === 3 && <Button data-test="upload-paper-submit" onClick={onClick}>Paper anonym einreichen</Button>}
+                {phase === 7 && <Button data-test="upload-paper-submit" onClick={onClick}>Finales Paper zur Bewertung einreichen</Button>}
             </div>
         </div>
     );

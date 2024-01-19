@@ -45,22 +45,22 @@ describe('SeminarDetailsPage', () => {
                 .should('have.value', this.participantsList.assignmentkey);
         });
         it('should display correct amount of submitted concepts', function () {
-            const conceptCount = this.participantsList?.roleassignments.filter(user => user.userO.userOIDStudent_concepts[0]?.accepted === true).length;
-            const studentCount = this.participantsList?.roleassignments.filter(user => user.roleOID === 3).length;
+            const conceptCount = this.participantsList?.roleassignments.filter((user: any) => user.userO.userOIDStudent_concepts[0]?.accepted === true).length;
+            const studentCount = this.participantsList?.roleassignments.filter((user: any) => user.roleOID === 3).length;
             cy.getByData('submitted-concepts')
                 .should('exist')
                 .should('contain.text', `${conceptCount}/${studentCount}`);
         });
         it('should display correct amount of submitted phase 3 paper', function () {
-            const p3paperCount = this.participantsList?.roleassignments.filter(user => user.phase3paperOID !== null).length;
-            const studentCount = this.participantsList?.roleassignments.filter(user => user.roleOID === 3).length;
+            const p3paperCount = this.participantsList?.roleassignments.filter((user: any) => user.phase3paperOID !== null).length;
+            const studentCount = this.participantsList?.roleassignments.filter((user: any) => user.roleOID === 3).length;
             cy.getByData('submitted-p3-paper')
                 .should('exist')
                 .should('contain.text', `${p3paperCount}/${studentCount}`);
         });
         it('should display correct amount of submitted phase 7 paper', function () {
-            const p7paperCount = this.participantsList?.roleassignments.filter(user => user.phase7paperOID !== null).length;
-            const studentCount = this.participantsList?.roleassignments.filter(user => user.roleOID === 3).length;
+            const p7paperCount = this.participantsList?.roleassignments.filter((user: any) => user.phase7paperOID !== null).length;
+            const studentCount = this.participantsList?.roleassignments.filter((user: any) => user.roleOID === 3).length;
             cy.getByData('submitted-p3-paper')
                 .should('exist')
                 .should('contain.text', `${p7paperCount}/${studentCount}`);
@@ -192,11 +192,9 @@ describe('SeminarDetailsPage', () => {
                     cy.wrap(row).find('td').eq(2).should('have.text', user.userO.mail);
                     cy.wrap(row).find('td').eq(3).should('have.text', mapRoleToString(user.roleOID));
 
-                    cy.log(user);
                     if (user.userO.userOIDStudent_concepts && user.userO.userOIDStudent_concepts.length > 0) {
                         const concept = user.userO.userOIDStudent_concepts[0];
                         const supervisor = concept.userOIDSupervisor_user;
-                        cy.log(concept)
                         console.log(supervisor)
                         supervisor ?
                             cy.wrap(row).find('td').eq(4).should('have.text', formatUserName(supervisor)) :
@@ -402,8 +400,8 @@ describe('SeminarDetailsPage', () => {
                 }).as('updateUser');
 
                 //search supervisor of student concept
-                const supervisorOID = this.participantsList.roleassignments.find(user => user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user);
-                const rowIndexOfSupervisor = this.participantsList.roleassignments.findIndex(user => user.userO.userOID === supervisorOID.userO.userOID);
+                const supervisorOID = this.participantsList.roleassignments.find((user: any) => user.userO.userOIDStudent_concepts[0]?.userOIDSupervisor_user);
+                const rowIndexOfSupervisor = this.participantsList.roleassignments.findIndex((user: any) => user.userO.userOID === supervisorOID.userO.userOID);
 
                 //click edit button of supervisor
                 cy.get('table tbody tr').eq(rowIndexOfSupervisor).find('td')
@@ -560,7 +558,7 @@ describe('SeminarDetailsPage', () => {
             const accept = Math.floor(Math.random() * 2);
             const randomSupervisorIndex = Math.floor(Math.random() * this.supervisorList.length);
             const userId = 41;
-            const rowIndexOfUser = this.participantsList.roleassignments.findIndex(user => user.userO.userOID === userId);
+            const rowIndexOfUser = this.participantsList.roleassignments.findIndex((user: any) => user.userO.userOID === userId);
 
             //create concept json as answer from backend
             const concept: Concept = {

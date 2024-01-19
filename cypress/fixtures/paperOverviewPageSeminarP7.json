@@ -1,0 +1,13 @@
+{
+  "description": "Bachelor SS 2023",
+  "phase": 7,
+  "roleassignments": [
+    {
+      "userOID": 1,
+      "seminarOID": 123,
+      "roleOID": 3,
+      "phase3paperOID": 20,
+      "phase7paperOID": null
+    }
+  ]
+}

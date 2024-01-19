@@ -1,4 +1,3 @@
-import seminar from "../../src/entities/database/Seminar.ts";
 import {
     formatUserName,
     isJsonEmpty,
@@ -6,16 +5,13 @@ import {
     mapPhaseToString, mapRatingToString,
     mapRoleToString
 } from "../../src/utils/helpers.ts";
-import concept from "../../src/entities/database/Concept.ts";
 
 describe('SeminarPage', () => {
     //user has id 1 in fixtures
     const userOID = 1;
+    // seminar has id 1 in fixtures
     const seminarOID = 1;
     beforeEach(function () {
-        // seminar has id 1 in fixtures
-        const seminarOID = 1;
-
         cy.visit(`${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_FRONTEND_URL')}/seminar/${seminarOID}`);
         cy.mockAuthStatus();
 
@@ -73,7 +69,6 @@ describe('SeminarPage', () => {
         //h1 should exist
         cy.getByData('header').should('exist').should('contain.text', 'Seminar Übersicht');
         cy.getByData('seminar-name').should('exist').should('have.text', `Seminarname: ${this.seminar.description}`);
-        cy.g
 
         //seminar name
         //phase
@@ -166,6 +161,30 @@ describe('SeminarPage', () => {
                 cy.get('.p-dropdown-items li.p-dropdown-item').eq(randomSupervisorIndex).click();
                 cy.getByData('concept-upload-fileupload').find('input[type="file"]').selectFile('cypress/fixtures/conceptTest.pdf', {force: true});
 
+                cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/concepts/newest/${seminarOID}`, {
+                    statusCode: 200,
+                    body: {
+                        conceptOID: 69,
+                        text: conceptText,
+                        userOIDSupervisor: this.supervisorList[randomSupervisorIndex].userOID,
+                        userOIDStudent: userOID,
+                        feedback: null,
+                        seminarOID: seminarOID,
+                        accepted: null,
+                        attachmentOID: 123,
+                        createdAt: "2024-01-18T21:34:24.000Z",
+                        updatedAt: "2024-01-18T21:34:24.000Z",
+                        attachmentO: {
+                            "filename": "conceptTest.pdf"
+                        },
+                        userOIDSupervisor_user: {
+                            "userOID": this.supervisorList[randomSupervisorIndex].userOID,
+                            "firstname": this.supervisorList[randomSupervisorIndex].firstname,
+                            "lastname": this.supervisorList[randomSupervisorIndex].lastname,
+                        }
+                    }
+                }).as('getDataConceptCreated');
+
                 //click upload
                 cy.getByData('concept-upload-submit').should('exist').click()
                 //should show confirm alert if sure to upload
@@ -185,8 +204,22 @@ describe('SeminarPage', () => {
                 //modal should be closed
                 cy.getByData('modal').should('not.exist');
 
-                //state should be updated
-                //TODO
+                cy.wait(500)
+
+                //state should be updated, check if uploaded concept is displayed
+                cy.getByData('concept-text').should('exist').should('have.text', conceptText);
+                //attachment is url
+                cy.getByData('concept-attachment').should('exist')
+                    .find('a')
+                    .should(($a) => {
+                        const href = $a.attr('href');
+                        expect(href).to.include(`/attachment/123`);
+                    })
+                    .should('have.text', `conceptTest.pdf`);
+                const supervisor = this.supervisorList[randomSupervisorIndex];
+                cy.getByData('concept-supervisor').should('exist').should('have.text', `${supervisor ? formatUserName(supervisor) : '-'}`);
+                cy.getByData('concept-feedback').should('exist').should('have.text', '-');
+                cy.getByData('concept-status').should('exist').should('have.text', mapConceptStatusToString(null));
             }
         });
 
@@ -212,9 +245,13 @@ describe('SeminarPage', () => {
     });
     describe('assigned paper part', function () {
         it('should show correct amount of assigned papers', function () {
+            cy.reload();
+            cy.wait(500)
             cy.getByData('amount-assigned-papers').should('exist').should('contain.text', this.assignedPaper.length);
         });
         it('assigned paper should be displayed correctly', function () {
+            cy.reload();
+            cy.wait(500)
             cy.getByData('assigned-papers-div')
                 .should('exist')
                 .findByData('assigned-paper-row')
@@ -239,6 +276,8 @@ describe('SeminarPage', () => {
                 })
         });
         it('test rating process of a paper', function () {
+            cy.reload();
+            cy.wait(500)
             cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/review/rate`, {
                 statusCode: 200,
                 body: {}
@@ -277,6 +316,8 @@ describe('SeminarPage', () => {
 
         describe('chat', function () {
             it('click on comment button should open chat modal, and should display messages correctly', function () {
+                cy.reload();
+                cy.wait(500)
                 cy.getByData('assigned-papers-div')
                     .should('exist')
                     .findByData('assigned-paper-row')
@@ -350,6 +391,8 @@ describe('SeminarPage', () => {
                     })
             });
             it('test to write review of a assigned paper', function () {
+                cy.reload();
+                cy.wait(500)
                 //add created message to chatmessagesList because messages of polling
                 const messagesWithCreatedMessage = this.chatmessagesList;
                 messagesWithCreatedMessage.push({
@@ -369,7 +412,6 @@ describe('SeminarPage', () => {
                     .each((paperRow, index) => {
                         cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/review/get-reviewoids-from-paper/${this.assignedPaper[index].paperOID}`, {
                             statusCode: 200,
-                            //body: [this.assignedPaper[index].reviews[0].reviewOID]
                             body: [
                                 {
                                     reviewOID: this.assignedPaper[index].reviews[0].reviewOID,
@@ -385,7 +427,7 @@ describe('SeminarPage', () => {
                         cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/chat`, {
                             statusCode: 200,
                             fixture: 'chatCreatedMessage.json',
-                        }).as('getChatMessages');
+                        }).as('createChatMessage');
 
                         cy.wrap(paperRow)
                             .findByData('assigned-paper-chat-btn')
@@ -405,11 +447,10 @@ describe('SeminarPage', () => {
                             .find('input[type="file"]')
                             .selectFile('cypress/fixtures/conceptTest.pdf', {force: true});
 
-                        console.log(this.chatmessagesList.length)
+
                         cy.getByData('review-send')
                             .should('exist')
                             .click();
-                        console.log(this.chatmessagesList.length)
 
                         //check if new message is displayed
                         cy.getByData('messages-div').should('exist')
@@ -435,6 +476,20 @@ describe('SeminarPage', () => {
                                 const href = $a.attr('href');
                                 expect(href).to.include(`/attachment/${this.createdMessage.createdAttachment.attachmentOID}`);
                             })
+
+                        cy.getByData('messages-div').should('exist')
+                            .findByData('ChatMessage-div')
+                            .last()
+                            .findByData('message-text')
+                            .should('exist')
+                            .should('have.text', this.createdMessage.createdMessage.message || '');
+
+                        cy.getByData('messages-div').should('exist')
+                            .findByData('ChatMessage-div')
+                            .last()
+                            .findByData('message-date')
+                            .should('exist')
+                            .should('have.text', new Date(this.createdMessage.createdMessage.createdAt).toLocaleString());
 
                         cy.getByData('close-modal').click();
                         cy.getByData('modal').should('not.exist');

@@ -2,27 +2,25 @@ import {formatUserName, mapConceptStatusToString} from "../../src/utils/helpers.
 
 describe('memberDetailPage', () => {
     const seminarOID = 1;
-    const userOID = 5;
+    let userOID = 5;
 
     beforeEach(function () {
         cy.fixture('memberDetailPageMember').then((member) => {
             this.member = member;
+            userOID = member.userOID;
         });
         cy.fixture('memberDetailPageReviewerOfPaper').then((reviewer) => {
             this.reviewer = reviewer;
         });
-        // TODO ändern auf member
+
         cy.visit(`${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_FRONTEND_URL')}/seminar-details/${seminarOID}/user/${userOID}`);
         cy.mockAuthStatus();
 
-
-        // TODO ändern auf member
         cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/${seminarOID}/get-student/${userOID}`, {
             statusCode: 200,
             fixture: 'memberDetailPageMember.json'
         }).as('getMemberDetailPage');
 
-        // TODO ändern auf member bzw dessen paperOD
         cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/review/get-reviewer-of-paper/9`, {
             statusCode: 200,
             fixture: 'memberDetailPageReviewerOfPaper.json'
@@ -85,13 +83,15 @@ describe('memberDetailPage', () => {
         });
     });
 
-    it.only('should display paper correctly', function () {
-        //TODO div is not found
+    it('should display paper correctly', function () {
         const roleassignment = this.member.roleassignments[0];
         cy.getByData('header-papers').should('exist').should('contain.text', 'Hochgeladene Paper');
 
         //iterate over over every fragment in div
-        cy.getByData('papers').should('exist').find('div').each((paper, paperIndex) => {
+        cy.getByData('papers')
+            .should('exist')
+            .findByData('paper-row')
+            .each((paper, paperIndex) => {
             const currentPaper = this.member.papers[paperIndex];
             //find href in div
             cy.wrap(paper).findByData('attachment-href').should(($a) => {

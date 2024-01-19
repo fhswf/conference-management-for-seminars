@@ -48,10 +48,10 @@ function ConceptUploadPage({seminarOID, onClose, onConceptUpload}: Props) {
         oid && formData.append('supervisorOID', oid.toString());
         seminarOID && formData.append('seminarOID', seminarOID.toString());
 
-        console.log(text);
-        console.log(selectedFile);
-        console.log(selectedSupervisor);
-        console.log(formData);
+        //console.log(text);
+        //console.log(selectedFile);
+        //console.log(selectedSupervisor);
+        //console.log(formData);
 
         try {
             const res = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/concepts`, {
@@ -101,7 +101,7 @@ function ConceptUploadPage({seminarOID, onClose, onConceptUpload}: Props) {
                     }
                 } )
                 setAvailableSupervisor(availableSupervisor);
-                console.log(availableSupervisor);
+                //console.log(availableSupervisor);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }

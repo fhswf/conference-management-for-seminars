@@ -62,7 +62,6 @@ describe('AdminPage', () => {
                 cy.wrap(row).find('td').eq(0).should('contain.text', seminarData.seminarOID);
                 cy.wrap(row).find('td').eq(1).should('contain.text', seminarData.description);
                 cy.wrap(row).find('td').eq(2).should('contain.text', seminarData.phase);
-                cy.log(new Date(seminarData.createdAt).toLocaleString());
                 cy.wrap(row).find('td').eq(3).should('have.text', new Date(seminarData.createdAt).toLocaleString());
                 cy.wrap(row).find('td').eq(4).find('input')
                     .should('have.value', seminarData.assignmentkey)
@@ -231,7 +230,7 @@ describe('AdminPage', () => {
             //for each user in fixture select a random row in table and assign a random user with a random role
 
             cy.fixture('adminAddableUsers').then((addableUsersList) => {
-                addableUsersList.forEach((user, userIndex) => {
+                addableUsersList.forEach(() => {
                     const randomRowIndex = Math.floor(Math.random() * this.seminarList.length);
                     cy.get('table tbody tr').eq(randomRowIndex).should('exist');
                     const seminarOID = this.seminarList[randomRowIndex].seminarOID;

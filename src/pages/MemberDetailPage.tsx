@@ -1,3 +1,4 @@
+import styles from "./MemberDetailPage.module.css"
 import Table from "../components/Table.tsx";
 import useFetch from "../hooks/useFetch.ts";
 import {useParams} from "react-router-dom";
@@ -51,27 +52,6 @@ function MemberDetailPage() {
         }
     }, [data]);
 
-    const styles = {
-        uploadedPaper: {
-            display: "grid",
-            gridTemplateColumns: "20% 20% 20%",
-            alignItems: "center"
-        },
-    };
-    /*
-    const styles = {
-        uploadedPaper: {
-            display: "grid",
-            gridTemplateColumns: "20% 20% 20%",
-            alignItems: "center"
-        },
-        uploadPaperItem: {
-            padding: "10px",
-            textAlign: "left"
-        }
-    };
-    * */
-
     const header = [
         {field: 'text', header: 'Text'},
         {field: 'pdf', header: 'PDF'},
@@ -81,7 +61,7 @@ function MemberDetailPage() {
         {field: 'createdAt', header: 'Eingereicht am'},
     ];
 
-    const tableData = Array.isArray(data?.userOIDStudent_concepts) && data?.userOIDStudent_concepts.map((concept) => {
+    const tableData = data?.userOIDStudent_concepts?.map((concept) => {
         return {
             text: concept.text,
             pdf: concept.attachmentO ?
@@ -102,16 +82,18 @@ function MemberDetailPage() {
                 <p data-test="seminar-id">Seminar-ID: {seminarOID}</p>
                 <p data-test="student-name">Student: {data && formatUserName(data)}</p>
                 <h2 data-test="header-concepts">Eingereichte Konzepte</h2>
-                <Table  data-test="table-concepts" header={header} data={tableData}/>
+                <Table data-test="table-concepts" header={header} data={tableData}/>
                 <h2 data-test="header-papers">Hochgeladene Paper</h2>
-                <div data-test="papers" style={styles.uploadedPaper}>
+                <div data-test="papers" className={styles.container}>
+                    <div>
                     <p>Datei:</p>
                     <p>Datum:</p>
-                    <p>Final Paper:</p>
+                    <p>Final Paper Phase:</p>
+                    </div>
                     {data?.papers && data?.papers.length > 0 && data?.papers.map((paper: PaperType, index: number) => {
                         /* make Fragment to div for testing */
                         return (
-                            <Fragment key={paper.paperOID}>
+                            <div data-test="paper-row" key={paper.paperOID}>
                                 <a  data-test="attachment-href" href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
                                 <p  data-test="date-paper">{paper.createdAt ? new Date(paper.createdAt).toLocaleString() : '-'}</p>
                                 {data.roleassignments.length > 0 ? (
@@ -125,7 +107,7 @@ function MemberDetailPage() {
                                 ) : (
                                     <p data-test="phase-paper">-</p>
                                 )}
-                            </Fragment>
+                            </div>
                         )
                     })}
                 </div>

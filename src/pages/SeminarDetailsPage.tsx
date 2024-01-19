@@ -76,7 +76,7 @@ function SeminarDetailsPage() {
         {field: "concept", header: "Konzept"},
     ];
 
-    const tableData = participantsList?.roleassignments.map(user => ({
+    const tableData = participantsList?.roleassignments?.map(user => ({
         lname: user.userO.lastname || "-",
         fname: user.userO.firstname || "-",
         mail: user.userO.mail || "-",
@@ -115,7 +115,7 @@ function SeminarDetailsPage() {
         }
     }
 
-    const tableDataEdit = participantsList?.roleassignments.map(user => ({
+    const tableDataEdit = participantsList?.roleassignments?.map(user => ({
         lname: user.userO.lastname || "-",
         fname: user.userO.firstname || "-",
         mail: user.userO.mail || "-",
@@ -131,12 +131,12 @@ function SeminarDetailsPage() {
         concept: !user.userO.userOIDStudent_concepts[0] ? "-" : mapConceptStatusToString(user.userO.userOIDStudent_concepts[0]?.accepted),
     }));
 
-    const p3paperCount = participantsList?.roleassignments.filter(user => user.phase3paperOID !== null).length;
-    const p7paperCount = participantsList?.roleassignments.filter(user => user.phase7paperOID !== null).length;
-    const conceptCount = participantsList?.roleassignments.filter(user => user.userO.userOIDStudent_concepts[0]?.accepted === true).length;
-    const studentCount = participantsList?.roleassignments.filter(user => user.roleOID === 3).length;
+    const p3paperCount = participantsList?.roleassignments?.filter(user => user.phase3paperOID !== null).length;
+    const p7paperCount = participantsList?.roleassignments?.filter(user => user.phase7paperOID !== null).length;
+    const conceptCount = participantsList?.roleassignments?.filter(user => user.userO.userOIDStudent_concepts[0]?.accepted === true).length;
+    const studentCount = participantsList?.roleassignments?.filter(user => user.roleOID === 3).length;
 
-    const currentRole = participantsList?.roleassignments.find(userEntry => userEntry.userOID === user?.userOID);
+    const currentRole = participantsList?.roleassignments?.find(userEntry => userEntry.userOID === user?.userOID);
 
     async function onUpdateUser() {
         setIsEditMode(0);
@@ -196,7 +196,7 @@ function SeminarDetailsPage() {
         setShowUserConcept(undefined);
     }
 
-    const role = participantsList?.roleassignments.find(userEntry => userEntry.userOID === user?.userOID)?.roleOID;
+    const role = participantsList?.roleassignments?.find(userEntry => userEntry.userOID === user?.userOID)?.roleOID;
 
     return (
         <div>
