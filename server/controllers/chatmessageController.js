@@ -118,6 +118,11 @@ const createMessage = async (req, res) => {
         delete createdMessage.dataValues.receiver;
         await t.commit();
 
+        //delete file attribute from attachment
+        if (createdAttachment) {
+            createdAttachment = createdAttachment.get();
+            delete createdAttachment.file;
+        }
         createdMessage.attachmentO = createdAttachment;
 
         // optional: send mail to receiver

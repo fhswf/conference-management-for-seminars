@@ -29,8 +29,8 @@ function App() {
     // TODO replace with useFetch
     useEffect(() => {
         const getUser = () => {
-            console.log("fetching user");
-            fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/authstatus`, {
+            //console.log("fetching user");
+            fetch(`${import.meta.env.VITE_BACKEND_URL}/authstatus`, {
                 method: "GET",
                 credentials: "include",
             })
@@ -39,7 +39,7 @@ function App() {
                     throw new Error("authentication has been failed!");
                 })
                 .then((resObject) => {
-                    console.log(resObject.user)
+                    //console.log(resObject.user)
                     setUser(resObject.user);
                     setIsLoading(false);
                 })

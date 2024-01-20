@@ -1,0 +1,20 @@
+[
+  {
+    "userOID": 19,
+    "firstname": "Finn",
+    "lastname": "Becker",
+    "mail": "becker.finn@fh-swf.de"
+  },
+  {
+    "userOID": 29,
+    "firstname": "David",
+    "lastname": "Krüger",
+    "mail": "krueger.david@fh-swf.de"
+  },
+  {
+    "userOID": 15,
+    "firstname": "Elias",
+    "lastname": "Schmitt",
+    "mail": "schmitt.elias@fh-swf.de"
+  }
+]

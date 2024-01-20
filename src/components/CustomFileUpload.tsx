@@ -20,6 +20,7 @@ function CustomFileUpload({onSelectionChanged, accept}: Props) {
     return (
         <>
             <FileUpload
+                data-test="fileupload-component"
                 accept={accept}
                 ref={fileUploadRef}
                 mode="basic"

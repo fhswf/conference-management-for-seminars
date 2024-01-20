@@ -1,3 +1,5 @@
+import User from "../entities/database/User.ts";
+
 export function mapPhaseToString(phase: number){
     switch (phase) {
         case 1: return 'Registrierung-Phase';
@@ -25,24 +27,23 @@ export function mapRoleToString(role: number){
 export function mapConceptStatusToString(accepted: boolean | null){
     switch (accepted) {
         case null: return 'Bewertung ausstehend';
-        case true: return 'akzeptiert';
-        case false: return 'abgelehnt';
+        case true: return 'Angenommen';
+        case false: return 'Abgelehnt';
 
         default: return 'Status ungültig';
     }
 }
 
-/*
-                <RadioButton inputId="5" value="5" onChange={(e) => setRating(e.value)} checked={rating === '5'} />
-                <p>Tendenziell Annehmen</p>
-                <RadioButton inputId="4" value="4" onChange={(e) => setRating(e.value)} checked={rating === '4'} />
-                <p>Enthaltung</p>
-                <RadioButton inputId="3" value="3" onChange={(e) => setRating(e.value)} checked={rating === '3'} />
-                <p>Tendenziell Ablehnen</p>
-                <RadioButton inputId="2" value="2" onChange={(e) => setRating(e.value)} checked={rating === '2'} />
-                <p>Ablehnen</p>
-                <RadioButton inputId="1" value="1" onChange={(e) => setRating(e.value)} checked={rating === '1'} />
-*/
+
+export function formatUserName(user: User){
+    if (user.firstname && user.lastname) {
+        return `${user.firstname} ${user.lastname}`;
+    } else if (user.firstname || user.lastname) {
+        return `${user.firstname || user.lastname}`;
+    } else {
+        return user.mail;
+    }
+}
 
 export function mapRatingToString(rating: number | null){
     switch (rating) {
@@ -54,4 +55,13 @@ export function mapRatingToString(rating: number | null){
 
         default: return 'Nicht bewertet';
     }
+}
+
+export function isJsonEmpty(json: any) {
+    for (var key in json) {
+        if (json.hasOwnProperty(key)) {
+            return false;
+        }
+    }
+    return true;
 }

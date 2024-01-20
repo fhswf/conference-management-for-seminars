@@ -1,0 +1,13 @@
+{
+  "description": "Konferenz-Seminar-Test",
+  "phase": 1,
+  "roleassignments": [
+    {
+      "userOID": 1,
+      "seminarOID": 1,
+      "roleOID": 2,
+      "phase3paperOID": null,
+      "phase7paperOID": null
+    }
+  ]
+}

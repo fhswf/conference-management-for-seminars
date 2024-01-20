@@ -4,28 +4,30 @@ import {AuthContext} from "../context/AuthContext.ts";
 
 interface Props {
     message: Message;
+    'data-test'?: string;
 }
 
-function ChatMessage({message}: Props) {
+function ChatMessage({message, ['data-test']: dataTest}: Props) {
     const {user, setUser} = useContext(AuthContext);
     return (
-        <div className={styles.messageContainer}>
+        <div data-test={dataTest} className={styles.messageContainer}>
+            {/* date alignment left or right */}
             {message.sender === user?.userOID ?
                 <>
-                    <div>
+                    <div data-test="message-date">
                         <p>{new Date(message.createdAt).toLocaleString()}</p>
                     </div>
-                    <div className={styles.text}>
-                        <p>{message.message}</p>
-                        {message.attachmentO && <><hr/><a href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${message.attachmentO.attachmentOID}`}>{message.attachmentO.filename}</a></>}
+                    <div data-test="message-bubble" className={styles.text}>
+                        <p data-test="message-text">{message.message || ""}</p>
+                        {message.attachmentO && <><hr/><a data-test="message-attachment" href={`${import.meta.env.VITE_BACKEND_URL}/attachment/${message.attachmentO.attachmentOID}`}>{message.attachmentO.filename}</a></>}
                     </div>
                 </> :
                 <>
-                    <div className={styles.text}>
-                        <p>{message.message}</p>
-                        {message.attachmentO && <><hr/><a href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${message.attachmentO.attachmentOID}`}>{message.attachmentO.filename}</a></>}
+                    <div data-test="message-bubble" className={styles.text}>
+                        <p data-test="message-text">{message.message}</p>
+                        {message.attachmentO && <><hr/><a data-test="message-attachment" href={`${import.meta.env.VITE_BACKEND_URL}/attachment/${message.attachmentO.attachmentOID}`}>{message.attachmentO.filename}</a></>}
                     </div>
-                    <div>
+                    <div data-test="message-date">
                         <p>{new Date(message.createdAt).toLocaleString()}</p>
                     </div>
                 </>

@@ -1,0 +1,26 @@
+[
+  {
+    "userOID": 8,
+    "firstname": "Laura",
+    "lastname": "Bauer",
+    "mail": "bauer.laura@fh-swf.de"
+  },
+  {
+    "userOID": 11,
+    "firstname": "Nico",
+    "lastname": "Kühn",
+    "mail": "kuehn.nico@fh-swf.de"
+  },
+  {
+    "userOID": 12,
+    "firstname": "Emilia",
+    "lastname": "Kaiser",
+    "mail": "kaiser.emilia@fh-swf.de"
+  },
+  {
+    "userOID": 25,
+    "firstname": "Ben",
+    "lastname": "Bergmann",
+    "mail": "bergmann.ben@fh-swf.de"
+  }
+]

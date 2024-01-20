@@ -1,43 +1,43 @@
 {
   "seminarOID": 1,
-  "description": "Konferenz-Seminar-Test",
+  "description": "Bachelor WS 2023/24",
   "phase": 2,
-  "assignmentkey": "89727b76-e004-403c-8a7b-31d76a908abd",
-  "createdAt": "2023-12-28T20:46:46.000Z",
-  "updatedAt": "2023-12-31T15:06:12.000Z",
+  "assignmentkey": "f250e71f-712e-43f1-820c-dc6952210d30",
+  "createdAt": "2023-12-06T16:49:09.000Z",
+  "updatedAt": "2023-12-06T16:49:09.000Z",
   "roleassignments": [
     {
-      "userOID": 1,
+      "userOID": 4,
       "seminarOID": 1,
       "roleOID": 3,
       "phase3paperOID": null,
       "phase7paperOID": null,
       "userO": {
-        "userOID": 1,
-        "firstname": "Max1",
-        "lastname": "Mustermann1",
-        "mail": "mustermann1.max1@fh-swf.de",
+        "userOID": 4,
+        "firstname": "Lena",
+        "lastname": "Schulz",
+        "mail": "schulz.lena@fh-swf.de",
         "isAdmin": false,
         "userOIDStudent_concepts": [
           {
-            "conceptOID": 2,
-            "text": "concept-text",
-            "userOIDSupervisor": 3,
-            "userOIDStudent": 1,
-            "feedback": "good",
+            "conceptOID": 13,
+            "text": "Mein Konzept14",
+            "userOIDSupervisor": 8,
+            "userOIDStudent": 4,
+            "feedback": "Gut!",
             "seminarOID": 1,
             "accepted": true,
-            "attachmentOID": 2,
-            "createdAt": "2023-12-31T15:07:28.000Z",
-            "updatedAt": "2023-12-31T15:07:28.000Z",
+            "attachmentOID": 1,
+            "createdAt": "2023-12-06T18:40:04.000Z",
+            "updatedAt": "2023-12-06T18:40:04.000Z",
             "userOIDSupervisor_user": {
-              "userOID": 3,
-              "firstname": "John",
-              "lastname": "Doe",
-              "mail": "doe.john@fh-swf.de"
+              "userOID": 8,
+              "firstname": "Laura",
+              "lastname": "Bauer",
+              "mail": "bauer.laura@fh-swf.de"
             },
             "attachmentO": {
-              "attachmentOID": 2,
+              "attachmentOID": 1,
               "filename": "test.pdf"
             }
           }
@@ -45,33 +45,597 @@
       }
     },
     {
-      "userOID": 3,
+      "userOID": 5,
+      "seminarOID": 1,
+      "roleOID": 3,
+      "phase3paperOID": null,
+      "phase7paperOID": null,
+      "userO": {
+        "userOID": 5,
+        "firstname": "Max",
+        "lastname": "Wagner",
+        "mail": "wagner.max@fh-swf.de",
+        "isAdmin": false,
+        "userOIDStudent_concepts": [
+          {
+            "conceptOID": 6,
+            "text": "Mein Konzept7",
+            "userOIDSupervisor": 25,
+            "userOIDStudent": 5,
+            "feedback": null,
+            "seminarOID": 1,
+            "accepted": null,
+            "attachmentOID": 1,
+            "createdAt": "2023-12-06T18:40:04.000Z",
+            "updatedAt": "2023-12-06T18:40:04.000Z",
+            "userOIDSupervisor_user": {
+              "userOID": 25,
+              "firstname": "Ben",
+              "lastname": "Bergmann",
+              "mail": "bergmann.ben@fh-swf.de"
+            },
+            "attachmentO": {
+              "attachmentOID": 1,
+              "filename": "test.pdf"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "userOID": 7,
+      "seminarOID": 1,
+      "roleOID": 3,
+      "phase3paperOID": null,
+      "phase7paperOID": null,
+      "userO": {
+        "userOID": 7,
+        "firstname": "Felix",
+        "lastname": "Hoffmann",
+        "mail": "hoffmann.felix@fh-swf.de",
+        "isAdmin": false,
+        "userOIDStudent_concepts": [
+          {
+            "conceptOID": 1,
+            "text": "Mein Konzept2",
+            "userOIDSupervisor": 11,
+            "userOIDStudent": 7,
+            "feedback": "Gut!",
+            "seminarOID": 1,
+            "accepted": true,
+            "attachmentOID": 1,
+            "createdAt": "2023-12-06T18:40:04.000Z",
+            "updatedAt": "2023-12-06T18:40:04.000Z",
+            "userOIDSupervisor_user": {
+              "userOID": 11,
+              "firstname": "Nico",
+              "lastname": "Kühn",
+              "mail": "kuehn.nico@fh-swf.de"
+            },
+            "attachmentO": {
+              "attachmentOID": 1,
+              "filename": "test.pdf"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "userOID": 8,
       "seminarOID": 1,
       "roleOID": 2,
       "phase3paperOID": null,
       "phase7paperOID": null,
       "userO": {
-        "userOID": 3,
-        "firstname": "Doe",
-        "lastname": "John",
-        "mail": "doe.john@fh-swf.de",
+        "userOID": 8,
+        "firstname": "Laura",
+        "lastname": "Bauer",
+        "mail": "bauer.laura@fh-swf.de",
         "isAdmin": false,
-        "userOIDStudent_concepts": []
+        "userOIDStudent_concepts": [
+          {
+            "conceptOID": 20,
+            "text": "Mein Konzept7",
+            "userOIDSupervisor": 38,
+            "userOIDStudent": 8,
+            "feedback": "Gut!",
+            "seminarOID": 2,
+            "accepted": true,
+            "attachmentOID": 1,
+            "createdAt": "2023-12-06T18:40:04.000Z",
+            "updatedAt": "2023-12-06T18:40:04.000Z",
+            "userOIDSupervisor_user": {
+              "userOID": 38,
+              "firstname": "Lena",
+              "lastname": "Zimmermann",
+              "mail": "zimmermann.lena@fh-swf.de"
+            },
+            "attachmentO": {
+              "attachmentOID": 1,
+              "filename": "test.pdf"
+            }
+          }
+        ]
       }
     },
     {
-      "userOID": 4,
+      "userOID": 11,
+      "seminarOID": 1,
+      "roleOID": 2,
+      "phase3paperOID": null,
+      "phase7paperOID": null,
+      "userO": {
+        "userOID": 11,
+        "firstname": "Nico",
+        "lastname": "Kühn",
+        "mail": "kuehn.nico@fh-swf.de",
+        "isAdmin": false,
+        "userOIDStudent_concepts": [
+          {
+            "conceptOID": 17,
+            "text": "Mein Konzept4",
+            "userOIDSupervisor": 15,
+            "userOIDStudent": 11,
+            "feedback": "Gut!",
+            "seminarOID": 2,
+            "accepted": true,
+            "attachmentOID": 1,
+            "createdAt": "2023-12-06T18:40:04.000Z",
+            "updatedAt": "2023-12-06T18:40:04.000Z",
+            "userOIDSupervisor_user": {
+              "userOID": 15,
+              "firstname": "Elias",
+              "lastname": "Schmitt",
+              "mail": "schmitt.elias@fh-swf.de"
+            },
+            "attachmentO": {
+              "attachmentOID": 1,
+              "filename": "test.pdf"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "userOID": 12,
+      "seminarOID": 1,
+      "roleOID": 2,
+      "phase3paperOID": null,
+      "phase7paperOID": null,
+      "userO": {
+        "userOID": 12,
+        "firstname": "Emilia",
+        "lastname": "Kaiser",
+        "mail": "kaiser.emilia@fh-swf.de",
+        "isAdmin": false,
+        "userOIDStudent_concepts": [
+          {
+            "conceptOID": 25,
+            "text": "Mein Konzept12",
+            "userOIDSupervisor": 25,
+            "userOIDStudent": 12,
+            "feedback": "Gut!",
+            "seminarOID": 2,
+            "accepted": true,
+            "attachmentOID": 1,
+            "createdAt": "2023-12-06T18:40:04.000Z",
+            "updatedAt": "2023-12-06T18:40:04.000Z",
+            "userOIDSupervisor_user": {
+              "userOID": 25,
+              "firstname": "Ben",
+              "lastname": "Bergmann",
+              "mail": "bergmann.ben@fh-swf.de"
+            },
+            "attachmentO": {
+              "attachmentOID": 1,
+              "filename": "test.pdf"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "userOID": 15,
+      "seminarOID": 1,
+      "roleOID": 3,
+      "phase3paperOID": null,
+      "phase7paperOID": null,
+      "userO": {
+        "userOID": 15,
+        "firstname": "Elias",
+        "lastname": "Schmitt",
+        "mail": "schmitt.elias@fh-swf.de",
+        "isAdmin": false,
+        "userOIDStudent_concepts": [
+          {
+            "conceptOID": 3,
+            "text": "Mein Konzept4",
+            "userOIDSupervisor": 11,
+            "userOIDStudent": 15,
+            "feedback": "Gut!",
+            "seminarOID": 1,
+            "accepted": true,
+            "attachmentOID": null,
+            "createdAt": "2023-12-06T18:40:04.000Z",
+            "updatedAt": "2023-12-06T18:40:04.000Z",
+            "userOIDSupervisor_user": {
+              "userOID": 11,
+              "firstname": "Nico",
+              "lastname": "Kühn",
+              "mail": "kuehn.nico@fh-swf.de"
+            },
+            "attachmentO": null
+          }
+        ]
+      }
+    },
+    {
+      "userOID": 16,
+      "seminarOID": 1,
+      "roleOID": 3,
+      "phase3paperOID": null,
+      "phase7paperOID": null,
+      "userO": {
+        "userOID": 16,
+        "firstname": "Julia",
+        "lastname": "Weber",
+        "mail": "weber.julia@fh-swf.de",
+        "isAdmin": false,
+        "userOIDStudent_concepts": [
+          {
+            "conceptOID": 9,
+            "text": "Mein Konzept10",
+            "userOIDSupervisor": 25,
+            "userOIDStudent": 16,
+            "feedback": "Gut!",
+            "seminarOID": 1,
+            "accepted": true,
+            "attachmentOID": 1,
+            "createdAt": "2023-12-06T18:40:04.000Z",
+            "updatedAt": "2023-12-06T18:40:04.000Z",
+            "userOIDSupervisor_user": {
+              "userOID": 25,
+              "firstname": "Ben",
+              "lastname": "Bergmann",
+              "mail": "bergmann.ben@fh-swf.de"
+            },
+            "attachmentO": {
+              "attachmentOID": 1,
+              "filename": "test.pdf"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "userOID": 19,
+      "seminarOID": 1,
+      "roleOID": 3,
+      "phase3paperOID": null,
+      "phase7paperOID": null,
+      "userO": {
+        "userOID": 19,
+        "firstname": "Finn",
+        "lastname": "Becker",
+        "mail": "becker.finn@fh-swf.de",
+        "isAdmin": false,
+        "userOIDStudent_concepts": [
+          {
+            "conceptOID": 7,
+            "text": "Mein Konzept8",
+            "userOIDSupervisor": null,
+            "userOIDStudent": 19,
+            "feedback": null,
+            "seminarOID": 1,
+            "accepted": null,
+            "attachmentOID": 1,
+            "createdAt": "2023-12-06T18:40:04.000Z",
+            "updatedAt": "2023-12-06T18:40:04.000Z",
+            "userOIDSupervisor_user": null,
+            "attachmentO": {
+              "attachmentOID": 1,
+              "filename": "test.pdf"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "userOID": 23,
       "seminarOID": 1,
       "roleOID": 1,
       "phase3paperOID": null,
       "phase7paperOID": null,
       "userO": {
-        "userOID": 4,
-        "firstname": "User",
-        "lastname": "Example",
-        "mail": "example.user@fh-swf.de",
-        "isAdmin": false,
+        "userOID": 23,
+        "firstname": "betreuer",
+        "lastname": "betreuer",
+        "mail": "betreuer@betreuer.de",
+        "isAdmin": true,
         "userOIDStudent_concepts": []
+      }
+    },
+    {
+      "userOID": 25,
+      "seminarOID": 1,
+      "roleOID": 2,
+      "phase3paperOID": null,
+      "phase7paperOID": null,
+      "userO": {
+        "userOID": 25,
+        "firstname": "Ben",
+        "lastname": "Bergmann",
+        "mail": "bergmann.ben@fh-swf.de",
+        "isAdmin": false,
+        "userOIDStudent_concepts": [
+          {
+            "conceptOID": 46,
+            "text": "Mein Konzept1",
+            "userOIDSupervisor": 19,
+            "userOIDStudent": 25,
+            "feedback": "Gut!",
+            "seminarOID": 4,
+            "accepted": true,
+            "attachmentOID": 1,
+            "createdAt": "2023-12-06T18:40:04.000Z",
+            "updatedAt": "2023-12-06T18:40:04.000Z",
+            "userOIDSupervisor_user": {
+              "userOID": 19,
+              "firstname": "Finn",
+              "lastname": "Becker",
+              "mail": "becker.finn@fh-swf.de"
+            },
+            "attachmentO": {
+              "attachmentOID": 1,
+              "filename": "test.pdf"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "userOID": 29,
+      "seminarOID": 1,
+      "roleOID": 3,
+      "phase3paperOID": null,
+      "phase7paperOID": null,
+      "userO": {
+        "userOID": 29,
+        "firstname": "David",
+        "lastname": "Krüger",
+        "mail": "krueger.david@fh-swf.de",
+        "isAdmin": false,
+        "userOIDStudent_concepts": [
+          {
+            "conceptOID": 8,
+            "text": "Mein Konzept9",
+            "userOIDSupervisor": 11,
+            "userOIDStudent": 29,
+            "feedback": null,
+            "seminarOID": 1,
+            "accepted": null,
+            "attachmentOID": 1,
+            "createdAt": "2023-12-06T18:40:04.000Z",
+            "updatedAt": "2023-12-06T18:40:04.000Z",
+            "userOIDSupervisor_user": {
+              "userOID": 11,
+              "firstname": "Nico",
+              "lastname": "Kühn",
+              "mail": "kuehn.nico@fh-swf.de"
+            },
+            "attachmentO": {
+              "attachmentOID": 1,
+              "filename": "test.pdf"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "userOID": 31,
+      "seminarOID": 1,
+      "roleOID": 3,
+      "phase3paperOID": null,
+      "phase7paperOID": null,
+      "userO": {
+        "userOID": 31,
+        "firstname": "Felix",
+        "lastname": "Schwarz",
+        "mail": "schwarz.felix@fh-swf.de",
+        "isAdmin": false,
+        "userOIDStudent_concepts": [
+          {
+            "conceptOID": 4,
+            "text": "Mein Konzept5",
+            "userOIDSupervisor": null,
+            "userOIDStudent": 31,
+            "feedback": "Bitte ... verbessern!",
+            "seminarOID": 1,
+            "accepted": false,
+            "attachmentOID": 1,
+            "createdAt": "2023-12-06T18:40:04.000Z",
+            "updatedAt": "2023-12-06T18:40:04.000Z",
+            "userOIDSupervisor_user": null,
+            "attachmentO": {
+              "attachmentOID": 1,
+              "filename": "test.pdf"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "userOID": 33,
+      "seminarOID": 1,
+      "roleOID": 3,
+      "phase3paperOID": null,
+      "phase7paperOID": null,
+      "userO": {
+        "userOID": 33,
+        "firstname": "Maximilian",
+        "lastname": "Langer",
+        "mail": "langer.maximilian@fh-swf.de",
+        "isAdmin": false,
+        "userOIDStudent_concepts": [
+          {
+            "conceptOID": 10,
+            "text": "Mein Konzept11",
+            "userOIDSupervisor": null,
+            "userOIDStudent": 33,
+            "feedback": "Bitte ... verbessern!",
+            "seminarOID": 1,
+            "accepted": false,
+            "attachmentOID": 1,
+            "createdAt": "2023-12-06T18:40:04.000Z",
+            "updatedAt": "2023-12-06T18:40:04.000Z",
+            "userOIDSupervisor_user": null,
+            "attachmentO": {
+              "attachmentOID": 1,
+              "filename": "test.pdf"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "userOID": 38,
+      "seminarOID": 1,
+      "roleOID": 3,
+      "phase3paperOID": null,
+      "phase7paperOID": null,
+      "userO": {
+        "userOID": 38,
+        "firstname": "Lena",
+        "lastname": "Zimmermann",
+        "mail": "zimmermann.lena@fh-swf.de",
+        "isAdmin": false,
+        "userOIDStudent_concepts": [
+          {
+            "conceptOID": 5,
+            "text": "Mein Konzept6",
+            "userOIDSupervisor": 11,
+            "userOIDStudent": 38,
+            "feedback": "Gut!",
+            "seminarOID": 1,
+            "accepted": true,
+            "attachmentOID": 1,
+            "createdAt": "2023-12-06T18:40:04.000Z",
+            "updatedAt": "2023-12-06T18:40:04.000Z",
+            "userOIDSupervisor_user": {
+              "userOID": 11,
+              "firstname": "Nico",
+              "lastname": "Kühn",
+              "mail": "kuehn.nico@fh-swf.de"
+            },
+            "attachmentO": {
+              "attachmentOID": 1,
+              "filename": "test.pdf"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "userOID": 42,
+      "seminarOID": 1,
+      "roleOID": 3,
+      "phase3paperOID": null,
+      "phase7paperOID": null,
+      "userO": {
+        "userOID": 42,
+        "firstname": "Emilia",
+        "lastname": "Schröder",
+        "mail": "schroeder.emilia@fh-swf.de",
+        "isAdmin": false,
+        "userOIDStudent_concepts": [
+          {
+            "conceptOID": 2,
+            "text": "Mein Konzept3",
+            "userOIDSupervisor": 8,
+            "userOIDStudent": 42,
+            "feedback": "Bitte ... verbessern!",
+            "seminarOID": 1,
+            "accepted": false,
+            "attachmentOID": null,
+            "createdAt": "2023-12-06T18:40:04.000Z",
+            "updatedAt": "2023-12-06T18:40:04.000Z",
+            "userOIDSupervisor_user": {
+              "userOID": 8,
+              "firstname": "Laura",
+              "lastname": "Bauer",
+              "mail": "bauer.laura@fh-swf.de"
+            },
+            "attachmentO": null
+          }
+        ]
+      }
+    },
+    {
+      "userOID": 47,
+      "seminarOID": 1,
+      "roleOID": 3,
+      "phase3paperOID": null,
+      "phase7paperOID": null,
+      "userO": {
+        "userOID": 47,
+        "firstname": "Elias",
+        "lastname": "Schneider",
+        "mail": "schneider.elias@fh-swf.de",
+        "isAdmin": false,
+        "userOIDStudent_concepts": [
+          {
+            "conceptOID": 11,
+            "text": "Mein Konzept12",
+            "userOIDSupervisor": 25,
+            "userOIDStudent": 47,
+            "feedback": null,
+            "seminarOID": 1,
+            "accepted": null,
+            "attachmentOID": 1,
+            "createdAt": "2023-12-06T18:40:04.000Z",
+            "updatedAt": "2023-12-06T18:40:04.000Z",
+            "userOIDSupervisor_user": {
+              "userOID": 25,
+              "firstname": "Ben",
+              "lastname": "Bergmann",
+              "mail": "bergmann.ben@fh-swf.de"
+            },
+            "attachmentO": {
+              "attachmentOID": 1,
+              "filename": "test.pdf"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "userOID": 50,
+      "seminarOID": 1,
+      "roleOID": 3,
+      "phase3paperOID": null,
+      "phase7paperOID": null,
+      "userO": {
+        "userOID": 50,
+        "firstname": "Marie",
+        "lastname": "Wagner",
+        "mail": "wagner.marie@fh-swf.de",
+        "isAdmin": false,
+        "userOIDStudent_concepts": [
+          {
+            "conceptOID": 12,
+            "text": "Mein Konzept13",
+            "userOIDSupervisor": null,
+            "userOIDStudent": 50,
+            "feedback": "Bitte ... verbessern",
+            "seminarOID": 1,
+            "accepted": false,
+            "attachmentOID": null,
+            "createdAt": "2023-12-06T18:40:04.000Z",
+            "updatedAt": "2023-12-06T18:40:04.000Z",
+            "userOIDSupervisor_user": null,
+            "attachmentO": null
+          }
+        ]
       }
     }
   ]

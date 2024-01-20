@@ -12,11 +12,11 @@ function Modal({ isOpen, onClose, children }: Props) {
     return (
         <>
             {isOpen && (
-                <div className={styles.modal}>
+                <div data-test="modal" className={styles.modal}>
                     <div onClick={onClose} className={styles.overlay}></div>
                     <div className={styles.modalContent}>
                         {children}
-                        <Button className={styles.closeModal} onClick={onClose}>
+                        <Button data-test="close-modal" className={styles.closeModal} onClick={onClose}>
                             X
                         </Button>
                     </div>

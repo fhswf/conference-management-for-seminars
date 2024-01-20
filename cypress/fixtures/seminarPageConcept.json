@@ -5,7 +5,7 @@
   "userOIDStudent": 1,
   "feedback": "good",
   "seminarOID": 1,
-  "accepted": true,
+  "accepted": false,
   "attachmentOID": 2,
   "createdAt": "2023-12-31T15:07:28.000Z",
   "updatedAt": "2023-12-31T15:07:28.000Z",

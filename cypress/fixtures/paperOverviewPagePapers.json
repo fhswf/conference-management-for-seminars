@@ -1,0 +1,23 @@
+[
+  {
+    "paperOID": 11,
+    "attachmentO": {
+      "attachmentOID": 2,
+      "filename": "paper1.pdf"
+    }
+  },
+  {
+    "paperOID": 12,
+    "attachmentO": {
+      "attachmentOID": 5,
+      "filename": "paper2.pdf"
+    }
+  },
+  {
+    "paperOID": 20,
+    "attachmentO": {
+      "attachmentOID": 10,
+      "filename": "paper3.pdf"
+    }
+  }
+]

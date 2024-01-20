@@ -20,7 +20,7 @@ type AssignedSeminar = Seminar & {
 function HomePage() {
     const navigate = useNavigate();
     const { user, setUser } = useContext(AuthContext);
-    const {data: assignedSeminars} = useFetch<AssignedSeminar[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/user/assigned-seminars`);
+    const {data: assignedSeminars} = useFetch<AssignedSeminar[]>(`${import.meta.env.VITE_BACKEND_URL}/user/assigned-seminars`);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const styles = {
@@ -67,7 +67,7 @@ function HomePage() {
             return;
         }
 
-        const result = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/enter-seminar/${seminarKey}`, {
+        const result = await fetch(`${import.meta.env.VITE_BACKEND_URL}/seminar/enter-seminar/${seminarKey}`, {
             method: "POST",
             credentials: 'include',
             headers: {
@@ -77,8 +77,8 @@ function HomePage() {
 
         if(result.ok) {
             const data = await result.json();
-            console.log(data);
-            navigate(`/seminar/${data}`);
+            console.log(data.seminarOID);
+            navigate(`/seminar/${data.seminarOID}`);
         } else if (result.status === 404){
             alert("Seminar nicht gefunden");
         } else if(result.status === 400) {
@@ -97,7 +97,7 @@ function HomePage() {
                         <Button data-test="enter-seminar" label="Seminar beitreten" onClick={onEnterSeminar}/>
                     </div>
                     <div>
-                        <Table header={header} data={tableData}/>
+                        <Table data-test="seminars-table" header={header} data={tableData}/>
                     </div>
                 </div>
             </MainLayout>
@@ -109,7 +109,7 @@ function HomePage() {
 export default HomePage;
 
 /*
-const {data, loading, error} = useFetch<AssignedSeminar[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/authstatus`);
+const {data, loading, error} = useFetch<AssignedSeminar[]>(`${import.meta.env.VITE_BACKEND_URL}/authstatus`);
 
 if(loading){ return <p>Is loading</p> }
 if(error ){ return <p>Is error</p> }

@@ -11,7 +11,7 @@ import HiddenLabel from "../components/ToggleLabel.tsx";
 
 function AdminPage() {
     const [showAddUser, setShowAddUser] = useState<Seminar>()
-    const {data} = useFetch<Seminar[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/all`);
+    const {data: seminarData, setData: setSeminarData} = useFetch<Seminar[]>(`${import.meta.env.VITE_BACKEND_URL}/seminar/all`);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const styles = {
@@ -26,12 +26,12 @@ function AdminPage() {
         {field: 'seminarOID', header: 'ID'},
         {field: 'name', header: 'Bezeichnung'},
         {field: 'phase', header: 'Phase'},
-        {field: 'createdAt', header: 'Erstellt am:'},
-        {field: 'assignmentkey', header: 'Einschreibeschlüssel:'},
+        {field: 'createdAt', header: 'Erstellt am'},
+        {field: 'assignmentkey', header: 'Einschreibeschlüssel'},
         {field: "btnAdd", header: ""}
     ];
 
-    const tableData = data?.map((seminar) => {
+    const tableData = Array.isArray(seminarData) && seminarData?.map((seminar) => {
         return {
             seminarOID: seminar.seminarOID,
             name: seminar.description,
@@ -42,7 +42,7 @@ function AdminPage() {
                 setShowAddUser(seminar)
             }}/>
         };
-    });
+    }) || [];
 
     async function onCreateSeminar() {
         //send data to backend
@@ -52,7 +52,7 @@ function AdminPage() {
             return
         }
 
-        const result = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar`, {
+        const result = await fetch(`${import.meta.env.VITE_BACKEND_URL}/seminar`, {
             method: "POST",
             credentials: 'include',
             headers: {
@@ -64,9 +64,9 @@ function AdminPage() {
         console.log(data);
 
         if (result.ok) {
-            //navigate to seminar page
-            //navigate("/seminar/1");
-            alert("Seminar erstellt")
+            alert("Seminar erstellt");
+            seminarData && setSeminarData([...seminarData, data]);
+            console.log(data);
         } else {
             alert("Seminar konnte nicht erstellt werden")
         }
@@ -75,12 +75,12 @@ function AdminPage() {
     return (
         <MainLayout>
             <div>
-                <h1>Administration</h1>
+                <h1 data-test="heading-admin">Administration</h1>
                 <div style={styles.createSeminar}>
-                    <InputText id="seminarName" name="seminarName" placeholder="Seminarname" ref={inputRef}/>
-                    <Button label="Seminar erstellen" onClick={onCreateSeminar}/>
+                    <InputText data-test="textfield-admin" id="seminarName" name="seminarName" placeholder="Seminarname" ref={inputRef} maxLength={32}/>
+                    <Button data-test="button-admin" label="Seminar erstellen" onClick={onCreateSeminar}/>
                 </div>
-                <Table header={header} data={tableData}/>
+                <Table data-test="seminar-table" header={header} data={tableData}/>
             </div>
             {showAddUser?.seminarOID && showAddUser?.description && <Modal isOpen={!!showAddUser} onClose={() => {
                 setShowAddUser(undefined)
