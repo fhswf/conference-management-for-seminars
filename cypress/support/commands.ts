@@ -49,7 +49,7 @@ Cypress.Commands.add("findByData", { prevSubject: 'element' }, (subject, selecto
 });
 
 Cypress.Commands.add('mockAuthStatus', () => {
-    cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/authstatus`, {
+    cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/authstatus`, {
         statusCode: 200,
         fixture: "authStatus.json"
     }).as('authStatus');

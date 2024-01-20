@@ -1,15 +1,15 @@
 describe('PaperOverviewPage', () => {
     const seminarOID = 123;
     beforeEach(function () {
-        cy.visit(`${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_FRONTEND_URL')}/paper-overview/${seminarOID}`);
+        cy.visit(`${Cypress.env('VITE_FRONTEND_URL')}/paper-overview/${seminarOID}`);
         cy.mockAuthStatus();
 
-        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/paper/get-uploaded-paper/${seminarOID}`, {
+        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/paper/get-uploaded-paper/${seminarOID}`, {
             statusCode: 200,
             fixture: 'paperOverviewPagePapers.json'
         });
 
-        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/${seminarOID}`, {
+        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/seminar/${seminarOID}`, {
             statusCode: 200,
             fixture: 'paperOverviewPageSeminar.json'
         });
@@ -90,7 +90,7 @@ describe('PaperOverviewPage', () => {
 
     it('test paper upload', function () {
         const attachmentOID = 321;
-        cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/paper`, (req) => {
+        cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/paper`, (req) => {
             req.reply({
                 statusCode: 200,
                 body: {
@@ -157,17 +157,17 @@ describe('PaperOverviewPage', () => {
 
     describe('chat', () => {
         beforeEach(function () {
-            cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/${seminarOID}`, {
+            cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/seminar/${seminarOID}`, {
                 statusCode: 200,
                 fixture: 'paperOverviewPageSeminarP7.json'
             });
             cy.reload();
 
-            cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/review/get-reviewoids-from-paper/*`, {
+            cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/review/get-reviewoids-from-paper/*`, {
                 statusCode: 200,
                 fixture: 'chatReviewOIDS.json'
             }).as('getReviewOIDsFromPaper');
-            cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/chat/*`, {
+            cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/chat/*`, {
                 statusCode: 200,
                 fixture: 'chatMessages.json',
             }).as('getChatMessages');
@@ -250,7 +250,7 @@ describe('PaperOverviewPage', () => {
                 .should('not.be.disabled')
                 .click()
 
-            cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/chat/${this.reviewOIDS[randomButtonIndex].reviewOID}`, {
+            cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/chat/${this.reviewOIDS[randomButtonIndex].reviewOID}`, {
                 statusCode: 200,
                 fixture: 'chatMessages.json',
             }).as('getChatMessagesSelectedReview');
@@ -266,7 +266,7 @@ describe('PaperOverviewPage', () => {
             //if selected review changed: expect /api/chat/:reviewOID to be called
             if (this.reviewOIDS[randomButtonIndex].reviewOID !== this.reviewOIDS[0].reviewOID) {
                 cy.wait('@getChatMessagesSelectedReview').should('exist').then((interception) => {
-                    const expectedURL = `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/chat/${String(this.reviewOIDS[randomButtonIndex].reviewOID)}`;
+                    const expectedURL = `${Cypress.env('VITE_BACKEND_URL')}/chat/${String(this.reviewOIDS[randomButtonIndex].reviewOID)}`;
                     expect(interception.request.url).to.equal(expectedURL);
                 });
             }
@@ -284,7 +284,7 @@ describe('PaperOverviewPage', () => {
                     "filename": this.createdMessage.createdAttachment.filename
                 }
             });
-            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/chat`, {
+            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/chat`, {
                 statusCode: 200,
                 fixture: 'chatCreatedMessage.json',
             }).as('createChatMessage');
@@ -302,7 +302,7 @@ describe('PaperOverviewPage', () => {
                 .find('input[type="file"]')
                 .selectFile('cypress/fixtures/conceptTest.pdf', {force: true});
 
-            cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/chat/${this.reviewOIDS[0].reviewOID}`, {
+            cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/chat/${this.reviewOIDS[0].reviewOID}`, {
                 statusCode: 200,
                 body: messagesWithCreatedMessage
             }).as('getChatMessagesNew');

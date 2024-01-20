@@ -19,13 +19,13 @@ function ChatMessage({message, ['data-test']: dataTest}: Props) {
                     </div>
                     <div data-test="message-bubble" className={styles.text}>
                         <p data-test="message-text">{message.message || ""}</p>
-                        {message.attachmentO && <><hr/><a data-test="message-attachment" href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${message.attachmentO.attachmentOID}`}>{message.attachmentO.filename}</a></>}
+                        {message.attachmentO && <><hr/><a data-test="message-attachment" href={`${import.meta.env.VITE_BACKEND_URL}/attachment/${message.attachmentO.attachmentOID}`}>{message.attachmentO.filename}</a></>}
                     </div>
                 </> :
                 <>
                     <div data-test="message-bubble" className={styles.text}>
                         <p data-test="message-text">{message.message}</p>
-                        {message.attachmentO && <><hr/><a data-test="message-attachment" href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${message.attachmentO.attachmentOID}`}>{message.attachmentO.filename}</a></>}
+                        {message.attachmentO && <><hr/><a data-test="message-attachment" href={`${import.meta.env.VITE_BACKEND_URL}/attachment/${message.attachmentO.attachmentOID}`}>{message.attachmentO.filename}</a></>}
                     </div>
                     <div data-test="message-date">
                         <p>{new Date(message.createdAt).toLocaleString()}</p>

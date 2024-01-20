@@ -46,8 +46,8 @@ function SeminarDetailsPage() {
     const {
         data: participantsList,
         setData: setParticipantsList
-    } = useFetch<StudentListResponse>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}/participants`);
-    const {data: availableSupervisor} = useFetch<User[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}/supervisor-list`);
+    } = useFetch<StudentListResponse>(`${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}/participants`);
+    const {data: availableSupervisor} = useFetch<User[]>(`${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}/supervisor-list`);
 
     const roles = [
         {name: "Kurs-Admin", value: 1},
@@ -98,7 +98,7 @@ function SeminarDetailsPage() {
     async function onNextPhaseClicked() {
         // TODO
         console.log("next phase");
-        const result = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}/go-to-next-phase`, {
+        const result = await fetch(`${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}/go-to-next-phase`, {
             method: 'POST',
             credentials: 'include'
         });
@@ -141,7 +141,7 @@ function SeminarDetailsPage() {
     async function onUpdateUser() {
         setIsEditMode(0);
 
-        const result = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/update-user`, {
+        const result = await fetch(`${import.meta.env.VITE_BACKEND_URL}/seminar/update-user`, {
             method: 'POST',
             credentials: 'include',
             headers: {

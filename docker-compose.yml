@@ -18,10 +18,7 @@ services:
     depends_on:
       - dbserver
     environment:
-      - FRONTEND_IP=${FRONTEND_IP}
-      - FRONTEND_PROTOCOL=${FRONTEND_PROTOCOL}
-#      - FRONTEND_PORT=${FRONTEND_PORT}
-      - EXPRESS_PORT_HTTP=${EXPRESS_PORT_HTTP}
+      - FRONTEND_URL=${FRONTEND_URL}
       - COOKIE_SECRET=${COOKIE_SECRET}
       - DB_TYPE=mariadb
       - DB_HOST=dbserver
@@ -40,7 +37,7 @@ services:
       - SMTP_HOST=${SMTP_HOST}
       - SENDER_MAIL=${SENDER_MAIL}
     ports:
-      - 11000:11000
+      - 11000:3000
     networks:
       - conference-management
 
@@ -50,13 +47,11 @@ services:
       context: .
       args:
         - VITE_BACKEND_URL=${VITE_BACKEND_URL}
-        - VITE_BACKEND_PROTOCOL=${VITE_BACKEND_PROTOCOL}
     restart: always
     environment:
       - VITE_BACKEND_URL=${VITE_BACKEND_URL}
-      - VITE_BACKEND_PROTOCOL=${VITE_BACKEND_PROTOCOL}
     ports:
-      - 11001:11001
+      - 11001:80
     networks:
       - conference-management
 

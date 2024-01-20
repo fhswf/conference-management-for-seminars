@@ -6,9 +6,9 @@ const smtpHost = process.env.SMTP_HOST;
 
 const transporter = nodemailer.createTransport({
     host: smtpHost,
-    port: 587,
-    //port: 465,
-    //secure: true,
+    //port: 587,
+    port: 465,
+    secure: true,
     auth: {
         user: mailUsername,
         pass: mailPassword,

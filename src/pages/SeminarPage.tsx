@@ -47,7 +47,7 @@ function SeminarPage() {
     const [showChat, setShowChat] = useState<PaperType>();
     const [showRating, setSetShowRating] = useState<PaperType>()
     const [showConceptUpload, setShowConceptUpload] = useState(false)
-    const {data: seminar} = useFetch<SeminarType>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}`,);
+    const {data: seminar} = useFetch<SeminarType>(`${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}`,);
     // TODO only fetch if phase >= 2 and phase >= 5
     // and user is student
     const {
@@ -55,12 +55,12 @@ function SeminarPage() {
         setData: setConcept,
         loading: loadingConcept,
         error: errorConcept
-    } = useFetch<ConceptType>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/concepts/newest/${seminarOID}`);
+    } = useFetch<ConceptType>(`${import.meta.env.VITE_BACKEND_URL}/concepts/newest/${seminarOID}`);
     const {
         data: assignedPaper,
         loading: loadingPaper,
         error: errorPaper
-    } = useFetch<PaperType[]>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/paper/get-assigned-paper/${seminarOID}`);
+    } = useFetch<PaperType[]>(`${import.meta.env.VITE_BACKEND_URL}/paper/get-assigned-paper/${seminarOID}`);
 
     //const [concept, setConcept] = useState<Concept | null>(null)
     //const [assignedPaper, setAssignedPaper] = useState<Paper[] | null>(null)
@@ -69,7 +69,7 @@ function SeminarPage() {
 
     async function onConceptUpload(concept: ConceptType) {
         setShowConceptUpload(false)
-        const newestConcept = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/concepts/newest/${seminarOID}`, {
+        const newestConcept = await fetch(`${import.meta.env.VITE_BACKEND_URL}/concepts/newest/${seminarOID}`, {
             method: "GET",
             credentials: "include",
         });
@@ -82,7 +82,7 @@ function SeminarPage() {
     async function handleRating(rating: string) {
         console.log(rating)
 
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/review/rate`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/review/rate`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -137,7 +137,7 @@ function SeminarPage() {
                         {/**/}
                         <div data-test="concept-attachment">
                             {(concept?.attachmentO?.filename) ? //if filename exists pdf exists
-                                <a href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${concept.attachmentOID}`}>{concept.attachmentO.filename}</a> :
+                                <a href={`${import.meta.env.VITE_BACKEND_URL}/attachment/${concept.attachmentOID}`}>{concept.attachmentO.filename}</a> :
                                 <p>-</p>
                             }
                         </div>
@@ -184,7 +184,7 @@ function SeminarPage() {
                         if (paper.attachmentO) {
                             return (
                                 <div data-test="assigned-paper-row" className={styles.assignedPaperContainer} key={paper.reviews[0].reviewOID}>
-                                    <div><a data-test="assigned-paper-file" href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a></div>
+                                    <div><a data-test="assigned-paper-file" href={`${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a></div>
                                     <div><p data-test="assigned-paper-rate-btn" onClick={() => setSetShowRating(paper)}>{mapRatingToString(paper.reviews[0].rating)}</p></div>
                                     <Button data-test="assigned-paper-chat-btn" onClick={() => setShowChat(paper)}>Kommentieren</Button>
                                 </div>

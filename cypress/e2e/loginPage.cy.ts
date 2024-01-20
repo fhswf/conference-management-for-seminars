@@ -1,6 +1,6 @@
 describe('LoginPage Test', () => {
   it('Should display the login page, login click should send GET request to backend', () => {
-    cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/login`, {
+    cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/login`, {
       statusCode: 200,
       body: 'Hello World',
     }).as('loginPage');

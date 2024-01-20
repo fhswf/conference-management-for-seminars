@@ -30,14 +30,14 @@ type PaperType = Paper & {
 
 function MemberDetailPage() {
     const {seminarOID, studentOID} = useParams();
-    const {data} = useFetch<UserType>(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}/get-student/${studentOID}`);
+    const {data} = useFetch<UserType>(`${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}/get-student/${studentOID}`);
     const [reviewer, setReviewer] = useState<User[]>([]);
 
     useEffect(() => {
         if (data && data.userOID) {
             const fetchReviewer = async () => {
                 try {
-                    const response = await fetch(`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/review/get-reviewer-of-paper/${data.roleassignments[0].phase3paperOID}`,
+                    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/review/get-reviewer-of-paper/${data.roleassignments[0].phase3paperOID}`,
                         {
                             credentials: "include",
                         });
@@ -65,7 +65,7 @@ function MemberDetailPage() {
         return {
             text: concept.text,
             pdf: concept.attachmentO ?
-                <a href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${concept.attachmentO?.attachmentOID}`}>{concept.attachmentO?.filename}</a> : "-",
+                <a href={`${import.meta.env.VITE_BACKEND_URL}/attachment/${concept.attachmentO?.attachmentOID}`}>{concept.attachmentO?.filename}</a> : "-",
             supervisor: concept.userOIDSupervisor_user ? `${concept.userOIDSupervisor_user.firstname} ${concept.userOIDSupervisor_user.lastname}` : '-',
             feedback: concept.feedback || '-',
             status: mapConceptStatusToString(concept.accepted),
@@ -94,7 +94,7 @@ function MemberDetailPage() {
                         /* make Fragment to div for testing */
                         return (
                             <div data-test="paper-row" key={paper.paperOID}>
-                                <a  data-test="attachment-href" href={`${import.meta.env.VITE_BACKEND_PROTOCOL}://${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
+                                <a  data-test="attachment-href" href={`${import.meta.env.VITE_BACKEND_URL}/attachment/${paper.attachmentO.attachmentOID}`}>{paper.attachmentO.filename}</a>
                                 <p  data-test="date-paper">{paper.createdAt ? new Date(paper.createdAt).toLocaleString() : '-'}</p>
                                 {data.roleassignments.length > 0 ? (
                                     paper.paperOID === data.roleassignments[0].phase3paperOID ? (

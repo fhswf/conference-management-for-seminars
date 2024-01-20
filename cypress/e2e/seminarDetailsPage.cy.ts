@@ -4,20 +4,20 @@ import Concept from "../../src/entities/database/Concept.ts";
 describe('SeminarDetailsPage', () => {
     beforeEach(function () {
         //seminarOID is 1 in fixture
-        cy.visit(`${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_FRONTEND_URL')}/seminar-details/1`);
+        cy.visit(`${Cypress.env('VITE_FRONTEND_URL')}/seminar-details/1`);
 
         // user 23 is course admin
-        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/authstatus`, {
+        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/authstatus`, {
             statusCode: 200,
             body: {"user": {"userOID": 23}}
         }).as('authStatus23');
 
-        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/*/participants`, {
+        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/seminar/*/participants`, {
             statusCode: 200,
             fixture: 'seminarDetailsPageParticipantsList.json',
         }).as('getDataParticipantsList');
 
-        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/*/supervisor-list`, {
+        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/seminar/*/supervisor-list`, {
             statusCode: 200,
             fixture: 'supervisorList.json',
         }).as('getDataSupervisorList');
@@ -74,7 +74,7 @@ describe('SeminarDetailsPage', () => {
 
     describe('Next Phase', function () {
         it('should be visible if user is course admin', function () {
-            cy.visit(`${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_FRONTEND_URL')}/seminar-details/2`);
+            cy.visit(`${Cypress.env('VITE_FRONTEND_URL')}/seminar-details/2`);
             cy.wait(500);
 
             cy.getByData('phase')
@@ -82,22 +82,22 @@ describe('SeminarDetailsPage', () => {
         });
         it('should be not visible if user is not course admin', function () {
             // user 25 is supervisor
-            cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/authstatus`, {
+            cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/authstatus`, {
                 statusCode: 200,
                 body: {"user": {"userOID": 25}}
             }).as('authStatus25');
-            cy.visit(`${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_FRONTEND_URL')}/seminar-details/${this.participantsList.seminarOID}`);
+            cy.visit(`${Cypress.env('VITE_FRONTEND_URL')}/seminar-details/${this.participantsList.seminarOID}`);
             cy.wait(500);
 
             cy.getByData('phase')
                 .should('not.exist')
         });
         it('should not show an alert if phase is in 7 and onclick', function () {
-            cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/*/participants`, {
+            cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/seminar/*/participants`, {
                 statusCode: 200,
                 fixture: 'seminarDetailsPageParticipantsListP7.json',
             }).as('getDataParticipantsListP7');
-            cy.visit(`${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_FRONTEND_URL')}/seminar-details/2`);
+            cy.visit(`${Cypress.env('VITE_FRONTEND_URL')}/seminar-details/2`);
 
             cy.getByData('phase')
                 .should('exist')
@@ -109,7 +109,7 @@ describe('SeminarDetailsPage', () => {
             });
         });
         it('should show confirm alert if onclick and alert if successfully changed phase', function () {
-            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/${this.participantsList.seminarOID}/go-to-next-phase`, {
+            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/seminar/${this.participantsList.seminarOID}/go-to-next-phase`, {
                 statusCode: 200,
                 body: {},
             }).as('getDataParticipantsList');
@@ -137,7 +137,7 @@ describe('SeminarDetailsPage', () => {
                 .should('contain.text', `${mapPhaseToString(this.participantsList.phase + 1)}`);
         });
         it('should show confirm alert if onclick and alert if successfully changed phase', function () {
-            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/${this.participantsList.seminarOID}/go-to-next-phase`, {
+            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/seminar/${this.participantsList.seminarOID}/go-to-next-phase`, {
                 statusCode: 400,
                 body: {},
             }).as('getDataParticipantsList');
@@ -223,7 +223,7 @@ describe('SeminarDetailsPage', () => {
         it('details button should redirect to correct page', function () {
             const randomRowIndex = Math.floor(Math.random() * this.participantsList.roleassignments.length);
             const randomUserId = this.participantsList.roleassignments[randomRowIndex].userO.userOID;
-            const url = `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/${this.participantsList.seminarOID}/get-student/${randomUserId}`;
+            const url = `${Cypress.env('VITE_BACKEND_URL')}/seminar/${this.participantsList.seminarOID}/get-student/${randomUserId}`;
 
             cy.intercept('GET', url, {
                 statusCode: 200,
@@ -303,7 +303,7 @@ describe('SeminarDetailsPage', () => {
                 const roleOID = randomRoleIndex + 1;
                 const seminarOID = this.participantsList.seminarOID;
 
-                cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/update-user`, (req) => {
+                cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/seminar/update-user`, (req) => {
 
                     expect(req.body).to.deep.equal({userOID, roleOID, seminarOID});
                     req.reply({
@@ -354,7 +354,7 @@ describe('SeminarDetailsPage', () => {
                 const roleOID = randomRoleIndex + 1;
                 const seminarOID = this.participantsList.seminarOID;
 
-                cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/update-user`, (req) => {
+                cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/seminar/update-user`, (req) => {
                     expect(req.body).to.deep.equal({userOID, roleOID, seminarOID});
                     req.reply({
                         statusCode: 200,
@@ -394,7 +394,7 @@ describe('SeminarDetailsPage', () => {
                 cy.get('@updateUser').should('not.exist');
             });
             it('should show alert if user is supervisor of student and role is changed', function () {
-                cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/update-user`, {
+                cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/seminar/update-user`, {
                     statusCode: 409,
                     body: {},
                 }).as('updateUser');
@@ -513,7 +513,7 @@ describe('SeminarDetailsPage', () => {
             });
         });
         it('should show alert if tried to accept concept without selected supervisor', function () {
-            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/evaluate-concept`, {
+            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/seminar/evaluate-concept`, {
                 statusCode: 200,
                 body: {},
             }).as('evaluateConcept');
@@ -573,7 +573,7 @@ describe('SeminarDetailsPage', () => {
                 accepted: accept === 1,
             };
 
-            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/evaluate-concept`, (req) => {
+            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/seminar/evaluate-concept`, (req) => {
                 expect(req.body).to.deep.equal({
                     conceptOID: this.participantsList.roleassignments[rowIndexOfUser].userO.userOIDStudent_concepts[0].conceptOID,
                     accepted: accept === 1,

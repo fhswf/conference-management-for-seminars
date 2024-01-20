@@ -1,6 +1,5 @@
 require('dotenv').config();
-const PORT_HTTP = process.env.EXPRESS_PORT_HTTP || 3000;
-//const PORT_HTTPS = process.env.EXPRESS_PORT_HTTPS || 3443;
+const PORT_HTTP = 3000;
 
 const express = require('express');
 const cors = require('cors');
@@ -19,7 +18,8 @@ app.set('trust proxy', true);
 const {isAuthenticated} = require("./middleware/authMiddleware");
 
 app.use(cors({
-    origin: `${process.env.FRONTEND_PROTOCOL}://${process.env.FRONTEND_IP}`,
+    //origin: `${process.env.FRONTEND_URL}`,
+    origin: `${process.env.FRONTEND_URL}`,
     credentials: true
 }));
 
@@ -33,7 +33,7 @@ app.use(fileUpload());
 
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
 app.use(morgan('combined', { stream: accessLogStream }))
-app.use(morgan('dev'))
+//app.use(morgan('dev'))
 
 
 // ------------------------------ session setup ------------------------------
@@ -61,8 +61,8 @@ app.use(session({
         //TODO
         //secure: false,
         //sameSite: true,
-        //secure: true,
-        //sameSite: 'none',
+        secure: true,
+        sameSite: 'none',
     }
 }))
 
@@ -120,7 +120,7 @@ app.post('/conference/api/lti/launch', passport.authenticate('lti', {
 
 app.get('/conference/api/login', passport.authenticate('openidconnect'));
 
-app.get('/conference/api/login/callback', passport.authenticate('openidconnect', {failureRedirect: `${process.env.FRONTEND_PROTOCOL}://${process.env.FRONTEND_IP}`}), function (req, res) {
+app.get('/conference/api/login/callback', passport.authenticate('openidconnect', {failureRedirect: `${process.env.FRONTEND_URL}`}), function (req, res) {
         res.redirect('/conference/api/success');
     }
 );
@@ -128,7 +128,7 @@ app.get('/conference/api/login/callback', passport.authenticate('openidconnect',
 app.get('/conference/api/success', function (req, res) {
     //console.log(req.user);
     //console.log(req.session);
-    res.redirect(`${process.env.FRONTEND_PROTOCOL}://${process.env.FRONTEND_IP}`);
+    res.redirect(`${process.env.FRONTEND_URL}`);
 });
 
 app.get('/conference/api/error-lti', function (req, res) {

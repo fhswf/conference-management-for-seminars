@@ -3,38 +3,38 @@ import {mapPhaseToString, mapRoleToString} from "../../src/utils/helpers.ts";
 describe('HomePage', () => {
     beforeEach(function () {
         // Visit the home page before each test
-        cy.visit(`${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_FRONTEND_URL')}`);
+        cy.visit(`${Cypress.env('VITE_FRONTEND_URL')}`);
 
         cy.mockAuthStatus();
 
-        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/user/assigned-seminars`, {
+        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/user/assigned-seminars`, {
             statusCode: 200,
             fixture: 'homepageSeminars.json',
         }).as('getData');
 
         //seminar-page
-        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/*`, {
+        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/seminar/*`, {
             statusCode: 200,
             body: {},
         }).as('getDataSeminar');
 
-        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/paper/get-assigned-paper/*`, {
+        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/paper/get-assigned-paper/*`, {
             statusCode: 200,
             body: {},
         }).as('getDataAssignedPaper');
 
-        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/concepts/newest/*`, {
+        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/concepts/newest/*`, {
             statusCode: 200,
             body: {},
         }).as('getDataNewestConcept');
 
         //seminar-details
-        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/*/supervisor-list`, {
+        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/seminar/*/supervisor-list`, {
             statusCode: 200,
             body: {},
         }).as('getDataSupervisorList');
 
-        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/*/participants`, {
+        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/seminar/*/participants`, {
             statusCode: 200,
             body: {},
         }).as('getDataParticipantsList');
@@ -127,7 +127,7 @@ describe('HomePage', () => {
     describe('Enter Seminar', () => {
         // Enter Seminar
         it('should redirect if key is valid', function () {
-            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/enter-seminar/validSeminarKey`, {
+            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/seminar/enter-seminar/validSeminarKey`, {
                 statusCode: 200,
                 body: {seminarOID: "123"},
             });
@@ -141,7 +141,7 @@ describe('HomePage', () => {
 
 
         it('should display an alert if seminar key is invalid', function () {
-            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/enter-seminar/invalidSeminarKey`, {
+            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/seminar/enter-seminar/invalidSeminarKey`, {
                 statusCode: 404,
                 body: { "error": "Seminar not found" },
             });
@@ -155,7 +155,7 @@ describe('HomePage', () => {
         });
 
         it('should display an alert if already entered the seminar', function () {
-            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/enter-seminar/alreadyEnteredSeminarKey`, {
+            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/seminar/enter-seminar/alreadyEnteredSeminarKey`, {
                 statusCode: 400,
                 body: { "error": "User already in seminar" },
             });

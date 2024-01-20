@@ -1,13 +1,13 @@
 describe('AdminPage', () => {
     beforeEach(function () {
         cy.mockAuthStatus();
-        cy.visit(`${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_FRONTEND_URL')}/administration`);
+        cy.visit(`${Cypress.env('VITE_FRONTEND_URL')}/administration`);
 
-        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/all`, {
+        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/seminar/all`, {
             statusCode: 200,
             fixture: 'adminSeminarList.json',
         }).as('getDataSeminarList');
-        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/*/addable-users`, {
+        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/seminar/*/addable-users`, {
             statusCode: 200,
             fixture: 'adminAddableUsers.json',
         }).as('getDataAddableUsers');
@@ -78,7 +78,7 @@ describe('AdminPage', () => {
 
     describe('Create Seminar', () => {
         it('Should display an alert if seminar created successfully', function () {
-            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar`, (req) => {
+            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/seminar`, (req) => {
                 expect(req.body).to.deep.equal({name: 'Test Seminar'});
                 req.reply({
                     statusCode: 200,
@@ -94,7 +94,7 @@ describe('AdminPage', () => {
             });
         });
         it('Should update seminar table if created successfully', function () {
-            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar`, (req) => {
+            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/seminar`, (req) => {
                 expect(req.body).to.deep.equal({name: 'Test Seminar'});
                 req.reply({
                     statusCode: 200,
@@ -202,7 +202,7 @@ describe('AdminPage', () => {
             cy.getByData('seminar-table').should('exist');
             cy.wait(500);
 
-            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/user/assign-to-seminar`, (req) => {
+            cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/user/assign-to-seminar`, (req) => {
                 req.reply({
                     statusCode: 400,
                     body: {},
@@ -241,7 +241,7 @@ describe('AdminPage', () => {
                     const userOID = addableUsersList[randomIndexUser].userOID;
                     const roleOID = randomIndexRole + 1;
 
-                    cy.intercept('POST', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/user/assign-to-seminar`, (req) => {
+                    cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/user/assign-to-seminar`, (req) => {
                         expect(req.body).to.deep.equal({seminarOID, userOID, roleOID});
                         req.reply({
                             statusCode: 200,

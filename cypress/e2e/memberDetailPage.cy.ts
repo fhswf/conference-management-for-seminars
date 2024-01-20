@@ -13,15 +13,15 @@ describe('memberDetailPage', () => {
             this.reviewer = reviewer;
         });
 
-        cy.visit(`${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_FRONTEND_URL')}/seminar-details/${seminarOID}/user/${userOID}`);
+        cy.visit(`${Cypress.env('VITE_FRONTEND_URL')}/seminar-details/${seminarOID}/user/${userOID}`);
         cy.mockAuthStatus();
 
-        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/seminar/${seminarOID}/get-student/${userOID}`, {
+        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/seminar/${seminarOID}/get-student/${userOID}`, {
             statusCode: 200,
             fixture: 'memberDetailPageMember.json'
         }).as('getMemberDetailPage');
 
-        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_PROTOCOL')}://${Cypress.env('VITE_BACKEND_URL')}/review/get-reviewer-of-paper/9`, {
+        cy.intercept('GET', `${Cypress.env('VITE_BACKEND_URL')}/review/get-reviewer-of-paper/9`, {
             statusCode: 200,
             fixture: 'memberDetailPageReviewerOfPaper.json'
         }).as('getMemberDetailPageReviewerOfPaper');
