@@ -97,7 +97,6 @@ function SeminarDetailsPage() {
 
     async function onNextPhaseClicked() {
         // TODO
-        console.log("next phase");
         const result = await fetch(`${import.meta.env.VITE_BACKEND_URL}/seminar/${seminarOID}/go-to-next-phase`, {
             method: 'POST',
             credentials: 'include'
@@ -107,7 +106,13 @@ function SeminarDetailsPage() {
             alert("Erfolgreich");
             setParticipantsList(studentList => {
                 const newStudentList = {...studentList!};
-                newStudentList.phase = newStudentList.phase! + 1;
+                // to skip reviewer assignment phase
+                if(newStudentList.phase! + 1 === 4) {
+                    newStudentList.phase = newStudentList.phase! + 2;
+                } else {
+                    newStudentList.phase = newStudentList.phase! + 1;
+                }
+
                 return newStudentList;
             });
         } else {
@@ -206,7 +211,7 @@ function SeminarDetailsPage() {
                     {/*<p>{role}</p>*/}
                     {participantsList?.phase && role === 1 &&
                         <p data-test="phase" onClick={() => {
-                            if (participantsList?.phase && participantsList?.phase < 7 && confirm(`Möchten Sie von "${mapPhaseToString(participantsList?.phase)}" übergehen zu "${mapPhaseToString(participantsList?.phase + 1)}"?`)) {
+                            if (participantsList?.phase && participantsList?.phase < 7 && confirm(`Möchten Sie von "${mapPhaseToString(participantsList?.phase)}" übergehen zu "${mapPhaseToString((participantsList?.phase + 1 === 4) ? participantsList?.phase + 2 : participantsList?.phase + 1)}"?`)) {
                                 onNextPhaseClicked();
                             }
                         }}>{mapPhaseToString(participantsList?.phase)} 🖊</p>}

@@ -1,10 +1,7 @@
 const {sendMailConceptUploaded} = require("../utils/mailer");
 const db = require("../models");
 const attachmentController = require("./attachmentController");
-const path = require("path");
 const {isValidPdf} = require("../utils/PdfUtils");
-//const {getUserWithOID, getCourseAdminUserInSeminar} = require("./userController");
-//const {getSeminarWithOID} = require("./seminarController");
 
 const Concept = db.concept;
 const User = db.user;
@@ -15,12 +12,11 @@ const RoleAssignment = db.roleassignment;
 /**
  * Retrieves the newest Concept associated with the current user and the given seminar.
  * If no Concept is found, it returns an empty response.
- * @param req
- * @param res
- * @returns {Promise<*>}
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A Promise that resolves with the newest concept or an empty object if not found.
  */
 const getNewestConceptOfCurrentUser = async (req, res) => {
-    // TODO ggf anpassen
     try {
         const seminarOID = req.params.seminarOID;
         const userOID = req.user.userOID;
@@ -55,9 +51,9 @@ const getNewestConceptOfCurrentUser = async (req, res) => {
 /**
  * Uploads a Concept associated with a user and seminar, optionally with text and attachments.
  * Sends an email notification to admin and supervisor.
- * @param req
- * @param res
- * @returns {Promise<*>}
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A Promise that resolves once the concept is uploaded.
  */
 const uploadConcept = async (req, res) => {
     const t = await db.sequelize.transaction();
@@ -69,22 +65,31 @@ const uploadConcept = async (req, res) => {
         const supervisorOID = req.body?.supervisorOID || undefined;
         const file = req.files?.file || undefined;
 
+        if(!text && !file){
+            await t.rollback();
+            return res.status(400).json({error: "No text or file provided."})
+        }
+
         const seminar = await Seminar.findByPk(seminarOID);
 
         if(seminar.phase !== 2 && seminar.phase !== 3) {
+            await t.rollback();
             return res.status(403).json({error: "You are not allowed to upload a Concept for this seminar."})
         }
 
         if (!file && !text.trim()) {
+            await t.rollback();
             return res.status(400).json({error: "No text or file provided."})
         }
 
         if (!await userIsAllowedToUploadConcept(userOID, seminarOID)) {
+            await t.rollback();
             return res.status(403).json({error: "You are not allowed to upload a Concept for this seminar."})
         }
 
         let attachment = null;
         if(file && !await isValidPdf(file)){
+            await t.rollback();
             return res.status(415).json({error: 'Unsupported Media Type; Only PDF files are allowed'});
         }
         if (file) {

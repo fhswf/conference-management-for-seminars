@@ -5,7 +5,7 @@ const Chatmessage = db.chatmessage;
 const Concept = db.concept;
 const Paper = db.paper;
 
-const {isAccessTokenExpired, refreshAccessToken, introspectToken} = require("../utils/TokenUtils");
+const {isAccessTokenExpired, refreshAccessToken} = require("../utils/TokenUtils");
 const {
     userIsMemberOfSeminar,
     userRoleIsCourseAdmin,
@@ -14,11 +14,14 @@ const {
 } = require("../controllers/roleassignmentController");
 
 const {userIsChatParticipant} = require("../controllers/chatmessageController");
-const {userIsAuthorOfConcept, conceptHasAttachment} = require("../controllers/conceptController");
-const {userIsAuthorOfPaper, paperHasAttachment, getSeminarOIDOfPaper} = require("../controllers/paperController");
-const {userIsReviewerOfPaper, userIsReviewerOfReviewOID} = require("../controllers/reviewController");
+const {userIsAuthorOfConcept} = require("../controllers/conceptController");
+const {userIsAuthorOfPaper, getSeminarOIDOfPaper, paperExists} = require("../controllers/paperController");
+const {userIsReviewerOfPaper, userIsReviewerOfReviewOID, getSeminarOIDOfReview, isReviewerOfReview,
+    userIsAuthorOfReview
+} = require("../controllers/reviewController");
 const {getAttachmentDetails} = require("../controllers/attachmentController");
 const {userIsSystemAdmin} = require("../controllers/userController");
+const {getPhaseOfSeminar} = require("../controllers/seminarController");
 
 /**
  * Checks if the user is authenticated.
@@ -124,17 +127,22 @@ async function isStudentInSeminar(req, res, next) {
  * @returns {Promise<*>}
  */
 async function isSupervisorInSeminar(req, res, next) {
-    const userOID = req.user.userOID;
-    const seminarOID = req.params.seminarOID || req.body.seminarOID;
+    try {
+        const userOID = req.user.userOID;
+        const seminarOID = req.params.seminarOID || req.body.seminarOID;
 
-    if(!userOID || !seminarOID) {
-        return res.status(400).json({msg: "No userOID or seminarOID"});
-    }
+        if (!userOID || !seminarOID) {
+            return res.status(400).json({msg: "No userOID or seminarOID"});
+        }
 
-    if (await userIsMemberOfSeminar(userOID, seminarOID) && await userRoleIsSupervisor(userOID, seminarOID)) {
-        return next();
-    } else {
-        return res.status(403).json({msg: "Not authorized"});
+        if (await userIsMemberOfSeminar(userOID, seminarOID) && await userRoleIsSupervisor(userOID, seminarOID)) {
+            return next();
+        } else {
+            return res.status(403).json({msg: "Not authorized"});
+        }
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({msg: "Internal server error"});
     }
 }
 
@@ -148,46 +156,87 @@ async function isSupervisorInSeminar(req, res, next) {
  * @returns {Promise<*>}
  */
 async function isCourseAdminInSeminar(req, res, next) {
-    const userOID = req.user.userOID;
-    const seminarOID = req.params.seminarOID || req.body.seminarOID;
+    try {
+        const userOID = req.user.userOID;
+        const seminarOID = req.params.seminarOID || req.body.seminarOID;
 
-    if(!userOID && !seminarOID) {
-        return res.status(400).json({msg: "No userOID or seminarOID"});
-    }
+        if (!userOID && !seminarOID) {
+            return res.status(400).json({msg: "No userOID or seminarOID"});
+        }
 
-    if (await userRoleIsCourseAdmin(userOID, seminarOID)) {
-        return next();
-    } else {
-        return res.status(403).json({msg: "Not authorized"});
+        if (await userRoleIsCourseAdmin(userOID, seminarOID)) {
+            return next();
+        } else {
+            return res.status(403).json({msg: "Not authorized"});
+        }
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({msg: "Internal server error"});
     }
 }
 
+/**
+ * Middleware to check if a user is either a supervisor or a student in a seminar.
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @param {function} next - The next middleware function.
+ * @returns {Object} - A response indicating whether the user is authorized or not.
+ */
+async function isSupervisorOrStudentInSeminar(req, res, next) {
+    try {
+        const userOID = req.user.userOID;
+        const seminarOID = req.params.seminarOID || req.body.seminarOID;
+
+        if (!userOID || !seminarOID) {
+            return res.status(400).json({msg: "No userOID or seminarOID"});
+        }
+
+        if (await userRoleIsSupervisor(userOID, seminarOID) || await userRoleIsStudent(userOID, seminarOID)) {
+            return next();
+        } else {
+            return res.status(403).json({msg: "Not authorized"});
+        }
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({msg: "Internal server error"});
+    }
+}
 
 /**
  * Checks if the user is a course admin or a supervisor in the seminar with the given seminarOID or paperOID.
  * Needs the seminarOID or paperOID in the request body or as a parameter.
- * @param req
- * @param res
- * @param next
- * @returns {Promise<*>}
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @param {function} next - The next middleware function.
+ * @returns {Object} - A response indicating whether the user is authorized or not.
  */
 async function isCourseAdminOrSupervisorInSeminar(req, res, next) {
-    const userOID = req.user.userOID;
-    let seminarOID = req.params.seminarOID || req.body.seminarOID;
-    const paperOID = req.params.paperOID || req.body.paperOID;
+    try {
+        const userOID = req.user.userOID;
+        let seminarOID = req.params.seminarOID || req.body.seminarOID;
+        const paperOID = req.params.paperOID || req.body.paperOID;
 
-    if(!userOID || (!seminarOID && !paperOID)) {
-        return res.status(400).json({msg: "No userOID or seminarOID or paperOID"});
-    }
+        if (!userOID || (!seminarOID && !paperOID)) {
+            return res.status(400).json({msg: "No userOID or seminarOID or paperOID"});
+        }
 
-    if (paperOID) {
-        seminarOID = await getSeminarOIDOfPaper(paperOID);
-    }
+        if (!seminarOID && paperOID) {
+            if (await paperExists(paperOID)) {
+                seminarOID = await getSeminarOIDOfPaper(paperOID);
+            } else {
+                return res.status(403).json({msg: "Not authorized"});
+            }
+        }
 
-    if (await userRoleIsCourseAdmin(userOID, seminarOID) || await userRoleIsSupervisor(userOID, seminarOID)) {
-        return next();
-    } else {
-        return res.status(403).json({msg: "Not authorized"});
+        if (await userRoleIsCourseAdmin(userOID, seminarOID) || await userRoleIsSupervisor(userOID, seminarOID)) {
+            return next();
+        } else {
+            return res.status(403).json({msg: "Not authorized"});
+        }
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({msg: "Internal server error"});
     }
 }
 
@@ -200,17 +249,22 @@ async function isCourseAdminOrSupervisorInSeminar(req, res, next) {
  * @returns {Promise<*>}
  */
 async function isConceptAuthor(req, res, next) {
-    const userOID = req.user.userOID;
-    const conceptOID = req.params.conceptOID;
+    try {
+        const userOID = req.user.userOID;
+        const conceptOID = req.params.conceptOID;
 
-    if(!userOID || !conceptOID) {
-        return res.status(400).json({msg: "No userOID or conceptOID"});
-    }
+        if (!userOID || !conceptOID) {
+            return res.status(400).json({msg: "No userOID or conceptOID"});
+        }
 
-    if (await userIsAuthorOfConcept(userOID, conceptOID)) {
-        return next();
-    } else {
-        return res.status(403).json({msg: "Not authorized"});
+        if (await userIsAuthorOfConcept(userOID, conceptOID)) {
+            return next();
+        } else {
+            return res.status(403).json({msg: "Not authorized"});
+        }
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({msg: "Internal server error"});
     }
 }
 
@@ -223,37 +277,42 @@ async function isConceptAuthor(req, res, next) {
  * @returns {Promise<*>}
  */
 async function isPermittedToAccessFile(req, res, next) {
-    const userOID = req.user.userOID;
-    const attachmentOID = req.params.attachmentOID;
+    try {
+        const userOID = req.user.userOID;
+        const attachmentOID = req.params.attachmentOID;
 
-    if(!userOID || !attachmentOID) {
-        return res.status(400).json({msg: "No userOID or attachmentOID"});
+        if (!userOID || !attachmentOID) {
+            return res.status(400).json({msg: "No userOID or attachmentOID"});
+        }
+
+        const model = await getAttachmentDetails(attachmentOID);
+
+        if (model instanceof Chatmessage) {
+            if (await userIsChatParticipant(userOID, attachmentOID)) {
+                return next();
+            }
+        } else if (model instanceof Concept) {
+            if (await userIsAuthorOfConcept(userOID, model.conceptOID) ||
+                await userRoleIsCourseAdmin(userOID, model.seminarOID) ||
+                await userRoleIsSupervisor(userOID, model.seminarOID)) {
+                return next();
+            }
+            //return res.status(403).json({msg: "concept"});
+        } else if (model instanceof Paper) {
+            if (await userIsAuthorOfPaper(userOID, model.paperOID) ||
+                await userRoleIsCourseAdmin(userOID, model.seminarOID) ||
+                await userRoleIsSupervisor(userOID, model.seminarOID) ||
+                await userIsReviewerOfPaper(userOID, model.paperOID)) {
+                return next();
+            }
+            //return res.status(403).json({msg: "paper"});
+        }
+
+        return res.status(403).json({msg: "Not authorized"});
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({msg: "Internal server error"});
     }
-
-    const model = await getAttachmentDetails(attachmentOID);
-
-    if (model instanceof Chatmessage) {
-        if (await userIsChatParticipant(userOID, attachmentOID)) {
-            return next();
-        }
-    } else if (model instanceof Concept) {
-        if (await userIsAuthorOfConcept(userOID, model.conceptOID) ||
-            await userRoleIsCourseAdmin(userOID, model.seminarOID) ||
-            await userRoleIsSupervisor(userOID, model.seminarOID)) {
-            return next();
-        }
-        //return res.status(403).json({msg: "concept"});
-    } else if (model instanceof Paper) {
-        if (await userIsAuthorOfPaper(userOID, model.paperOID) ||
-            await userRoleIsCourseAdmin(userOID, model.seminarOID) ||
-            await userRoleIsSupervisor(userOID, model.seminarOID) ||
-            await userIsReviewerOfPaper(userOID, model.paperOID)) {
-            return next();
-        }
-        //return res.status(403).json({msg: "paper"});
-    }
-
-    return res.status(403).json({msg: "Not authorized"});
 }
 
 /**
@@ -265,28 +324,38 @@ async function isPermittedToAccessFile(req, res, next) {
  * @returns {Promise<*>}
  */
 async function isMemberOfSeminar(req, res, next) {
-    const userOID = req.user.userOID;
-    const seminarOID = req.params.seminarOID || req.body.seminarOID;
+    try {
+        const userOID = req.user.userOID;
+        const seminarOID = req.params.seminarOID || req.body.seminarOID;
 
-    if(!userOID || !seminarOID) {
-        return res.status(400).json({msg: "No userOID or seminarOID"});
-    }
+        if (!userOID || !seminarOID) {
+            return res.status(400).json({msg: "No userOID or seminarOID"});
+        }
 
-    if (await userIsMemberOfSeminar(userOID, seminarOID)) {
-        return next();
-    } else {
-        return res.status(403).json({msg: "Not authorized"});
+        if (await userIsMemberOfSeminar(userOID, seminarOID)) {
+            return next();
+        } else {
+            return res.status(403).json({msg: "Not authorized"});
+        }
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({msg: "Internal server error"});
     }
 }
 
 async function isSystemAdmin(req, res, next) {
-    const userOID = req.user.userOID;
+    try {
+        const userOID = req.user.userOID;
 
-    if(await userIsSystemAdmin(userOID)) {
-        return next();
+        if (await userIsSystemAdmin(userOID)) {
+            return next();
+        }
+
+        return res.status(403).json({msg: "Not authorized"});
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({msg: "Internal server error"});
     }
-
-    return res.status(403).json({msg: "Not authorized"});
 }
 
 /**
@@ -298,18 +367,23 @@ async function isSystemAdmin(req, res, next) {
  * @returns {Promise<*>}
  */
 async function isChatParticipant(req, res, next) {
-    const userOID = req.user.userOID;
-    const chatmessageOID = req.params.chatmessageOID || req.body.chatmessageOID;
-    const reviewOID = req.params.reviewOID || req.body.reviewOID;
+    try {
+        const userOID = req.user.userOID;
+        const chatmessageOID = req.params.chatmessageOID || req.body.chatmessageOID;
+        const reviewOID = req.params.reviewOID || req.body.reviewOID;
 
-    if(!userOID || (!chatmessageOID && !reviewOID)) {
-        return res.status(400).json({msg: "No userOID or chatmessageOID or reviewOID"});
-    }
+        if (!userOID || (!chatmessageOID && !reviewOID)) {
+            return res.status(400).json({msg: "No userOID or chatmessageOID or reviewOID"});
+        }
 
-    if (await userIsChatParticipant(userOID, chatmessageOID, reviewOID)) {
-        return next();
-    } else {
-        return res.status(403).json({msg: "Not authorized"});
+        if (await userIsChatParticipant(userOID, chatmessageOID, reviewOID)) {
+            return next();
+        } else {
+            return res.status(403).json({msg: "Not authorized"});
+        }
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({msg: "Internal server error"});
     }
 }
 
@@ -321,29 +395,100 @@ async function isChatParticipant(req, res, next) {
  * @returns {Promise<*>}
  */
 async function isReviewerOrAuthorOfPaper(req, res, next) {
-    if(!req.user.userOID || (!req.params.paperOID && !req.params.reviewOID) && (!req.body.paperOID && !req.body.reviewOID)) {
-        return res.status(400).json({msg: "No userOID or paperOID or reviewOID given in request"});
-    }
+    try {
+        if (!req.user.userOID || (!req.params.paperOID && !req.params.reviewOID) && (!req.body.paperOID && !req.body.reviewOID)) {
+            return res.status(400).json({msg: "No userOID or paperOID or reviewOID given in request"});
+        }
 
-    if(req.params.reviewOID){
-        console.log("review");
-    }
+        const userOID = req.user.userOID;
+        const paperOID = req.params.paperOID || req.body.paperOID;
+        const reviewOID = req.params.reviewOID || req.body.reviewOID;
 
-    if(userIsReviewerOfPaper || userIsAuthorOfPaper) {
-        return next();
+        const isRevOrAuth = await userIsReviewerOfPaper(userOID, paperOID);
+        const isAuth = await userIsAuthorOfPaper(userOID, paperOID);
+        const isRev = await isReviewerOfReview(userOID, reviewOID);
+
+        if (await userIsReviewerOfPaper(userOID, paperOID) || await userIsAuthorOfPaper(userOID, paperOID) ||
+            await userIsReviewerOfReviewOID(userOID, reviewOID) || await userIsAuthorOfReview(userOID, reviewOID)) {
+            return next();
+        }
+        return res.status(403).json({msg: "Not authorized"});
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({msg: "Internal server error"});
     }
-    return res.status(403).json({msg: "Not authorized"});
+}
+
+/**
+ * Middleware to check if a user is allowed to get or create a message for a paper or review.
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @param {function} next - The next middleware function.
+ * @returns {Object} - A response indicating whether the user is authorized or not.
+ */
+async function isAllowedToGetOrCreateMessage(req, res, next) {
+    try {
+        if (!req.user.userOID || (!req.params.paperOID && !req.params.reviewOID) && (!req.body.paperOID && !req.body.reviewOID)) {
+            return res.status(400).json({msg: "No userOID or paperOID or reviewOID given in request"});
+        }
+        const seminarOID = await getSeminarOIDWithPaperOrReviewOID(req.params.paperOID || req.body.paperOID, req.params.reviewOID || req.body.reviewOID);
+        const phase = await getPhaseOfSeminar(seminarOID);
+        const userOID = req.user.userOID;
+        const paperOID = req.params.paperOID || req.body.paperOID;
+        const reviewOID = req.params.reviewOID || req.body.reviewOID;
+
+        if (await userIsAuthorOfPaper(userOID, paperOID) || await userIsAuthorOfReview(userOID, reviewOID)) {
+            if (phase >= 6) {
+                return next();
+            } else {
+                return res.status(403).json({msg: "Not in review reading phase"});
+            }
+        } else if (await userIsReviewerOfPaper(userOID, paperOID) || await userIsReviewerOfReviewOID(userOID, reviewOID)) {
+            if (phase >= 5) {
+                return next();
+            } else {
+                return res.status(403).json({msg: "Not in review phase"});
+            }
+        }
+
+        return res.status(403).json({msg: "Not authorized"});
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({msg: "Internal server error"});
+    }
+}
+
+/**
+ * Retrieves the seminarOID associated with either a paper or a review.
+ *
+ * @param {number} paperOID - The OID of the paper to fetch the seminarOID for.
+ * @param {number} reviewOID - The OID of the review to fetch the seminarOID for.
+ * @returns {Promise<number|null>} - A Promise that resolves with the seminar OID associated with the paper or review, or null if neither OID is provided.
+ */
+async function getSeminarOIDWithPaperOrReviewOID(paperOID, reviewOID) {
+    if(paperOID) {
+        return await getSeminarOIDOfPaper(paperOID);
+    } else if(reviewOID) {
+        return await getSeminarOIDOfReview(reviewOID);
+    }
+    return null;
 }
 
 async function isReviewer(req, res, next) {
-    if(!req.user.userOID || !req.body.reviewOID) {
-        return res.status(400).json({msg: "No userOID or reviewOID"});
-    }
+    try {
+        if (!req.user.userOID || !req.body.reviewOID) {
+            return res.status(400).json({msg: "No userOID or reviewOID"});
+        }
 
-    if(userIsReviewerOfReviewOID) {
-        return next();
+        if (await userIsReviewerOfReviewOID(req.user.userOID, req.body.reviewOID)) {
+            return next();
+        }
+        return res.status(403).json({msg: "Not authorized"});
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({msg: "Internal server error"});
     }
-    return res.status(403).json({msg: "Not authorized"});
 }
 
 module.exports = {
@@ -351,6 +496,7 @@ module.exports = {
     isStudentInSeminar,
     isSupervisorInSeminar,
     isCourseAdminInSeminar,
+    isSupervisorOrStudentInSeminar,
     isCourseAdminOrSupervisorInSeminar,
     isPermittedToAccessFile,
     isConceptAuthor,
@@ -358,5 +504,6 @@ module.exports = {
     isSystemAdmin,
     isChatParticipant,
     isReviewerOrAuthorOfPaper,
-    isReviewer
+    isReviewer,
+    isAllowedToGetOrCreateMessage,
 };

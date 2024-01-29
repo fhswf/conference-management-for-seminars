@@ -1,6 +1,5 @@
 const crypto = require('crypto');
 const db = require("../models");
-const {setPhase3PaperOID} = require("./roleassignmentController");
 const {assignReviewer} = require("./reviewController");
 const {sendMailPhaseChanged, sendMailConceptEvaluated} = require("../utils/mailer");
 //const {getUser, getUserWithConceptOID} = require("./userController");
@@ -17,17 +16,16 @@ const OidcUser = db.oidcuser;
 /**
  * Returns the seminar with the given seminarOID.
  * The user must be assigned to the seminar.
- * @param req
- * @param res
- * @returns {Promise<void>}
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A Promise that resolves with the seminar or an error response.
  */
 const getSeminar = async (req, res) => {
     try {
         if (!req.params.seminarOID) {
-            return res.status(400).json({error: 'Not Found'});
+            return res.status(400).json({error: 'seminarOID is missing'});
         }
 
-        //const userOID = req.user.userOID;
         const userOID = req.user.userOID;
         const seminarOID = req.params.seminarOID;
         const seminar = await Seminar.findByPk(seminarOID,
@@ -45,19 +43,19 @@ const getSeminar = async (req, res) => {
         if (seminar) {
             res.status(200).send(seminar);
         } else {
-            res.status(404).send({message: "Seminar not found."});
+            res.status(404).send({msg: "Seminar not found."});
         }
     } catch (e) {
         console.log(e);
-        res.status(500).send({message: "Error while retrieving seminar."});
+        res.status(500).send({msg: "Error while retrieving seminar."});
     }
 }
 
 /**
  * Returns all existing seminars in database.
- * @param req
- * @param res
- * @returns {Promise<void>}
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A Promise that resolves with the list of seminars or an error response.
  */
 const getSeminars = async (req, res) => {
     try {
@@ -67,20 +65,19 @@ const getSeminars = async (req, res) => {
         if (seminars) {
             res.status(200).send(seminars);
         } else {
-            res.status(404).send({message: "Seminar not found."});
+            res.status(404).send({msg: "Seminar not found."});
         }
     } catch (e) {
         console.log(e);
-        res.status(500).send({message: "Error while retrieving seminar."});
+        res.status(500).send({msg: "Error while retrieving seminar."});
     }
 }
 
 /**
  * Go to next phase of seminar with given seminarOID.
- * If next phase is phase 4, sets the phase3paperOID for all users and assign reviewer.
- * @param req
- * @param res
- * @returns {Promise<*>}
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A Promise that resolves with a success message or an error response.
  */
 const gotoNextPhase = async (req, res) => {
     const t = await db.sequelize.transaction();
@@ -88,16 +85,17 @@ const gotoNextPhase = async (req, res) => {
         const seminarOID = req.params.seminarOID;
 
         if (!seminarOID) {
-            return res.status(400).send({message: "SeminarOID is missing."});
+            await t.rollback();
+            return res.status(400).send({msg: "SeminarOID is missing."});
         }
 
         const currentPhase = await Seminar.findByPk(seminarOID, {attributes: ["phase"]});
         if (currentPhase.phase + 1 >= 8) {
-            return res.status(200).send({message: "Seminar is already in the last phase."});
+            await t.rollback();
+            return res.status(200).send({msg: "Seminar is already in the last phase."});
         }
 
         if (currentPhase.phase + 1 === 4) {
-            await setPhase3PaperOID(seminarOID, t);
             await assignReviewer(seminarOID, t);
             currentPhase.phase++;
         }
@@ -107,11 +105,9 @@ const gotoNextPhase = async (req, res) => {
         //const seminar = await Seminar.update({phase: currentPhase.phase + 1}, {where: {seminaroid: seminarOID}, transaction: t});
         const [updatedRows] = await Seminar.update({phase: currentPhase.phase + 1}, {where: {seminaroid: seminarOID}, transaction: t});
 
-        // TODO affectedRows prüfen
         //if (seminar[0] === 1) {
         if (updatedRows === 1) {
-            // TODO handle phase change
-
+            //send mail to all users of seminar
             const users = await User.findAll({
                 include: [{
                     model: RoleAssignment,
@@ -126,17 +122,15 @@ const gotoNextPhase = async (req, res) => {
 
             sendMailPhaseChanged(users, updatedSeminar)
 
-
-
-            return res.status(200).send({message: "Phase successfully changed."});
+            return res.status(200).send({msg: "Phase successfully changed."});
         } else {
             await t.rollback();
-            return res.status(500).send({message: "Error while changing phase."});
+            return res.status(500).send({msg: "Error while changing phase."});
         }
     } catch (e) {
         await t.rollback();
         console.log(e);
-        return res.status(500).send({message: "Error while changing phase."});
+        return res.status(500).send({msg: "Error while changing phase."});
     }
 }
 
@@ -172,16 +166,16 @@ const getAddableUsers = async (req, res) => {
 
 /**
  * Returns all users of a seminar with their roleassignments and newest concept, with given seminarOID.
- * @param req
- * @param res
- * @returns {Promise<*>}
+ * @param {Object} req - The HTTP request object containing the seminarOID.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A Promise that resolves with the list of users or an error response.
  */
 const getUserList = async (req, res) => {
     try {
         const seminarOID = req.params.seminarOID;
 
         if (!seminarOID) {
-            return res.status(400).send({message: "SeminarOID is missing."});
+            return res.status(400).send({msg: "SeminarOID is missing."});
         }
 
         const users = await Seminar.findByPk(seminarOID,
@@ -207,6 +201,7 @@ const getUserList = async (req, res) => {
                                     attributes: ["attachmentOID", "filename"]
                                 }
                             ],
+                            where: {seminarOID: seminarOID},
                             order: [['createdAt', 'DESC']], //Das neueste Concept
                             limit: 1
                         }]
@@ -218,21 +213,21 @@ const getUserList = async (req, res) => {
         if (users) {
             return res.status(200).send(users);
         } else {
-            return res.status(404).send({message: "Seminar not found."});
+            return res.status(404).send({msg: "Seminar not found."});
         }
 
     } catch
         (e) {
         console.log(e);
-        return res.status(500).send({message: "Error while retrieving user."});
+        return res.status(500).send({msg: "Error while retrieving user."});
     }
 }
 
 /**
  * Updates the roleassignment of a user in a seminar.
- * @param req
- * @param res
- * @returns {Promise<*>}
+ * @param {Object} req - The HTTP request object containing userOID, roleOID, and seminarOID.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A Promise that resolves with a success message or an error response.
  */
 const updateUserInSeminar = async (req, res) => {
     const t = await db.sequelize.transaction();
@@ -242,10 +237,10 @@ const updateUserInSeminar = async (req, res) => {
         const seminarOid = req.body.seminarOID;
 
         if (!userOid || !roleOid || !seminarOid) {
-            return res.status(400).send({message: "Missing required parameters."});
+            return res.status(400).send({msg: "Missing required parameters."});
         }
 
-        const phase = await Seminar.findByPk(seminarOid, {attributes: ["phase"]});
+        //const phase = await Seminar.findByPk(seminarOid, {attributes: ["phase"]});
 
         const supervisorHasAssignedConcepts = await Concept.findOne({
             where: {
@@ -255,7 +250,7 @@ const updateUserInSeminar = async (req, res) => {
         });
 
         if (supervisorHasAssignedConcepts) {
-            return res.status(409).send({message: "Supervisor has already assigned concepts."});
+            return res.status(409).send({msg: "Supervisor has already assigned concepts."});
         }
 
         const assignment = await RoleAssignment.update(
@@ -264,11 +259,11 @@ const updateUserInSeminar = async (req, res) => {
         );
 
         await t.commit();
-        return res.status(200).send({message: "user successfully changed."});
+        return res.status(200).send({msg: "user successfully changed."});
     } catch (e) {
         await t.rollback();
         console.log(e);
-        return res.status(500).send({message: "Error while changing user."});
+        return res.status(500).send({msg: "Error while changing user."});
     }
 }
 
@@ -276,20 +271,33 @@ const updateUserInSeminar = async (req, res) => {
 /**
  * Evaluates a concept with given conceptOID, accepted, feedback and userOIDSupervisor.
  * Also sends mail to author.
- * @param req
- * @param res
- * @returns {Promise<*>}
+ *
+ * @param {Object} req - The HTTP request object containing concept evaluation data.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A Promise that resolves with the evaluated concept or an error response.
  */
 const evaluateConcept = async (req, res) => {
+    const t = await db.sequelize.transaction();
     try {
         const conceptOID = req.body.conceptOID;
         const accepted = req.body.accepted;
-        // TODO set note
         const feedback = req.body.feedback;
         const userOIDSupervisor = req.body.userOIDSupervisor;
 
         if (!conceptOID || accepted === null || accepted === undefined || (!userOIDSupervisor && accepted)) {
-            return res.status(400).send({message: "Missing required parameters."});
+            await t.rollback();
+            return res.status(400).send({msg: "Missing required parameters."});
+        }
+
+        const concept = await Concept.findByPk(conceptOID);
+
+        if (!concept) {
+            return res.status(404).send({msg: "Concept not found."});
+        }
+
+        if(concept.accepted === true) {
+            await t.rollback();
+            return res.status(409).send({msg: "Concept already accepted."});
         }
 
         //const concept = await Concept.update(
@@ -299,11 +307,12 @@ const evaluateConcept = async (req, res) => {
                 feedback: feedback,
                 userOIDSupervisor: userOIDSupervisor
             },
-            {where: {conceptOID: conceptOID}}
+            {where: {conceptOID: conceptOID}, transaction: t}
         );
         //if (concept[0] === 1) {
         if (updatedRows === 1) {
             const conc = await getConceptInformation(conceptOID);
+            await t.commit();
 
             sendMailConceptEvaluated(conc)
 
@@ -311,11 +320,12 @@ const evaluateConcept = async (req, res) => {
 
             return res.status(200).send(concept);
         } else {
-            return res.status(500).send({message: "Error while evaluating concept."});
+            return res.status(500).send({msg: "Error while evaluating concept."});
         }
     } catch (e) {
+        await t.rollback();
         console.log(e);
-        return res.status(500).send({message: "Error while evaluating concept."});
+        return res.status(500).send({msg: "Error while evaluating concept."});
     }
 }
 
@@ -359,20 +369,21 @@ async function getConceptInformation(conceptOID) {
 
 /**
  * Creates a new seminar with a random assignmentkey.
- * @param req
- * @param res
- * @returns {Promise<*>}
+ *
+ * @param {Object} req - The HTTP request object containing the seminar name.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A Promise that resolves with the created seminar or an error response.
  */
 const createSeminar = async (req, res) => {
     try {
         const name = req.body.name;
 
         if (!name) {
-            return res.status(400).send({message: "Name is missing."});
+            return res.status(400).send({msg: "Name is missing."});
         }
 
         if (name.length > 32) {
-            return res.status(400).send({message: "Name is too long."});
+            return res.status(400).send({msg: "Name is too long."});
         }
 
         let existingSeminar = null;
@@ -394,7 +405,7 @@ const createSeminar = async (req, res) => {
         return res.status(200).send(seminar);
     } catch (e) {
         console.log(e);
-        return res.status(500).send({message: "Error while creating seminar."});
+        return res.status(500).send({msg: "Error while creating seminar."});
     }
 }
 
@@ -403,9 +414,10 @@ const createSeminar = async (req, res) => {
 /**
  * Returns a student with all uploaded concepts with attachments and paper with attachments.
  * Also returns the roleassignments phase3paperOID and phase7paperOID.
- * @param req
- * @param res
- * @returns {Promise<void>}
+ *
+ * @param {Object} req - The HTTP request object containing seminarOID and userOID.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A Promise that resolves with the student's information or an error response.
  */
 const getStudent = async (req, res) => {
     try {
@@ -414,7 +426,18 @@ const getStudent = async (req, res) => {
         const userOID = req.params.userOID;
 
         if (!seminarOID || !userOID) {
-            return res.status(400).send({message: "SeminarOID or userOID is missing."});
+            return res.status(400).send({msg: "SeminarOID or userOID is missing."});
+        }
+
+        const isMember = await RoleAssignment.findOne({
+            where: {
+                userOID: userOID,
+                seminarOID: seminarOID,
+            }
+        });
+
+        if (!isMember) {
+            return res.status(403).send({msg: "User is not a member of this seminar."});
         }
 
         const user = await User.findByPk(userOID, {
@@ -463,11 +486,11 @@ const getStudent = async (req, res) => {
         if (user) {
             res.status(200).send(user);
         } else {
-            res.status(404).send({message: "Student not found."});
+            res.status(404).send({msg: "Student not found."});
         }
     } catch (e) {
         console.log(e);
-        res.status(500).send({message: "Error while retrieving student."});
+        res.status(500).send({msg: "Error while retrieving student."});
     }
 }
 
@@ -483,7 +506,7 @@ const enterSeminar = async (req, res) => {
         const assignmentkey = req.params.assignmentkey;
 
         if (!userOID || !assignmentkey) {
-            return res.status(400).send({message: "UserOID or assignmentkey is missing."});
+            return res.status(400).send({msg: "UserOID or assignmentkey is missing."});
         }
 
         const seminar = await Seminar.findOne({
@@ -524,6 +547,7 @@ const enterSeminar = async (req, res) => {
         res.status(500).json({error: 'Internal Server Error'});
     }
 }
+
 /**
  * Returns a list of supervisors for a seminar with the given seminarOID.
  * @param req
@@ -557,11 +581,26 @@ const getSupervisorList = async (req, res) => {
     }
 }
 
-/*
-async function getSeminarWithOID(seminarOID) {
-    return await Seminar.findByPk(seminarOID);
-}
+/**
+ * Retrieves the phase of a seminar based on its OID.
+ *
+ * @param {number} seminarOID - The OID of the seminar to fetch the phase for.
+ * @returns {Promise<number|null>} - A Promise that resolves with the phase number of the seminar or null if the seminarOID is missing or not found.
+ * @throws {Error} - Throws an error if the seminarOID is missing.
  */
+async function getPhaseOfSeminar(seminarOID) {
+    if(!seminarOID) {
+        throw new Error("SeminarOID is missing.");
+    }
+
+    const seminar = await Seminar.findByPk(seminarOID, {attributes: ["phase"]});
+
+    if (seminar) {
+        return seminar.phase;
+    } else {
+        return null;
+    }
+}
 
 module.exports = {
     gotoNextPhase,
@@ -574,6 +613,6 @@ module.exports = {
     createSeminar,
     getStudent,
     enterSeminar,
-    //getSeminarWithOID,
-    getSupervisorList
+    getSupervisorList,
+    getPhaseOfSeminar
 }

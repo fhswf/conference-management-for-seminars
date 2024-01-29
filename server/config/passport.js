@@ -96,11 +96,6 @@ async function addSeminar(lti, t) {
         });
     }
 
-    // TODO delete
-    // seminar.description = lti.context_title;
-    // //seminar.phase = 1;
-    // await seminar.save({transaction: t});
-
     return seminar;
 }
 
@@ -121,7 +116,6 @@ async function addRoleAssignment(lti, user, seminar, t) {
     return assignment;
 }
 
-// TODO edit
 function mapLtiRoles(roles) {
     //if(roles[0] === 'Admin') return 1; //moodle role does not exist
     if (roles[0] === 'Instructor') return 2;
@@ -152,7 +146,7 @@ const ltiVerifyCallback = async (req, lti, done) => {
             seminar = await addSeminar(lti, t);
         }
 
-        await addRoleAssignment(lti, user, seminar, t); // TODO only if phase 1 ?
+        await addRoleAssignment(lti, user, seminar, t);
 
         var userJson = {
             id: user.userOID,

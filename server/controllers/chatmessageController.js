@@ -15,7 +15,6 @@ const Paper = db.paper;
  * @param res
  */
 const getMessagesOfReview = async (req, res) => {
-    //TODO check if user is allowed to see messages of this review: if reviewer or author of paper if phase >= 6
     try {
         const userOID = req.user.userOID
         const reviewOID = req.params.reviewOID
@@ -42,9 +41,11 @@ const getMessagesOfReview = async (req, res) => {
             message = message.get();
 
             if (message.sender === userOID) {
-                delete message.receiver;
+                //delete message.receiver;
+                message.receiver = null;
             } else if (message.receiver === userOID) {
-                delete message.sender;
+                //delete message.sender;
+                message.sender = null;
             }
 
             return message;
@@ -85,7 +86,7 @@ const createMessage = async (req, res) => {
 
         if (!review) {
             await t.rollback();
-            return res.status(404).json({error: 'Not Found'});
+            return res.status(404).json({error: 'Review Not Found'});
         }
 
 
@@ -112,8 +113,8 @@ const createMessage = async (req, res) => {
             message: message,
             attachmentOID: createdAttachment?.attachmentOID,
             reviewOID: reviewOID,
-            sender: userOID, // TODO
-            receiver: receiverId // TODO
+            sender: userOID,
+            receiver: receiverId
         }, {transaction: t});
         delete createdMessage.dataValues.receiver;
         await t.commit();

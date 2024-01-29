@@ -56,7 +56,6 @@ function AssignUserPage({seminar, onClose}: Props) {
         setSelectedRole(rollen[2].value);
     }, [])
 
-    // TODO anpassen
     let usersJson: { name: string, userOID: number }[] = [];
 
     Array.isArray(userList.data) && userList?.data?.map((user: User) => {

@@ -68,7 +68,7 @@ function ConceptAcceptReject({user0, availableSupervisors, onClose, userRole, on
             seminarOID: user0.userOIDStudent_concepts[0].seminarOID,
         }
 
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/seminar/evaluate-concept`, {// TODO change to concept route
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/seminar/evaluate-concept`, {
             method: "POST",
             credentials: 'include',
             headers: {

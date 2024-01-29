@@ -13,7 +13,6 @@ router.get('/all', isSystemAdmin, seminarController.getSeminars);
 router.get('/:seminarOID', isMemberOfSeminar, seminarController.getSeminar);
 router.post('/:seminarOID/go-to-next-phase/', isCourseAdminInSeminar, seminarController.gotoNextPhase);
 
-
 router.post('/update-user', isCourseAdminOrSupervisorInSeminar, seminarController.updateUserInSeminar);
 
 router.get('/:seminarOID/participants', isCourseAdminOrSupervisorInSeminar, seminarController.getUserList);
