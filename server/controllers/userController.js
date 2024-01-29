@@ -33,7 +33,6 @@ const getUserById = async (req, res) => {
 
 /**
  * Assigns a user to a seminar with the given role and seminarOID.
- * TODO also send mail to user
  * @param req
  * @param res
  * @returns {Promise<void>}
@@ -53,7 +52,7 @@ const assignToSeminar = async (req, res) => {
             seminarOID: seminarOID,
             roleOID: roleOID
         });
-        // TODO send Mail to User
+        // optional: send Mail to User
         res.status(200).json(roleassignment);
     } catch (error) {
         console.error(error);
@@ -175,7 +174,7 @@ const getAssignedSeminars = async (req, res) => {
         const userOID = req.user.userOID;
 
         if (!userOID) {
-            return res.status(400).send({message: "UserOID is missing."});
+            return res.status(400).send({msg: "UserOID is missing."});
         }
 
         const seminars = await Seminar.findAll({
@@ -190,11 +189,11 @@ const getAssignedSeminars = async (req, res) => {
         if (seminars) {
             res.status(200).send(seminars);
         } else {
-            res.status(404).send({message: "Seminar not found."});
+            res.status(404).send({msg: "Seminar not found."});
         }
     } catch (e) {
         console.log(e);
-        res.status(500).send({message: "Error while retrieving seminar."});
+        res.status(500).send({msg: "Error while retrieving seminar."});
     }
 }
 

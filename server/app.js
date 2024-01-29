@@ -18,7 +18,6 @@ app.set('trust proxy', true);
 const {isAuthenticated} = require("./middleware/authMiddleware");
 
 app.use(cors({
-    //origin: `${process.env.FRONTEND_URL}`,
     origin: `${process.env.FRONTEND_URL}`,
     credentials: true
 }));
@@ -50,7 +49,7 @@ const sessionStore = new MySQLStore({
 });
 
 app.use(session({
-    key: 'session_cookie_name',
+    key: 'conference_session',
     secret: process.env.COOKIE_SECRET,
     store: sessionStore,
     resave: false,
@@ -132,7 +131,7 @@ app.get('/conference/api/success', function (req, res) {
 });
 
 app.get('/conference/api/error-lti', function (req, res) {
-    // consumer key not found or not authorized
+    // consumer key not found or not authorized or mail is null
     console.log('Error during LTI launch.');
     res.status(401).send('Error during LTI launch.');
 });
@@ -163,14 +162,8 @@ app.get('/conference/api', (req, res) => {
     res.send('Hello World!');
 });
 
-app.get('/conference/api/test', (req, res) => {
-    res.send(process.env.EXPRESS_PORT_HTTP);
-});
-
 //logout
 app.get('/conference/api/logout', isAuthenticated, (req, res) => {
-    console.log("");
-
     let redirectUrl;
     if (req.user.authtype === "lti") {
         redirectUrl = req.user.lti?.launch_presentation_return_url;

@@ -1,6 +1,6 @@
 import styles from './ChatWindowPage.module.css';
 import ChatMessage from "../components/ChatMessage.tsx";
-import {useContext, useEffect, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import {Button} from "primereact/button";
 import {InputTextarea} from "primereact/inputtextarea";
 import CustomFileUpload from "../components/CustomFileUpload.tsx";
@@ -16,8 +16,13 @@ interface Props {
     reviewOID?: number;
 }
 
+interface CustomFileUploadRef {
+    onClear: () => void;
+}
+
 function ChatWindowPage({paper, reviewOID}: Props) {
-    const pollingInterval = 2000;
+    const pollingInterval = 3000;
+    const customFileUploadRef = useRef<CustomFileUploadRef | null>(null);
     const {user, setUser} = useContext(AuthContext);
     const [selectedFile, setSelectedFile] = useState<File>()
     const [text, setText] = useState<string>("")
@@ -96,6 +101,9 @@ function ChatWindowPage({paper, reviewOID}: Props) {
         setChatmessages([...chatmessages, newMessage])
         setText("")
         setSelectedFile(undefined)
+        if (customFileUploadRef.current) {
+            customFileUploadRef.current.onClear();
+        }
     }
 
     return (
@@ -133,7 +141,7 @@ function ChatWindowPage({paper, reviewOID}: Props) {
             </div>
             <div className={styles.textfieldAndButton}>
                 <InputTextarea data-test="review-textfield" value={text} onChange={(e) => setText(e.target.value)}/>
-                <CustomFileUpload accept="application/pdf" onSelectionChanged={(file) => setSelectedFile(file || undefined)}/>
+                <CustomFileUpload ref={customFileUploadRef} accept="application/pdf" onSelectionChanged={(file) => setSelectedFile(file || undefined)}/>
                 <Button data-test="review-send" onClick={onSendClicked} label="➡" disabled={!text && !selectedFile}/>
             </div>
         </div>

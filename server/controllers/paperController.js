@@ -1,11 +1,7 @@
 const db = require("../models");
 const attachmentController = require("./attachmentController");
-const pdf = require('pdf-parse');
 const {isValidPdf, replaceInFilename} = require("../utils/PdfUtils");
-const {setPhase7PaperOID, setPhase3PaperOID} = require("./roleassignmentController");
-//const {getCAdminsAndSupervisors, getUserWithOID} = require("./userController");
 const {sendMailPaperUploaded} = require("../utils/mailer");
-//const {getSeminarWithOID} = require("./seminarController");
 
 const Op = db.Sequelize.Op;
 const Paper = db.paper;
@@ -15,15 +11,14 @@ const Attachment = db.attachment;
 const Seminar = db.seminar;
 const RoleAssignment = db.roleassignment;
 
-
 /**
  * Uploads a Paper associated with a user and seminar, with optional file.
  * Returns 415 if the file is not a PDF.
  * Returns 409 if the user has already uploaded a paper in phase 7.
  * Sends an email notification to admin and supervisor.
- * @param req
- * @param res
- * @returns {Promise<*>}
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A Promise that resolves once the paper is uploaded.
  */
 async function uploadPaper(req, res) {
     const t = await db.sequelize.transaction();
@@ -35,10 +30,11 @@ async function uploadPaper(req, res) {
 
         if (!seminarOID || !file) {
             await t.rollback();
-            return res.status(400).json({error: 'Bad Request'});
+            return res.status(400).json({error: 'seminarOID or file missing'});
         }
 
         if(!await isValidPdf(file.data)){
+            await t.rollback();
             return res.status(415).json({error: 'Unsupported Media Type; Only PDF files are allowed'});
         }
         const currentPhase = await Seminar.findByPk(seminarOID, {attributes: ["phase"]});
@@ -46,6 +42,7 @@ async function uploadPaper(req, res) {
         const student = await User.findByPk(userOID, {attributes: ["firstname", "lastname"]});
 
         if(currentPhase.phase !== 3 && currentPhase.phase !== 7){
+            await t.rollback();
             return res.status(400).json({error: 'Current phase is not 3 or 7'});
         }
 
@@ -61,16 +58,31 @@ async function uploadPaper(req, res) {
             attachmentOID: attachment.attachmentOID
         }, {transaction: t});
 
+        // set paperOID in roleassignment
         if(currentPhase.phase === 7){
-            // TODO
-            if(!await setPhase7PaperOID(t, paper.paperOID, userOID, seminarOID)){
+            const [updatedRows] = await RoleAssignment.update({
+                phase7paperOID: paper.paperOID
+            }, {
+                where: {
+                    userOID: userOID,
+                    seminarOID: seminarOID,
+                    phase7paperOID: null
+                }, transaction: t
+            });
+
+            if (updatedRows === 0) {
                 await t.rollback();
                 return res.status(409).json({error: 'Already uploaded a paper'});
             }
         }else if(currentPhase.phase === 3){
-            //if(!await setPhase3PaperOID(t, paper.paperOID, userOID, seminarOID)){
-            //    return res.status(409).json({error: 'Bad Request'});
-            //}
+            await RoleAssignment.update({
+                phase3paperOID: paper.paperOID
+            }, {
+                where: {
+                    userOID: userOID,
+                    seminarOID: seminarOID,
+                }, transaction: t
+            });
         }
 
         // add created attachment to paper
@@ -93,7 +105,6 @@ async function uploadPaper(req, res) {
             }],
         });
 
-        //const seminar = await getSeminarWithOID(seminarOID)
         const seminar = await Seminar.findByPk(seminarOID);
 
         sendMailPaperUploaded(users, seminar, student);
@@ -110,9 +121,9 @@ async function uploadPaper(req, res) {
 /**
  * Retrieves all papers assigned to a user within a seminar.
  * Returns a list of papers with their reviews.
- * @param req
- * @param res
- * @returns {Promise<*>}
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A Promise that resolves with the papers assigned to the user for review.
  */
 async function getAssignedPaper(req, res) {
     try {
@@ -164,9 +175,9 @@ async function getAssignedPaper(req, res) {
 /**
  * Retrieves all papers uploaded by a user within a seminar.
  * Returns a list of papers with their attachments.
- * @param req
- * @param res
- * @returns {Promise<*>}
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A Promise that resolves with the papers uploaded by the user for the specified seminar.
  */
 async function getUploadedPaper(req, res) {
     try {
@@ -207,7 +218,8 @@ async function userIsAuthorOfPaper(userOID, paperOID ) {
     }
 
     const paper = await Paper.findByPk(paperOID, {attributes: ["authorOID"]});
-    return paper.authorOID === userOID;
+
+    return paper?.authorOID === userOID;
 }
 
 /**
@@ -242,12 +254,17 @@ async function paperHasAttachment(attachmentOID) {
 
 /**
  * Returns the seminarOID associated with a paper.
- * @param paperOID
- * @returns {Promise<*>}
+ * @param {number} paperOID - The unique identifier of the paper.
+ * @returns {Promise<number|null>} - A Promise that resolves with the seminarOID if found, or null if not found.
  */
 async function getSeminarOIDOfPaper(paperOID) {
     const paper = await Paper.findByPk(paperOID, {attributes: ["seminarOID"]});
-    return paper.seminarOID;
+    return paper?.seminarOID;
+}
+
+async function paperExists(paperOID) {
+    const paper = await Paper.findByPk(paperOID);
+    return paper !== null;
 }
 
 module.exports = {
@@ -257,5 +274,6 @@ module.exports = {
     userIsAuthorOfPaper,
     //paperHasAttachmentAndUserIsAuthor,
     paperHasAttachment,
-    getSeminarOIDOfPaper
+    getSeminarOIDOfPaper,
+    paperExists
 }

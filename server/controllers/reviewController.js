@@ -193,12 +193,34 @@ async function userIsReviewerOfPaper(userOID, paperOID) {
 }
 
 /**
+ * Checks if a user is a reviewer of a specific review.
+ *
+ * @param {number} userOID - The user's unique identifier.
+ * @param {number} reviewOID - The review's unique identifier.
+ * @returns {Promise<boolean>} - A Promise that resolves to true if the user is a reviewer of the review, or false otherwise.
+ */
+async function isReviewerOfReview(userOID, reviewOID) {
+    if (!userOID || !reviewOID) {
+        return false;
+    }
+
+    const reviews = await Review.findOne({
+        where: {
+            reviewOID: reviewOID,
+            reviewerOID: userOID,
+        },
+    });
+
+    return reviews !== null;
+}
+
+/**
  * Checks if a user is the reviewer of a review, with the given userOID and reviewOID.
  * @param reviewOID
  * @param userOID
  * @returns {Promise<boolean>}
  */
-async function userIsReviewerOfReviewOID(reviewOID, userOID) {
+async function userIsReviewerOfReviewOID(userOID, reviewOID) {
     if (!reviewOID || !userOID) {
         return false;
     }
@@ -213,6 +235,36 @@ async function userIsReviewerOfReviewOID(reviewOID, userOID) {
     return review !== null;
 }
 
+async function userIsAuthorOfReview(userOID, reviewOID) {
+    if (!reviewOID || !userOID) {
+        return false;
+    }
+
+    const review = await Review.findOne({
+        where: {
+            reviewOID: reviewOID,
+        },
+        include: [{
+            model: Paper,
+            as: "paperO",
+            attributes: ['authorOID'],
+        }],
+    });
+
+    if (review) {
+        return review.paperO.authorOID || null;
+    } else {
+        return null;
+    }
+}
+
+/**
+ * Updates the rating of a review.
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A Promise that resolves once the review is successfully rated.
+ */
 async function rateReview(req, res) {
     try {
         const reviewOID = req.body.reviewOID;
@@ -226,10 +278,41 @@ async function rateReview(req, res) {
             },
         });
 
-        return res.status(200).json({message: 'Review successfully rated'});
+        return res.status(200).json({msg: 'Review successfully rated'});
     } catch (e) {
         console.error(e);
         return res.status(500).json({error: 'Internal Server Error'});
+    }
+}
+
+/**
+ * Retrieves the seminarOID associated with a review.
+ *
+ * @param {number} reviewOID - The OID of the review to fetch the seminarOID for.
+ * @returns {Promise<number|null>} - A Promise that resolves with the seminarOID associated with the review, or null if reviewOID is missing or not found.
+ * @throws {Error} - Throws an error if the reviewOID is null.
+ */
+async function getSeminarOIDOfReview(reviewOID){
+    if (!reviewOID) {
+        throw new Error("reviewOID is null");
+    }
+
+    const review = await Review.findOne({
+        where: {
+            reviewOID: reviewOID,
+        },
+        attributes: ['paperOID'],
+        include: [{
+            model: Paper,
+            as: "paperO",
+            attributes: ['seminarOID'],
+        }],
+    });
+
+    if (review) {
+        return review.paperO.seminarOID || null;
+    } else {
+        return null;
     }
 }
 
@@ -238,6 +321,9 @@ module.exports = {
     assignReviewer,
     getReviewOIDsOfPaper,
     userIsReviewerOfPaper,
+    isReviewerOfReview,
     userIsReviewerOfReviewOID,
+    userIsAuthorOfReview,
     rateReview,
+    getSeminarOIDOfReview,
 }

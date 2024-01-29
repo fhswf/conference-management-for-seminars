@@ -15,7 +15,8 @@ const sequelize = new Sequelize(dbConfig.DATABASE, dbConfig.USER, dbConfig.PASSW
         acquire: dbConfig.pool.acquire,
         idle: dbConfig.pool.idle,
     },
-    logging: true
+    //logging: true
+    logging: false
 });
 
 sequelize.authenticate().then(() => {

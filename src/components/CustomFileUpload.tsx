@@ -1,27 +1,33 @@
-import {FileUpload} from "primereact/fileupload";
-import {useRef, useState} from "react";
-import {Button} from "primereact/button";
+import React, { useRef, useState, forwardRef, useImperativeHandle } from 'react';
+import { FileUpload } from 'primereact/fileupload';
+
+interface CustomFileUploadRef {
+    onClear: () => void;
+}
 
 interface Props {
     onSelectionChanged: (file: File | null) => void;
     accept?: string;
 }
 
-function CustomFileUpload({onSelectionChanged, accept}: Props) {
+const CustomFileUpload = forwardRef<CustomFileUploadRef, Props>((props, ref) => {
     const fileUploadRef = useRef<FileUpload | null>(null);
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     function onClear() {
         fileUploadRef.current && fileUploadRef.current.clear();
-        setSelectedFile(null);
-        onSelectionChanged(null);
+        //setSelectedFile(null);
+        props.onSelectionChanged(null);
     }
+
+    useImperativeHandle(ref, () => ({
+        onClear
+    }));
 
     return (
         <>
             <FileUpload
                 data-test="fileupload-component"
-                accept={accept}
+                accept={props.accept}
                 ref={fileUploadRef}
                 mode="basic"
                 customUpload
@@ -29,13 +35,12 @@ function CustomFileUpload({onSelectionChanged, accept}: Props) {
                 maxFileSize={16000000}
                 chooseLabel="Datei auswählen"
                 onSelect={(e) => {
-                    setSelectedFile(e.files[0]);
-                    onSelectionChanged(e.files[0]);
+                    //setSelectedFile(e.files[0]);
+                    props.onSelectionChanged(e.files[0]);
                 }}
             />
-            {/*selectedFile && (<Button label="X" onClick={onClear}/>)*/}
         </>
     );
-}
+});
 
 export default CustomFileUpload;
