@@ -2,6 +2,7 @@ const db = require("../models");
 const attachmentController = require("./attachmentController");
 const {isValidPdf, replaceInFilename} = require("../utils/PdfUtils");
 const {sendMailPaperUploaded} = require("../utils/mailer");
+const archiver = require("archiver");
 
 const Op = db.Sequelize.Op;
 const Paper = db.paper;
@@ -267,6 +268,80 @@ async function paperExists(paperOID) {
     return paper !== null;
 }
 
+/**
+ * Get all final papers in a seminar as a ZIP file and send it as a response.
+ *
+ * @param {Object} req - The HTTP request object containing the seminarOID.
+ * @param {Object} res - The HTTP response object for sending the ZIP file.
+ * @returns {Promise<void>} - A Promise that resolves after creating and sending the ZIP file or an error response.
+ */
+async function getAllFinalPaperZip(req, res) {
+    try {
+        const userOID = req.user.userOID;
+        const seminarOID = req.params.seminarOID;
+
+        if (!seminarOID) {
+            return res.status(400).json({error: 'Bad Request'});
+        }
+
+        const seminar = await Seminar.findByPk(seminarOID);
+
+        //get all papers with attachment
+        const papers = await RoleAssignment.findAll({
+            where: {
+                seminarOID: seminarOID,
+                phase7paperOID: {
+                    [Op.not]: null
+                }
+            },
+            include: [{
+                model: Paper,
+                as: "phase7paperO",
+                include: [{
+                    model: Attachment,
+                    as: "attachmentO",
+                    attributes: ["filename", "file"]
+                }],
+                attributes: ["paperOID"]
+            },
+                {
+                    model: User,
+                    as: "userO",
+                    attributes: ["firstname", "lastname"]
+                }],
+            attributes: ["phase7paperOID"]
+        });
+
+        //create and send zip
+        const archive = archiver('zip', {
+            zlib: { level: 9 }
+        });
+
+        res.setHeader('Content-Type', 'application/zip');
+        res.setHeader('Content-Disposition', `attachment; filename=${seminar.description}.zip`);
+
+        archive.pipe(res);
+
+        papers.forEach((paper) => {
+            const filename = paper.userO.firstname + "_" + paper.userO.lastname + "_" + paper.phase7paperO.attachmentO.filename;
+            const fileData = paper.phase7paperO.attachmentO.file;
+
+            if (!Buffer.isBuffer(fileData)) {
+                const bufferData = Buffer.from(fileData.data);
+                archive.append(bufferData, { name: filename });
+            } else {
+                archive.append(fileData, { name: filename });
+            }
+        });
+
+        await archive.finalize();
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({error: 'Internal Server Error'});
+    }
+}
+
 module.exports = {
     uploadPaper,
     getAssignedPaper,
@@ -275,5 +350,6 @@ module.exports = {
     //paperHasAttachmentAndUserIsAuthor,
     paperHasAttachment,
     getSeminarOIDOfPaper,
-    paperExists
+    paperExists,
+    getAllFinalPaperZip
 }

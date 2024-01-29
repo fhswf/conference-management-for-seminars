@@ -107,7 +107,7 @@ function SeminarDetailsPage() {
             setParticipantsList(studentList => {
                 const newStudentList = {...studentList!};
                 // to skip reviewer assignment phase
-                if(newStudentList.phase! + 1 === 4) {
+                if (newStudentList.phase! + 1 === 4) {
                     newStudentList.phase = newStudentList.phase! + 2;
                 } else {
                     newStudentList.phase = newStudentList.phase! + 1;
@@ -179,6 +179,18 @@ function SeminarDetailsPage() {
         }
     }
 
+    async function onExportCkicked() {
+        const link = document.createElement('a');
+        link.href = `${import.meta.env.VITE_BACKEND_URL}/paper/get-all-final-paper/${seminarOID}`;
+        link.download = 'downloaded.zip';
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+
+        link.click();
+
+        document.body.removeChild(link);
+    }
+
     /**
      * Handles the evaluation of a concept and updates the participant list.
      *
@@ -222,6 +234,8 @@ function SeminarDetailsPage() {
                         Konzepte: {conceptCount}/{studentCount}</p>
                     <p data-test="submitted-p3-paper">Eingereichte Paper Phase 3: {p3paperCount}/{studentCount}</p>
                     <p data-test="submitted-p7-paper">Eingereichte Paper Phase 7: {p7paperCount}/{studentCount}</p>
+                    <Button data-test="zip-export" disabled={!!(participantsList?.phase && participantsList?.phase < 7)}
+                            onClick={onExportCkicked}>Final Paper Zip-Export</Button>
                     {!isEditMode ?
                         <Table data-test="table-participants" header={header} data={tableData}/> :
                         <Table data-test="table-participants-edit" header={headerEdit} data={tableDataEdit}/>
