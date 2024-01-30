@@ -8,53 +8,66 @@ const RoleAssignment = db.roleassignment;
 const OidcUser = db.oidcuser;
 const Seminar = db.seminar;
 
-/*
-const getUserById = async (req, res) => {
-    try {
-        const user = await User.findAll({
-            include: [{
-                model: Concept,
-                as: 'userOIDStudent_concepts',
-                include: [{
-                    model: Status,
-                    as: 'statusO'
-                }]
-            }],
-            where: {userOID: req.params.id}
-        });
-        res.status(200).json(user);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({error: 'Internal Server Error'});
-    }
-};*/
-
-
-
 /**
  * Assigns a user to a seminar with the given role and seminarOID.
- * @param req
- * @param res
- * @returns {Promise<void>}
+ *
+ * @param {Object} req - The HTTP request object containing userOID, seminarOID, and roleOID.
+ * @param {Object} res - The HTTP response object for sending the roleassignment data or an error response.
+ * @returns {Promise<void>} - A Promise that resolves with the created roleassignment data or an error response.
  */
 const assignToSeminar = async (req, res) => {
+    const t = await db.sequelize.transaction();
     try {
         const userOID = req.body.userOID;
         const seminarOID = req.body.seminarOID;
         const roleOID = req.body.roleOID;
 
         if(!userOID || !seminarOID || !roleOID) {
-            return res.status(400).json({error: 'Bad Request'});
+            await t.rollback();
+            return res.status(400).json({error: 'Missing parameters.'});
         }
 
-        const roleassignment = await RoleAssignment.create({
-            userOID: userOID,
-            seminarOID: seminarOID,
-            roleOID: roleOID
+        if (roleOID < 1 || roleOID > 3) {
+            await t.rollback();
+            return res.status(400).json({error: 'Invalid roleOID'});
+        }
+
+        const user = await User.findByPk(userOID);
+        if(!user) {
+            await t.rollback();
+            return res.status(404).json({error: 'User not found.'});
+        }
+
+        const seminar = await Seminar.findByPk(seminarOID);
+        if(!seminar) {
+            await t.rollback();
+            return res.status(404).json({error: 'Seminar not found.'});
+        }
+
+        const [roleassignment, created] = await RoleAssignment.findOrCreate({
+            where: {
+                userOID: userOID,
+                seminarOID: seminarOID
+            },
+            defaults: {
+                userOID: userOID,
+                seminarOID: seminarOID,
+                roleOID: roleOID
+            },
+            transaction: t
         });
+
+        if(!created) {
+            await t.rollback();
+            return res.status(409).json({error: 'User already assigned to this seminar.'});
+        }
+
         // optional: send Mail to User
+
+        await t.commit();
         res.status(200).json(roleassignment);
     } catch (error) {
+        await t.rollback();
         console.error(error);
         res.status(500).json({error: 'Internal Server Error'});
     }
@@ -98,7 +111,7 @@ async function getCAdminsAndSupervisors(seminarOID) {
 /**
  * Return a User with the given userOID.
  * @param userOID
- * @returns {Promise<Model|null>}
+ * @returns {Promise<Object|null>}
  */
 async function getUserWithOID(userOID) {
     const user = await User.findByPk(userOID);
@@ -109,7 +122,7 @@ async function getUserWithOID(userOID) {
 /**
  * Return a User with a concept with the given conceptOID.
  * @param conceptOID
- * @returns {Promise<Model|null>}
+ * @returns {Promise<Object|null>}
  */
 async function getUserWithConceptOID(conceptOID) {
     const user = await User.findOne({
@@ -128,7 +141,7 @@ async function getUserWithConceptOID(conceptOID) {
 
 /**
  * Return a list of supervisors for a seminar with the given seminarOID.
- * @param seminarOID
+ * @param {number} seminarOID
  * @returns {Promise<*>}
  */
 async function getSupervisorUsersInSeminar(seminarOID){
@@ -147,6 +160,12 @@ async function getSupervisorUsersInSeminar(seminarOID){
     return user;
 }
 
+/**
+ * Retrieves a list of users who are course admins in a specific seminar based on seminarOID.
+ *
+ * @param {string} seminarOID - The seminar's identifier.
+ * @returns {Promise<*>} - A Promise that resolves with an array of users who are course admins in the specified seminar.
+ */
 async function getCourseAdminUserInSeminar(seminarOID){
     const user = await User.findAll({
         include: [{
@@ -165,9 +184,10 @@ async function getCourseAdminUserInSeminar(seminarOID){
 
 /**
  * Returns all seminars assigned to the current user with their roleassignments.
- * @param req
- * @param res
- * @returns {Promise<void>}
+ *
+ * @param {Object} req - The HTTP request object containing userOID.
+ * @param {Object} res - The HTTP response object for sending the list of assigned seminars or an error response.
+ * @returns {Promise<void>} - A Promise that resolves with the list of assigned seminars or an error response.
  */
 const getAssignedSeminars = async (req, res) => {
     try {
@@ -198,7 +218,6 @@ const getAssignedSeminars = async (req, res) => {
 }
 
 module.exports = {
-    //getUserById,
     assignToSeminar,
     userIsSystemAdmin,
     getCAdminsAndSupervisors,

@@ -1,7 +1,7 @@
 const userController = require('../controllers/userController.js');
 
 const router = require('express').Router();
-const {isMemberOfSeminar, isSystemAdmin} = require('../middleware/authMiddleware');
+const {isSystemAdmin} = require('../middleware/authMiddleware');
 
 //router.get('/get-user/:id', userController.getUserById);
 

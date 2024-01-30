@@ -9,9 +9,10 @@ const Concept = db.concept;
 
 /**
  * Returns an array user which review a paper.
- * @param req
- * @param res
- * @returns {Promise<*>}
+ *
+ * @param {Object} req - The HTTP request object containing the paperOID.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A Promise that resolves with the list of reviewers (users) or an error response.
  */
 async function getReviewerUserOfPaper(req, res) {
     try {
@@ -44,9 +45,10 @@ async function getReviewerUserOfPaper(req, res) {
 /**
  * Assigns reviewers to papers according to the given rules
  * Uses phase3paperOID of roleassignment to determine which paper is the newest.
- * @param seminarOID
- * @param t
- * @returns {Promise<void>}
+ *
+ * @param {number} seminarOID - The unique identifier of the seminar.
+ * @param {Object} t - The database transaction object.
+ * @returns {Promise<void>} - A Promise that resolves when reviewers are assigned to papers.
  */
 async function assignReviewer(seminarOID, t) {
     // Jeder User (Student) eines Seminars soll 2 Reviewe Eintrag mit sich als Reviewer bekommen
@@ -80,7 +82,7 @@ async function assignReviewer(seminarOID, t) {
     });
 
     // for randomness, possible to mix studentsInSeminar-array here
-    //mixArray(studentsInSeminar)
+    mixArray(studentsInSeminar)
 
     // users do not review themselves: at least 3 students in the seminar
     // users do not review each other: at least 4 students in the seminar
@@ -130,9 +132,10 @@ async function assignReviewer(seminarOID, t) {
  * Returns all reviewOIDs of a paper with the given paperOID.
  * If user is author of paper, all reviewOIDs of a paper are returned.
  * If user is reviewer of paper, only reviewOID where user is reviewer are returned.
- * @param req
- * @param res
- * @returns {Promise<*>}
+ *
+ * @param {Object} req - The HTTP request object containing the paperOID parameter.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A Promise that resolves with the reviewOIDs or an error response.
  */
 async function getReviewOIDsOfPaper(req, res) {
     const paperOID = req.params.paperOID;
@@ -173,9 +176,10 @@ async function getReviewOIDsOfPaper(req, res) {
 /**
  * Checks if a user is the reviewer of a paper, with the given userOID and paperOID.
  * Returns false if userOID or paperOID is null.
- * @param userOID
- * @param paperOID
- * @returns {Promise<boolean>}
+ *
+ * @param {number} userOID - The user's identifier.
+ * @param {number} paperOID - The paper's identifier.
+ * @returns {Promise<boolean>} - A Promise that resolves with `true` if the user is a reviewer, or `false` if not.
  */
 async function userIsReviewerOfPaper(userOID, paperOID) {
     if (!userOID || !paperOID) {
@@ -216,9 +220,10 @@ async function isReviewerOfReview(userOID, reviewOID) {
 
 /**
  * Checks if a user is the reviewer of a review, with the given userOID and reviewOID.
- * @param reviewOID
- * @param userOID
- * @returns {Promise<boolean>}
+ *
+ * @param {number} userOID - The user's identifier.
+ * @param {number} reviewOID - The review's identifier.
+ * @returns {Promise<boolean>} - A Promise that resolves with `true` if the user is a reviewer, or `false` if not.
  */
 async function userIsReviewerOfReviewOID(userOID, reviewOID) {
     if (!reviewOID || !userOID) {
@@ -235,6 +240,14 @@ async function userIsReviewerOfReviewOID(userOID, reviewOID) {
     return review !== null;
 }
 
+/**
+ * Checks if a user is the author of a specific review based on the reviewOID.
+ *
+ * @param {number} userOID - The user's identifier.
+ * @param {number} reviewOID - The review's identifier.
+ * @returns {Promise<boolean|null>} - A Promise that resolves with `true` if the user is the author,
+ *                                      `false` if not, or `null` if the review is not found.
+ */
 async function userIsAuthorOfReview(userOID, reviewOID) {
     if (!reviewOID || !userOID) {
         return false;

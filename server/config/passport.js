@@ -13,6 +13,13 @@ const LtiUser = db.ltiuser
 const ContextToSeminar = db.contexttoseminar;
 const LtiCredentials = db.lticredentials;
 
+/**
+ * Add or update a user based on LTI information.
+ *
+ * @param {Object} lti - LTI information.
+ * @param {Object} t - Transaction object.
+ * @returns {Object} - User object.
+ */
 async function addOrUpdateUser(lti, t) {
     let ltiUser = await LtiUser.findOne({
         where: {
@@ -61,6 +68,13 @@ async function addOrUpdateUser(lti, t) {
     return user;
 }
 
+/**
+ * Add a seminar based on LTI information.
+ *
+ * @param {Object} lti - LTI information.
+ * @param {Object} t - Transaction object.
+ * @returns {Object} - Seminar object.
+ */
 async function addSeminar(lti, t) {
     const key = crypto.randomUUID()
 
@@ -99,6 +113,15 @@ async function addSeminar(lti, t) {
     return seminar;
 }
 
+/**
+ * Add a role assignment based on LTI information.
+ *
+ * @param {Object} lti - LTI information.
+ * @param {Object} user - User object.
+ * @param {Object} seminar - Seminar object.
+ * @param {Object} t - Transaction object.
+ * @returns {Object} - Role assignment object.
+ */
 async function addRoleAssignment(lti, user, seminar, t) {
     const [assignment, created] = await RoleAssignment.findOrCreate({
         where: {
@@ -116,6 +139,12 @@ async function addRoleAssignment(lti, user, seminar, t) {
     return assignment;
 }
 
+/**
+ * Map LTI roles to roleOID.
+ *
+ * @param {string[]} roles - LTI roles.
+ * @returns {number|null} - Mapped roleOID.
+ */
 function mapLtiRoles(roles) {
     //if(roles[0] === 'Admin') return 1; //moodle role does not exist
     if (roles[0] === 'Instructor') return 2;
@@ -123,6 +152,14 @@ function mapLtiRoles(roles) {
     return null;
 }
 
+/**
+ * LTI verify callback function.
+ *
+ * @param {Object} req - HTTP request object.
+ * @param {Object} lti - LTI information.
+ * @param {function} done - Passport done function.
+ * @returns {Object} - User object or false.
+ */
 const ltiVerifyCallback = async (req, lti, done) => {
     const t = await db.sequelize.transaction();
 
@@ -200,7 +237,19 @@ const ltiStrategy = new LTIStrategy({
     passReqToCallback: true,
 }, ltiVerifyCallback);
 
-
+/**
+ * OpenID Connect verify callback function.
+ *
+ * @param {string} issuer - Issuer URL.
+ * @param {Object} profile - User profile.
+ * @param {Object} context - Context object.
+ * @param {string} idToken - ID token.
+ * @param {string} accessToken - Access token.
+ * @param {string} refreshToken - Refresh token.
+ * @param {Object} params - Additional parameters.
+ * @param {function} done - Passport done function.
+ * @returns {Object} - User object or error.
+ */
 async function oidcVerifyCallback(issuer, profile, context, idToken, accessToken, refreshToken, params, done) {
     const t = await db.sequelize.transaction();
 

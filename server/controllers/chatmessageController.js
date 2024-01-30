@@ -11,8 +11,10 @@ const Paper = db.paper;
  * Retrieves chat messages related to a specific review.
  * The messages are ordered by creation date in ascending order.
  * Removes the partners user ID from each message for privacy reasons if user is not sender.
- * @param req
- * @param res
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A Promise that resolves with the retrieved chat messages or an error response.
  */
 const getMessagesOfReview = async (req, res) => {
     try {
@@ -61,8 +63,10 @@ const getMessagesOfReview = async (req, res) => {
 /**
  * Creates a chat message associated with a review, including optional attachments.
  * Returns the created message and attachment (if any).
- * @param req
- * @param res
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @returns {Promise<void>} - A Promise that resolves with the created message and attachment (if any) or an error response.
  */
 const createMessage = async (req, res) => {
     const t = await db.sequelize.transaction();
@@ -138,6 +142,7 @@ const createMessage = async (req, res) => {
 
 /**
  * Checks if a user with the provided userOID is a participant in a chat conversation.
+ *
  * @param userOID - The userOID to be checked.
  * @param attachmentOID - The attachmentOID associated with the chat (optional).
  * @param reviewOID - The reviewOID associated with the chat (optional).
@@ -172,6 +177,7 @@ async function userIsChatParticipant(userOID, attachmentOID = false, reviewOID =
 
 /**
  * Checks if a user with the provided userOID is a participant in a chat conversation associated with the given attachmentOID.
+ *
  * @param userOID - The userOID to be checked.
  * @param attachmentOID - The attachmentOID to be associated with a chat.
  * @throws {Error} - Throws an error if userOID or attachmentOID is null.
@@ -192,6 +198,7 @@ async function chatHasAttachmentAndUserIsParticipant(userOID, attachmentOID) {
 
 /**
  * Checks if there is a chat message associated with the given attachmentOID.
+ *
  * @param attachmentOID
  * @throws {Error} - Throws an error if attachmentOID is null.
  * @returns {Promise<Object|null>} - The found chat message or null if not found.
