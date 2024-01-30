@@ -11,6 +11,7 @@ const RoleAssignment = db.roleassignment;
 
 /**
  * Retrieves the newest Concept associated with the current user and the given seminar.
+ *
  * If no Concept is found, it returns an empty response.
  * @param {Object} req - The HTTP request object.
  * @param {Object} res - The HTTP response object.
@@ -51,6 +52,7 @@ const getNewestConceptOfCurrentUser = async (req, res) => {
 /**
  * Uploads a Concept associated with a user and seminar, optionally with text and attachments.
  * Sends an email notification to admin and supervisor.
+ *
  * @param {Object} req - The HTTP request object.
  * @param {Object} res - The HTTP response object.
  * @returns {Promise<void>} - A Promise that resolves once the concept is uploaded.
@@ -136,6 +138,7 @@ const uploadConcept = async (req, res) => {
 /**
  * Checks if the given user is allowed to upload a Concept for the given seminar:
  * if last one was rejected or if no Concept was uploaded yet.
+ *
  * @param userOID
  * @param seminarOID
  * @returns {Promise<boolean>}
@@ -157,6 +160,7 @@ async function userIsAllowedToUploadConcept(userOID, seminarOID) {
 
 /**
  * Checks if the given user is the author of the given Concept.
+ *
  * @param userOID
  * @param conceptOID
  * @returns {Promise<boolean>}
@@ -173,6 +177,7 @@ async function userIsAuthorOfConcept(userOID, conceptOID) {
 /**
  * Checks if there is a Concept associated with the given attachmentOID.
  * Returns the found Concept if it exists, otherwise null.
+ *
  * @param {number} attachmentOID - The attachmentOID to be checked for association with a Concept.
  * @returns {Promise<Object|null>} - A Promise that resolves to the found Concept or null if not found.
  */

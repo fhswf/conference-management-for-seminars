@@ -16,6 +16,7 @@ const OidcUser = db.oidcuser;
 /**
  * Returns the seminar with the given seminarOID.
  * The user must be assigned to the seminar.
+ *
  * @param {Object} req - The HTTP request object.
  * @param {Object} res - The HTTP response object.
  * @returns {Promise<void>} - A Promise that resolves with the seminar or an error response.
@@ -53,6 +54,7 @@ const getSeminar = async (req, res) => {
 
 /**
  * Returns all existing seminars in database.
+ *
  * @param {Object} req - The HTTP request object.
  * @param {Object} res - The HTTP response object.
  * @returns {Promise<void>} - A Promise that resolves with the list of seminars or an error response.
@@ -75,6 +77,7 @@ const getSeminars = async (req, res) => {
 
 /**
  * Go to next phase of seminar with given seminarOID.
+ *
  * @param {Object} req - The HTTP request object.
  * @param {Object} res - The HTTP response object.
  * @returns {Promise<void>} - A Promise that resolves with a success message or an error response.
@@ -136,13 +139,25 @@ const gotoNextPhase = async (req, res) => {
 
 /**
  * Returns a list of oidc users that can be assigned to a seminar.
- * @param req
- * @param res
- * @returns {Promise<void>}
+ *
+ * @param {Object} req - The HTTP request object containing the seminarOID.
+ * @param {Object} res - The HTTP response object for sending the list of supervisors or an error response.
+ * @returns {Promise<void>} - A Promise that resolves with the list of supervisors or an error response.
  */
 const getAddableUsers = async (req, res) => {
     try {
         const seminarOID = req.params.seminarOID;
+
+        if (!seminarOID){
+            return res.status(400).json({error: 'Bad Request'});
+        }
+
+        const seminar = await Seminar.findByPk(seminarOID);
+
+        if (!seminar) {
+            return res.status(404).json({error: 'Seminar not found'});
+        }
+
         const users = await User.findAll({
             where: {
                 userOID: {
@@ -166,6 +181,7 @@ const getAddableUsers = async (req, res) => {
 
 /**
  * Returns all users of a seminar with their roleassignments and newest concept, with given seminarOID.
+ *
  * @param {Object} req - The HTTP request object containing the seminarOID.
  * @param {Object} res - The HTTP response object.
  * @returns {Promise<void>} - A Promise that resolves with the list of users or an error response.
@@ -225,6 +241,7 @@ const getUserList = async (req, res) => {
 
 /**
  * Updates the roleassignment of a user in a seminar.
+ *
  * @param {Object} req - The HTTP request object containing userOID, roleOID, and seminarOID.
  * @param {Object} res - The HTTP response object.
  * @returns {Promise<void>} - A Promise that resolves with a success message or an error response.
@@ -232,30 +249,48 @@ const getUserList = async (req, res) => {
 const updateUserInSeminar = async (req, res) => {
     const t = await db.sequelize.transaction();
     try {
-        const userOid = req.body.userOID;
-        const roleOid = req.body.roleOID;
-        const seminarOid = req.body.seminarOID;
+        const userOID = req.body.userOID;
+        const roleOID = req.body.roleOID;
+        const seminarOID = req.body.seminarOID;
 
-        if (!userOid || !roleOid || !seminarOid) {
+        if (!userOID || !roleOID || !seminarOID) {
+            await t.rollback();
             return res.status(400).send({msg: "Missing required parameters."});
         }
 
-        //const phase = await Seminar.findByPk(seminarOid, {attributes: ["phase"]});
+        if (roleOID < 1 || roleOID > 3) {
+            await t.rollback();
+            return res.status(400).json({error: 'Invalid roleOID'});
+        }
+
+        const userInSeminar = await RoleAssignment.findOne({
+            where: {
+                userOID: userOID,
+                seminarOID: seminarOID,
+            }
+        });
+        if (!userInSeminar) {
+            await t.rollback();
+            return res.status(404).send({msg: "User not found in seminar."});
+        }
+
+        //const phase = await Seminar.findByPk(seminarOID, {attributes: ["phase"]});
 
         const supervisorHasAssignedConcepts = await Concept.findOne({
             where: {
-                userOIDSupervisor: userOid,
-                seminarOID: seminarOid
+                userOIDSupervisor: userOID,
+                seminarOID: seminarOID
             }
         });
 
         if (supervisorHasAssignedConcepts) {
+            await t.rollback();
             return res.status(409).send({msg: "Supervisor has already assigned concepts."});
         }
 
         const assignment = await RoleAssignment.update(
-            {roleOID: roleOid},
-            {where: {userOID: userOid, seminarOID: seminarOid}, transaction: t},
+            {roleOID: roleOID},
+            {where: {userOID: userOID, seminarOID: seminarOID}, transaction: t},
         );
 
         await t.commit();
@@ -333,8 +368,9 @@ const evaluateConcept = async (req, res) => {
  * Returns the Concept with the given conceptOID.
  * The Object contains all relevant information about the Concept.
  * Relevant for sending mail
- * @param conceptOID - The conceptOID of the Concept to be found.
- * @returns {Promise<Model|null>}
+ *
+ * @param {number} conceptOID - The conceptOID of the Concept to be found.
+ * @returns {Promise<Object|null>}
  */
 async function getConceptInformation(conceptOID) {
     const concept = await Concept.findOne({
@@ -408,8 +444,6 @@ const createSeminar = async (req, res) => {
         return res.status(500).send({msg: "Error while creating seminar."});
     }
 }
-
-
 
 /**
  * Returns a student with all uploaded concepts with attachments and paper with attachments.
@@ -496,9 +530,10 @@ const getStudent = async (req, res) => {
 
 /**
  * Adds a user to a seminar associated with the given assignmentkey.
- * @param req
- * @param res
- * @returns {Promise<void>}
+ *
+ * @param {Object} req - The HTTP request object containing the userOID and assignmentkey.
+ * @param {Object} res - The HTTP response object for sending the result.
+ * @returns {Promise<void>} - A Promise that resolves after entering the seminar and assigning a role or an error response.
  */
 const enterSeminar = async (req, res) => {
     try {
@@ -550,9 +585,10 @@ const enterSeminar = async (req, res) => {
 
 /**
  * Returns a list of supervisors for a seminar with the given seminarOID.
- * @param req
- * @param res
- * @returns {Promise<void>}
+ *
+ * @param {Object} req - The HTTP request object containing the seminarOID.
+ * @param {Object} res - The HTTP response object for sending the list of supervisors or an error response.
+ * @returns {Promise<void>} - A Promise that resolves with the list of supervisors or an error response.
  */
 const getSupervisorList = async (req, res) => {
     try {

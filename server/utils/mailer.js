@@ -15,6 +15,13 @@ const transporter = nodemailer.createTransport({
     },
 });
 
+/**
+ * Sends an email using the configured transporter.
+ *
+ * @param {string} to - The recipient's email address.
+ * @param {string} subject - The email subject.
+ * @param {string} text - The email body text.
+ */
 const sendMail = async (to, subject, text) => {
         console.log(to);
         console.log(subject);
@@ -42,9 +49,10 @@ const sendMail = async (to, subject, text) => {
 }
 
 /**
- * Sends an email to all users in the given userArray.
- * @param userArray - An array of user Models.
- * @param seminar - The seminar Model the phase was changed for.
+ * Sends an email notification to users about a phase change in the seminar.
+ *
+ * @param {Array} userArray - An array of user objects.
+ * @param {Object} seminar - The seminar object containing phase information.
  * @returns {Promise<void>}
  */
 const sendMailPhaseChanged = async (userArray, seminar) => {
@@ -62,7 +70,7 @@ const sendMailPhaseChanged = async (userArray, seminar) => {
 
 /**
  * Sends an email to the student that his concept was evaluated.
- * @param concept - The concept Model that was evaluated.
+ * @param {Object} concept - The concept object with evaluation details.
  * @returns {Promise<void>}
  */
 const sendMailConceptEvaluated = async (concept) => {
@@ -83,9 +91,10 @@ const sendMailConceptEvaluated = async (concept) => {
 
 /**
  * Sends an email to all users in the given user array.
- * @param users - An array of user Models to send the email to.
- * @param seminar - The seminar Model the concept was uploaded for.
- * @param student - The student Model that uploaded the concept.
+ *
+ * @param {Array} users - An array of users to send notifications to.
+ * @param {Object} seminar - The seminar for which the concept was uploaded.
+ * @param {Object} student - The student who uploaded the concept.
  * @returns {Promise<void>}
  */
 const sendMailConceptUploaded = async (users, seminar, student) => {
@@ -104,9 +113,9 @@ const sendMailConceptUploaded = async (users, seminar, student) => {
 
 /**
  * Sends an email to all users in the given user array.
- * @param users - An array of user Models to send the email to.
- * @param seminar - The seminar Model the paper was uploaded for.
- * @param student - The student Model that uploaded the paper.
+ * @param {Array} users - An array of users to send notifications to.
+ * @param {Object} seminar - The seminar for which the paper was uploaded.
+ * @param {Object} student - The student who uploaded the paper.
  * @returns {Promise<void>}
  */
 const sendMailPaperUploaded = async (users, seminar, student) => {
@@ -123,6 +132,12 @@ const sendMailPaperUploaded = async (users, seminar, student) => {
     }
 }
 
+/**
+ * Maps a numeric phase to its corresponding string representation.
+ *
+ * @param {number} phase - The numeric phase.
+ * @returns {string} - The string representation of the phase.
+ */
 function mapPhaseToString(phase){
     switch (phase) {
         case 1: return 'Registrierung-Phase';
@@ -137,6 +152,13 @@ function mapPhaseToString(phase){
     }
 }
 
+/**
+ * Generates a user display name based on the firstname and lastname properties.
+ * If both properties are available, it concatenates them. Otherwise, it uses the mail property.
+ *
+ * @param {Object} student - The student object.
+ * @returns {string} - The user display name.
+ */
 function getUserDisplayName(student) {
     try {
         if (student.firstname && student.lastname) {

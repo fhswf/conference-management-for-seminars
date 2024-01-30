@@ -17,6 +17,7 @@ const RoleAssignment = db.roleassignment;
  * Returns 415 if the file is not a PDF.
  * Returns 409 if the user has already uploaded a paper in phase 7.
  * Sends an email notification to admin and supervisor.
+ *
  * @param {Object} req - The HTTP request object.
  * @param {Object} res - The HTTP response object.
  * @returns {Promise<void>} - A Promise that resolves once the paper is uploaded.
@@ -122,6 +123,7 @@ async function uploadPaper(req, res) {
 /**
  * Retrieves all papers assigned to a user within a seminar.
  * Returns a list of papers with their reviews.
+ *
  * @param {Object} req - The HTTP request object.
  * @param {Object} res - The HTTP response object.
  * @returns {Promise<void>} - A Promise that resolves with the papers assigned to the user for review.
@@ -176,6 +178,7 @@ async function getAssignedPaper(req, res) {
 /**
  * Retrieves all papers uploaded by a user within a seminar.
  * Returns a list of papers with their attachments.
+ *
  * @param {Object} req - The HTTP request object.
  * @param {Object} res - The HTTP response object.
  * @returns {Promise<void>} - A Promise that resolves with the papers uploaded by the user for the specified seminar.
@@ -209,9 +212,10 @@ async function getUploadedPaper(req, res) {
 /**
  * Checks if a user is the author of a paper.
  * Returns false if userOID or paperOID is null.
- * @param userOID - The userOID to be checked.
- * @param paperOID - The paperOID to be checked.
- * @returns {Promise<boolean>}
+ *
+ * @param {number} userOID - The userOID
+ * @param {number} paperOID - The paperOID
+ * @returns {Promise<boolean>} - A Promise that resolves with true if the user is the author, false otherwise.
  */
 async function userIsAuthorOfPaper(userOID, paperOID ) {
     if (!userOID || !paperOID) {
@@ -225,6 +229,7 @@ async function userIsAuthorOfPaper(userOID, paperOID ) {
 
 /**
  * Checks if a paper has an attachment and if the user is the author of the paper.
+ *
  * @param userOID - The userOID to be checked.
  * @param attachmentOID
  * @returns {Promise<boolean>}
@@ -241,7 +246,8 @@ async function userIsAuthorOfPaper(userOID, paperOID ) {
 /**
  * Checks if a paper has an attachment.
  * Returns the paper if it exists, null otherwise.
- * @param attachmentOID - The attachmentOID to be checked.
+ *
+ * @param {number} attachmentOID - The attachmentOID to be checked.
  * @returns {Promise<Object|null>}
  */
 async function paperHasAttachment(attachmentOID) {
@@ -255,6 +261,7 @@ async function paperHasAttachment(attachmentOID) {
 
 /**
  * Returns the seminarOID associated with a paper.
+ *
  * @param {number} paperOID - The unique identifier of the paper.
  * @returns {Promise<number|null>} - A Promise that resolves with the seminarOID if found, or null if not found.
  */

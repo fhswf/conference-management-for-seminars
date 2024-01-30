@@ -7,9 +7,10 @@ const Concept = db.concept;
 
 /**
  * Checks if a user is a member of a seminar.
- * @param userOID
- * @param seminarOID
- * @returns {Promise<boolean>}
+ *
+ * @param {number} userOID - The user's identifier.
+ * @param {number} seminarOID - The seminar's identifier.
+ * @returns {Promise<boolean>} - A Promise that resolves with `true` if the user is a member, or `false` if not.
  */
 async function userIsMemberOfSeminar(userOID, seminarOID) {
     const roleAssignment = await RoleAssignment.findOne({
@@ -22,10 +23,11 @@ async function userIsMemberOfSeminar(userOID, seminarOID) {
 }
 
 /**
- * Checks if a user is a student of a seminar.
- * @param userOID
- * @param seminarOID
- * @returns {Promise<boolean>}
+ * Checks if a user's role in a specific seminar is a student based on userOID and seminarOID.
+ *
+ * @param {number} userOID - The user's identifier.
+ * @param {number} seminarOID - The seminar's identifier.
+ * @returns {Promise<boolean>} - A Promise that resolves with `true` if the user's role is student, or `false` if not.
  */
 async function userRoleIsStudent(userOID, seminarOID) {
     const roleAssignment = await RoleAssignment.findOne({
@@ -39,10 +41,11 @@ async function userRoleIsStudent(userOID, seminarOID) {
 }
 
 /**
- * Checks if a user is a supervisor of a seminar.
- * @param userOID
- * @param seminarOID
- * @returns {Promise<boolean>}
+ * Checks if a user's role in a specific seminar is a supervisor based on userOID and seminarOID.
+ *
+ * @param {number} userOID - The user's identifier.
+ * @param {number} seminarOID - The seminar's identifier.
+ * @returns {Promise<boolean>} - A Promise that resolves with `true` if the user's role is supervisor, or `false` if not.
  */
 async function userRoleIsSupervisor(userOID, seminarOID) {
     const roleAssignment = await RoleAssignment.findOne({
@@ -56,10 +59,11 @@ async function userRoleIsSupervisor(userOID, seminarOID) {
 }
 
 /**
- * Checks if a user is a course admin of a seminar.
- * @param userOID
- * @param seminarOID
- * @returns {Promise<boolean>}
+ * Checks if a user's role in a specific seminar is a course administrator based on userOID and seminarOID.
+ *
+ * @param {number} userOID - The user's identifier.
+ * @param {number} seminarOID - The seminar's identifier.
+ * @returns {Promise<boolean>} - A Promise that resolves with `true` if the user's role is course administrator, or `false` if not.
  */
 async function userRoleIsCourseAdmin(userOID, seminarOID) {
     const roleAssignment = await RoleAssignment.findOne({

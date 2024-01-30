@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 
 /**
  * Checks if an Access Token has expired.
+ *
  * @param {string} accessToken - The Access Token to check.
  * @returns {boolean} - True if the token has expired, otherwise false.
  */
@@ -16,6 +17,7 @@ function isAccessTokenExpired(accessToken) {
 
 /**
  * Refreshes an Access Token using a Refresh Token.
+ *
  * @param {string} refreshToken
  * @returns {Promise<any>} - A Promise containing the response data with the refreshed token.
  * @throws {Error} - An error is thrown if the request fails or if an error is returned by the server.
@@ -49,6 +51,7 @@ async function refreshAccessToken(refreshToken) {
 
 /**
  * Checks if an Access Token is valid by introspecting it with the authorization server.
+ *
  * @param {string} accessToken
  * @returns {Promise<boolean>} - true if the token is valid, otherwise false.
  */

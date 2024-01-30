@@ -1,0 +1,5577 @@
+{
+	"info": {
+		"_postman_id": "0cbc9453-4a0f-40da-aa58-8794c8c8e249",
+		"name": "Conference-Management-API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21015816"
+	},
+	"item": [
+		{
+			"name": "AttachmentController",
+			"item": [
+				{
+					"name": "getAttachment",
+					"item": [
+						{
+							"name": "Get attachment as course admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should have PDF Content-Type\", function () {\r",
+											"    pm.response.to.have.header(\"Content-Type\", \"application/pdf\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should have correct filename in Content-Disposition header\", function () {\r",
+											"    pm.response.to.have.header(\"Content-Disposition\", 'attachment; filename=\"test1.pdf\"');\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response body should have a non-zero size\", function () {\r",
+											"    pm.expect(pm.response.text().length).to.be.above(0);\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/attachment/:attachmentOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"attachment",
+										":attachmentOID"
+									],
+									"variable": [
+										{
+											"key": "attachmentOID",
+											"value": "1",
+											"description": "user is course admin of that attachment"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get attachment as supervisor",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should have PDF Content-Type\", function () {\r",
+											"    pm.response.to.have.header(\"Content-Type\", \"application/pdf\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should have correct filename in Content-Disposition header\", function () {\r",
+											"    pm.response.to.have.header(\"Content-Disposition\", 'attachment; filename=\"test2.pdf\"');\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response body should have a non-zero size\", function () {\r",
+											"    pm.expect(pm.response.text().length).to.be.above(0);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/attachment/:attachmentOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"attachment",
+										":attachmentOID"
+									],
+									"variable": [
+										{
+											"key": "attachmentOID",
+											"value": "2",
+											"description": "user is supervisor of that attachment"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get attachment as reviewer",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should have PDF Content-Type\", function () {\r",
+											"    pm.response.to.have.header(\"Content-Type\", \"application/pdf\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should have correct filename in Content-Disposition header\", function () {\r",
+											"    pm.response.to.have.header(\"Content-Disposition\", 'attachment; filename=\"test4.pdf\"');\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response body should have a non-zero size\", function () {\r",
+											"    pm.expect(pm.response.text().length).to.be.above(0);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/attachment/:attachmentOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"attachment",
+										":attachmentOID"
+									],
+									"variable": [
+										{
+											"key": "attachmentOID",
+											"value": "4",
+											"description": "user is reviewer of that attachment"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get attachment as chat member",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should have PDF Content-Type\", function () {\r",
+											"    pm.response.to.have.header(\"Content-Type\", \"application/pdf\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should have correct filename in Content-Disposition header\", function () {\r",
+											"    pm.response.to.have.header(\"Content-Disposition\", 'attachment; filename=\"testChat.pdf\"');\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response body should have a non-zero size\", function () {\r",
+											"    pm.expect(pm.response.text().length).to.be.above(0);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/attachment/:attachmentOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"attachment",
+										":attachmentOID"
+									],
+									"variable": [
+										{
+											"key": "attachmentOID",
+											"value": "5",
+											"description": "user is chat member of that attachment"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get not existing or not accessable attachment",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should have 'Not authorized' message\", function () {\r",
+											"    pm.response.to.have.jsonBody({ msg: \"Not authorized\" });\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/attachment/:attachmentOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"attachment",
+										":attachmentOID"
+									],
+									"variable": [
+										{
+											"key": "attachmentOID",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "ChatmessageController",
+			"item": [
+				{
+					"name": "getMessagesOfReview",
+					"item": [
+						{
+							"name": "Get a list of chat messages as reviewer",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"array\",\r",
+											"    \"items\": {\r",
+											"        \"type\": \"object\",\r",
+											"        \"properties\": {\r",
+											"            \"message\": {\r",
+											"                \"type\": \"string\"\r",
+											"            },\r",
+											"            \"createdAt\": {\r",
+											"                \"type\": \"string\",\r",
+											"                \"format\": \"date-time\"\r",
+											"            },\r",
+											"            \"sender\": {\r",
+											"                \"anyOf\": [\r",
+											"                    {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    {\r",
+											"                        \"type\": \"null\"\r",
+											"                    }\r",
+											"                ]\r",
+											"            },\r",
+											"            \"receiver\": {\r",
+											"                \"anyOf\": [\r",
+											"                    {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    {\r",
+											"                        \"type\": \"null\"\r",
+											"                    }\r",
+											"                ]\r",
+											"            },\r",
+											"            \"attachmentO\": {\r",
+											"                \"anyOf\": [\r",
+											"                    {\r",
+											"                        \"type\": \"null\"\r",
+											"                    },\r",
+											"                    {\r",
+											"                        \"type\": \"object\",\r",
+											"                        \"properties\": {\r",
+											"                            \"attachmentOID\": {\r",
+											"                                \"type\": \"integer\"\r",
+											"                            },\r",
+											"                            \"filename\": {\r",
+											"                                \"type\": \"string\"\r",
+											"                            }\r",
+											"                        },\r",
+											"                        \"required\": [\"attachmentOID\", \"filename\"]\r",
+											"                    }\r",
+											"                ]\r",
+											"            }\r",
+											"        },\r",
+											"        \"required\": [\"message\", \"createdAt\", \"attachmentO\"]\r",
+											"    }\r",
+											"};\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"  pm.response.to.have.jsonSchema (schema);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/chat/:reviewOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"chat",
+										":reviewOID"
+									],
+									"variable": [
+										{
+											"key": "reviewOID",
+											"value": "32",
+											"description": "user is reviewer"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a list of chat messages as author",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"array\",\r",
+											"    \"items\": {\r",
+											"        \"type\": \"object\",\r",
+											"        \"properties\": {\r",
+											"            \"message\": {\r",
+											"                \"type\": \"string\"\r",
+											"            },\r",
+											"            \"createdAt\": {\r",
+											"                \"type\": \"string\",\r",
+											"                \"format\": \"date-time\"\r",
+											"            },\r",
+											"            \"sender\": {\r",
+											"                \"anyOf\": [\r",
+											"                    {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    {\r",
+											"                        \"type\": \"null\"\r",
+											"                    }\r",
+											"                ]\r",
+											"            },\r",
+											"            \"receiver\": {\r",
+											"                \"anyOf\": [\r",
+											"                    {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    {\r",
+											"                        \"type\": \"null\"\r",
+											"                    }\r",
+											"                ]\r",
+											"            },\r",
+											"            \"attachmentO\": {\r",
+											"                \"anyOf\": [\r",
+											"                    {\r",
+											"                        \"type\": \"null\"\r",
+											"                    },\r",
+											"                    {\r",
+											"                        \"type\": \"object\",\r",
+											"                        \"properties\": {\r",
+											"                            \"attachmentOID\": {\r",
+											"                                \"type\": \"integer\"\r",
+											"                            },\r",
+											"                            \"filename\": {\r",
+											"                                \"type\": \"string\"\r",
+											"                            }\r",
+											"                        },\r",
+											"                        \"required\": [\"attachmentOID\", \"filename\"]\r",
+											"                    }\r",
+											"                ]\r",
+											"            }\r",
+											"        },\r",
+											"        \"required\": [\"message\", \"createdAt\", \"attachmentO\"]\r",
+											"    }\r",
+											"};\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"  pm.response.to.have.jsonSchema (schema);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/chat/:reviewOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"chat",
+										":reviewOID"
+									],
+									"variable": [
+										{
+											"key": "reviewOID",
+											"value": "1",
+											"description": "user is author"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a list of chat messages of not existing review",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should have 'Not authorized' message\", function () {\r",
+											"    pm.response.to.have.jsonBody({ msg: \"Not authorized\" });\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/chat/:reviewOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"chat",
+										":reviewOID"
+									],
+									"variable": [
+										{
+											"key": "reviewOID",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "createMessage",
+					"item": [
+						{
+							"name": "Create a chat message as reviewer",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"object\",\r",
+											"    \"properties\": {\r",
+											"        \"createdMessage\": {\r",
+											"            \"type\": \"object\",\r",
+											"            \"properties\": {\r",
+											"                \"chatmessageOID\": {\r",
+											"                    \"type\": \"integer\"\r",
+											"                },\r",
+											"                \"message\": {\r",
+											"                    \"type\": \"string\"\r",
+											"                },\r",
+											"                \"attachmentOID\": {\r",
+											"                    \"anyOf\": [\r",
+											"                        {\r",
+											"                            \"type\": \"integer\"\r",
+											"                        },\r",
+											"                        {\r",
+											"                            \"type\": \"null\"\r",
+											"                        }\r",
+											"                    ]\r",
+											"                },\r",
+											"                \"reviewOID\": {\r",
+											"                    \"type\": \"string\"\r",
+											"                },\r",
+											"                \"sender\": {\r",
+											"                    \"type\": \"integer\"\r",
+											"                },\r",
+											"                \"updatedAt\": {\r",
+											"                    \"type\": \"string\",\r",
+											"                    \"format\": \"date-time\"\r",
+											"                },\r",
+											"                \"createdAt\": {\r",
+											"                    \"type\": \"string\",\r",
+											"                    \"format\": \"date-time\"\r",
+											"                }\r",
+											"            },\r",
+											"            \"required\": [\"chatmessageOID\", \"message\", \"reviewOID\", \"sender\", \"updatedAt\", \"createdAt\"]\r",
+											"        },\r",
+											"        \"createdAttachment\": {\r",
+											"            \"anyOf\": [\r",
+											"                {\r",
+											"                    \"type\": \"object\",\r",
+											"                    \"properties\": {\r",
+											"                        \"attachmentOID\": {\r",
+											"                            \"type\": \"integer\"\r",
+											"                        },\r",
+											"                        \"mimetype\": {\r",
+											"                            \"type\": \"string\"\r",
+											"                        },\r",
+											"                        \"filename\": {\r",
+											"                            \"type\": \"string\"\r",
+											"                        }\r",
+											"                    },\r",
+											"                    \"required\": [\"attachmentOID\", \"mimetype\", \"filename\"]\r",
+											"                },\r",
+											"                {\r",
+											"                    \"type\": \"null\"\r",
+											"                }\r",
+											"            ]\r",
+											"        }\r",
+											"    },\r",
+											"    \"required\": [\"createdMessage\", \"createdAttachment\"]\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"  pm.response.to.have.jsonSchema (schema);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "message",
+											"value": "pm_{{$randomLoremWords}}",
+											"type": "text"
+										},
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/Oliver/Downloads/testChat.pdf"
+										},
+										{
+											"key": "paperOID",
+											"value": "25",
+											"type": "text"
+										},
+										{
+											"key": "reviewOID",
+											"value": "32",
+											"description": "user is reviewer",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/chat",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"chat"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create a chat message as student/author",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"object\",\r",
+											"    \"properties\": {\r",
+											"        \"createdMessage\": {\r",
+											"            \"type\": \"object\",\r",
+											"            \"properties\": {\r",
+											"                \"chatmessageOID\": {\r",
+											"                    \"type\": \"integer\"\r",
+											"                },\r",
+											"                \"message\": {\r",
+											"                    \"type\": \"string\"\r",
+											"                },\r",
+											"                \"attachmentOID\": {\r",
+											"                    \"anyOf\": [\r",
+											"                        {\r",
+											"                            \"type\": \"integer\"\r",
+											"                        },\r",
+											"                        {\r",
+											"                            \"type\": \"null\"\r",
+											"                        }\r",
+											"                    ]\r",
+											"                },\r",
+											"                \"reviewOID\": {\r",
+											"                    \"type\": \"string\"\r",
+											"                },\r",
+											"                \"sender\": {\r",
+											"                    \"type\": \"integer\"\r",
+											"                },\r",
+											"                \"updatedAt\": {\r",
+											"                    \"type\": \"string\",\r",
+											"                    \"format\": \"date-time\"\r",
+											"                },\r",
+											"                \"createdAt\": {\r",
+											"                    \"type\": \"string\",\r",
+											"                    \"format\": \"date-time\"\r",
+											"                }\r",
+											"            },\r",
+											"            \"required\": [\"chatmessageOID\", \"message\", \"reviewOID\", \"sender\", \"updatedAt\", \"createdAt\"]\r",
+											"        },\r",
+											"        \"createdAttachment\": {\r",
+											"            \"anyOf\": [\r",
+											"                {\r",
+											"                    \"type\": \"object\",\r",
+											"                    \"properties\": {\r",
+											"                        \"attachmentOID\": {\r",
+											"                            \"type\": \"integer\"\r",
+											"                        },\r",
+											"                        \"mimetype\": {\r",
+											"                            \"type\": \"string\"\r",
+											"                        },\r",
+											"                        \"filename\": {\r",
+											"                            \"type\": \"string\"\r",
+											"                        }\r",
+											"                    },\r",
+											"                    \"required\": [\"attachmentOID\", \"mimetype\", \"filename\"]\r",
+											"                },\r",
+											"                {\r",
+											"                    \"type\": \"null\"\r",
+											"                }\r",
+											"            ]\r",
+											"        }\r",
+											"    },\r",
+											"    \"required\": [\"createdMessage\", \"createdAttachment\"]\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"  pm.response.to.have.jsonSchema (schema);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "message",
+											"value": "pm_{{$randomLoremWords}}",
+											"type": "text"
+										},
+										{
+											"key": "file",
+											"value": "",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "paperOID",
+											"value": "14",
+											"type": "text"
+										},
+										{
+											"key": "reviewOID",
+											"value": "1",
+											"description": "user is author",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/chat",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"chat"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create a chat message with wrong file format",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 415\", function () {\r",
+											"    pm.response.to.have.status(415);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"error\", \"Unsupported Media Type; Only PDF files are allowed\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "message",
+											"value": "pm_{{$randomLoremWords}}",
+											"type": "text"
+										},
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/Oliver/Downloads/testChat.zip"
+										},
+										{
+											"key": "paperOID",
+											"value": "14",
+											"type": "text"
+										},
+										{
+											"key": "reviewOID",
+											"value": "1",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/chat",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"chat"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test invalid POST Request",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {\r",
+											"    pm.response.to.have.status(404);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"error\", \"Review Not Found\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "message",
+											"value": "{{$randomLoremWords}}",
+											"type": "text"
+										},
+										{
+											"key": "file",
+											"value": "",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "paperOID",
+											"value": "14",
+											"type": "text"
+										},
+										{
+											"key": "reviewOID",
+											"value": "1",
+											"type": "text",
+											"disabled": true
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/chat",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"chat"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Test invalid POST Request",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"No userOID or paperOID or reviewOID given in request\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "message",
+											"value": "{{$randomLoremWords}}",
+											"type": "text"
+										},
+										{
+											"key": "file",
+											"value": "",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "paperOID",
+											"value": "14",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "reviewOID",
+											"value": "1",
+											"type": "text",
+											"disabled": true
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/chat",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"chat"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "ConceptController",
+			"item": [
+				{
+					"name": "getNewestConceptOfCurrentUser",
+					"item": [
+						{
+							"name": "Get the newest concept of current user in seminar",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"object\",\r",
+											"    \"properties\": {\r",
+											"        \"conceptOID\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"text\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"userOIDSupervisor\": {\r",
+											"            \"anyOf\": [\r",
+											"                {\r",
+											"                    \"type\": \"integer\"\r",
+											"                },\r",
+											"                {\r",
+											"                    \"type\": \"null\"\r",
+											"                }\r",
+											"            ]\r",
+											"        },\r",
+											"        \"userOIDStudent\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"feedback\": {\r",
+											"            \"anyOf\": [\r",
+											"                {\r",
+											"                    \"type\": \"string\"\r",
+											"                },\r",
+											"                {\r",
+											"                    \"type\": \"null\"\r",
+											"                }\r",
+											"            ]\r",
+											"        },\r",
+											"        \"seminarOID\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"accepted\": {\r",
+											"            \"anyOf\": [\r",
+											"                {\r",
+											"                    \"type\": \"boolean\"\r",
+											"                },\r",
+											"                {\r",
+											"                    \"type\": \"null\"\r",
+											"                }\r",
+											"            ]\r",
+											"        },\r",
+											"        \"attachmentOID\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"createdAt\": {\r",
+											"            \"type\": \"string\",\r",
+											"            \"format\": \"date-time\"\r",
+											"        },\r",
+											"        \"updatedAt\": {\r",
+											"            \"type\": \"string\",\r",
+											"            \"format\": \"date-time\"\r",
+											"        },\r",
+											"        \"attachmentO\": {\r",
+											"            \"anyOf\": [\r",
+											"                {\r",
+											"                    \"type\": \"object\",\r",
+											"                    \"properties\": {\r",
+											"                        \"filename\": {\r",
+											"                            \"type\": \"string\"\r",
+											"                        }\r",
+											"                    },\r",
+											"                    \"required\": [\"filename\"]\r",
+											"                },\r",
+											"                {\r",
+											"                    \"type\": \"null\"\r",
+											"                }\r",
+											"            ]\r",
+											"        },\r",
+											"        \"userOIDSupervisor_user\": {\r",
+											"            \"anyOf\": [\r",
+											"                {\r",
+											"                    \"type\": \"object\",\r",
+											"                    \"properties\": {\r",
+											"                        \"userOID\": {\r",
+											"                            \"type\": \"integer\"\r",
+											"                        },\r",
+											"                        \"firstname\": {\r",
+											"                            \"type\": \"string\"\r",
+											"                        },\r",
+											"                        \"lastname\": {\r",
+											"                            \"type\": \"string\"\r",
+											"                        }\r",
+											"                    },\r",
+											"                    \"required\": [\"userOID\", \"firstname\", \"lastname\"]\r",
+											"                },\r",
+											"                {\r",
+											"                    \"type\": \"null\"\r",
+											"                }\r",
+											"            ]\r",
+											"        }\r",
+											"    },\r",
+											"    \"required\": [\"conceptOID\", \"text\", \"userOIDStudent\", \"seminarOID\", \"attachmentOID\", \"createdAt\", \"updatedAt\"]\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"  pm.response.to.have.jsonSchema (schema);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/concepts/newest/:seminarOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"concepts",
+										"newest",
+										":seminarOID"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get the newest concept of current user in seminar as supervisor or course-admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/concepts/newest/:seminarOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"concepts",
+										"newest",
+										":seminarOID"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "0",
+											"description": "not existing seminar"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get the newest concept of current user of not existing seminar",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/concepts/newest/:seminarOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"concepts",
+										"newest",
+										":seminarOID"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "uploadConcept",
+					"item": [
+						{
+							"name": "Upload Concept as student",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200 or 403\", function () {\r",
+											"    pm.expect(pm.response.code).to.be.oneOf([200, 403]);\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"object\",\r",
+											"    \"properties\": {\r",
+											"        \"conceptOID\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"text\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"userOIDSupervisor\": {\r",
+											"            \"anyOf\": [\r",
+											"                {\r",
+											"                    \"type\": \"string\"\r",
+											"                },\r",
+											"                {\r",
+											"                    \"type\": \"null\"\r",
+											"                }\r",
+											"            ]\r",
+											"        },\r",
+											"        \"userOIDStudent\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"feedback\": {\r",
+											"            \"type\": \"null\"\r",
+											"        },\r",
+											"        \"seminarOID\": {\r",
+											"            \"anyOf\": [\r",
+											"                {\r",
+											"                    \"type\": \"string\"\r",
+											"                },\r",
+											"                {\r",
+											"                    \"type\": \"null\"\r",
+											"                }\r",
+											"            ]\r",
+											"        },\r",
+											"        \"accepted\": {\r",
+											"            \"type\": \"null\"\r",
+											"        },\r",
+											"        \"updatedAt\": {\r",
+											"            \"type\": \"string\",\r",
+											"            \"format\": \"date-time\"\r",
+											"        },\r",
+											"        \"createdAt\": {\r",
+											"            \"type\": \"string\",\r",
+											"            \"format\": \"date-time\"\r",
+											"        }\r",
+											"    },\r",
+											"    \"required\": [\"conceptOID\", \"text\", \"userOIDStudent\", \"updatedAt\", \"createdAt\"]\r",
+											"}\r",
+											"\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field if 403\", function () {\r",
+											"    if(pm.response.code === 403){\r",
+											"        const responseBody = pm.response.json();\r",
+											"        pm.expect(responseBody).to.have.property(\"error\", \"You are not allowed to upload a Concept for this seminar.\");\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test('Schema validation successfully created a concept', () => {\r",
+											"    if(pm.response.code === 200){\r",
+											"        pm.response.to.have.jsonSchema (schema);\r",
+											"    }\r",
+											"  });"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "text",
+											"value": "pm_{{$randomLoremWords}}",
+											"type": "text"
+										},
+										{
+											"key": "file",
+											"type": "file",
+											"src": [],
+											"disabled": true
+										},
+										{
+											"key": "supervisorOID",
+											"value": "14",
+											"type": "text"
+										},
+										{
+											"key": "seminarOID",
+											"value": "3",
+											"description": "user is student in that seminar",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/concepts",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"concepts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Upload Concept as supervisor or course-admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "text",
+											"value": "pm_{{$randomLoremWord}}",
+											"type": "text"
+										},
+										{
+											"key": "file",
+											"type": "file",
+											"src": [],
+											"disabled": true
+										},
+										{
+											"key": "supervisorOID",
+											"value": "14",
+											"type": "text"
+										},
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"description": "user is course admin in that seminar",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/concepts",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"concepts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Upload Concept without seminarOID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"No userOID or seminarOID\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "test",
+											"value": "pm_{{$randomLoremWord}}",
+											"type": "text"
+										},
+										{
+											"key": "file",
+											"type": "file",
+											"src": [],
+											"disabled": true
+										},
+										{
+											"key": "supervisorOID",
+											"value": "14",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"type": "text",
+											"disabled": true
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/concepts",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"concepts"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "PaperController",
+			"item": [
+				{
+					"name": "getAssignedPaper",
+					"item": [
+						{
+							"name": "Get a list of assigned papers of current as supervisor or student",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"array\",\r",
+											"    \"items\": {\r",
+											"        \"type\": \"object\",\r",
+											"        \"properties\": {\r",
+											"            \"paperOID\": {\r",
+											"                \"type\": \"integer\"\r",
+											"            },\r",
+											"            \"attachmentO\": {\r",
+											"                \"type\": \"object\",\r",
+											"                \"properties\": {\r",
+											"                    \"attachmentOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"filename\": {\r",
+											"                        \"type\": \"string\"\r",
+											"                    }\r",
+											"                },\r",
+											"                \"required\": [\"attachmentOID\", \"filename\"]\r",
+											"            },\r",
+											"            \"reviews\": {\r",
+											"                \"type\": \"array\",\r",
+											"                \"items\": {\r",
+											"                    \"type\": \"object\",\r",
+											"                    \"properties\": {\r",
+											"                        \"reviewOID\": {\r",
+											"                            \"type\": \"integer\"\r",
+											"                        },\r",
+											"                        \"paperOID\": {\r",
+											"                            \"type\": \"integer\"\r",
+											"                        },\r",
+											"                        \"reviewerOID\": {\r",
+											"                            \"type\": \"integer\"\r",
+											"                        },\r",
+											"                        \"rating\": {\r",
+											"                            \"anyOf\": [\r",
+											"                                {\r",
+											"                                    \"type\": \"integer\"\r",
+											"                                },\r",
+											"                                {\r",
+											"                                    \"type\": \"null\"\r",
+											"                                }\r",
+											"                            ]\r",
+											"                        }\r",
+											"                    },\r",
+											"                    \"required\": [\"reviewOID\", \"paperOID\", \"reviewerOID\", \"rating\"]\r",
+											"                }\r",
+											"            }\r",
+											"        },\r",
+											"        \"required\": [\"paperOID\", \"attachmentO\", \"reviews\"]\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"    pm.response.to.have.jsonSchema (schema);\r",
+											"  });"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/paper/get-assigned-paper/:seminarOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"paper",
+										"get-assigned-paper",
+										":seminarOID"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "3",
+											"description": "user is student in that seminar"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get error message if user is course admin in seminar",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/paper/get-assigned-paper/:seminarOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"paper",
+										"get-assigned-paper",
+										":seminarOID"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"description": "user is course admin in that seminar"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a list of assigned papers of not existing seminar",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/paper/get-assigned-paper/:seminarOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"paper",
+										"get-assigned-paper",
+										":seminarOID"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "getUploadedPaper",
+					"item": [
+						{
+							"name": "Get a list of uploaded papers of current user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"array\",\r",
+											"    \"items\": {\r",
+											"        \"type\": \"object\",\r",
+											"        \"properties\": {\r",
+											"            \"paperOID\": {\r",
+											"                \"type\": \"integer\"\r",
+											"            },\r",
+											"            \"attachmentO\": {\r",
+											"                \"type\": \"object\",\r",
+											"                \"properties\": {\r",
+											"                    \"attachmentOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"filename\": {\r",
+											"                        \"type\": \"string\"\r",
+											"                    }\r",
+											"                },\r",
+											"                \"required\": [\"attachmentOID\", \"filename\"]\r",
+											"            }\r",
+											"        },\r",
+											"        \"required\": [\"paperOID\", \"attachmentO\"]\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"    pm.response.to.have.jsonSchema (schema);\r",
+											"  });"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/paper/get-uploaded-paper/:seminarOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"paper",
+										"get-uploaded-paper",
+										":seminarOID"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a list of uploaded papers of not existing seminar",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/paper/get-uploaded-paper/:seminarOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"paper",
+										"get-uploaded-paper",
+										":seminarOID"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a list of uploaded papers of current user as supervisor or course-admin Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/paper/get-uploaded-paper/:seminarOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"paper",
+										"get-uploaded-paper",
+										":seminarOID"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"description": "user is course admin in that seminar"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "uploadPaper",
+					"item": [
+						{
+							"name": "Upload Paper as student in seminar",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200, 400 or 409\", function () {\r",
+											"    pm.expect(pm.response.code).to.be.oneOf([200, 400, 409]);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field if code is 400\", function () {\r",
+											"    if(pm.response.code === 400){\r",
+											"        const responseBody = pm.response.json();\r",
+											"        pm.expect(responseBody.error).to.satisfy(function (error) {\r",
+											"            return error === \"seminarOID or file missing\" || error === \"Current phase is not 3 or 7\";\r",
+											"        });\r",
+											"    } else if(pm.response.code === 409){\r",
+											"        const responseBody = pm.response.json();\r",
+											"        pm.expect(responseBody).to.have.property(\"error\", \"Already uploaded a paper\");\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"object\",\r",
+											"    \"properties\": {\r",
+											"        \"paperOID\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"seminarOID\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"authorOID\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"attachmentOID\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"updatedAt\": {\r",
+											"            \"type\": \"string\",\r",
+											"            \"format\": \"date-time\"\r",
+											"        },\r",
+											"        \"createdAt\": {\r",
+											"            \"type\": \"string\",\r",
+											"            \"format\": \"date-time\"\r",
+											"        },\r",
+											"        \"attachmentO\": {\r",
+											"            \"type\": \"object\",\r",
+											"            \"properties\": {\r",
+											"                \"attachmentOID\": {\r",
+											"                    \"type\": \"integer\"\r",
+											"                },\r",
+											"                \"mimetype\": {\r",
+											"                    \"type\": \"string\"\r",
+											"                },\r",
+											"                \"filename\": {\r",
+											"                    \"type\": \"string\"\r",
+											"                }\r",
+											"            },\r",
+											"            \"required\": [\"attachmentOID\", \"mimetype\", \"filename\"]\r",
+											"        }\r",
+											"    },\r",
+											"    \"required\": [\"paperOID\", \"seminarOID\", \"authorOID\", \"attachmentOID\", \"updatedAt\", \"createdAt\", \"attachmentO\"]\r",
+											"}\r",
+											"\r",
+											"pm.test('Schema validation if status code is 200', () => {\r",
+											"    if(pm.response.code === 200){\r",
+											"        pm.response.to.have.jsonSchema (schema);\r",
+											"    }\r",
+											"  });"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "seminarOID",
+											"value": "3",
+											"description": "user is student in that seminar",
+											"type": "text"
+										},
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/Oliver/Downloads/testChat.pdf"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/paper",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"paper"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Upload Paper as student with missing file",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"error\", \"seminarOID or file missing\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "seminarOID",
+											"value": "3",
+											"description": "user is student in that seminar",
+											"type": "text"
+										},
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/Oliver/Downloads/testChat.pdf"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/paper",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"paper"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Upload Paper with wrong file format",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 415\", function () {\r",
+											"    pm.response.to.have.status(415);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"error\", \"Unsupported Media Type; Only PDF files are allowed\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "seminarOID",
+											"value": "3",
+											"type": "text"
+										},
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/Oliver/Downloads/testChat.zip"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/paper",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"paper"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "getAllFinalPaperZip",
+					"item": [
+						{
+							"name": "Get final-paper-zip of a seminar as course admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should have ZIP Content-Type\", function () {\r",
+											"    pm.response.to.have.header(\"Content-Type\", \"application/zip\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response body should have a non-zero size\", function () {\r",
+											"    pm.expect(pm.response.text().length).to.be.above(0);\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/paper/get-all-final-paper/:seminarOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"paper",
+										"get-all-final-paper",
+										":seminarOID"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"description": "user is course admin in that seminar"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get final-paper-zip of a seminar as supervisor",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should have ZIP Content-Type\", function () {\r",
+											"    pm.response.to.have.header(\"Content-Type\", \"application/zip\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response body should have a non-zero size\", function () {\r",
+											"    pm.expect(pm.response.text().length).to.be.above(0);\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/paper/get-all-final-paper/:seminarOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"paper",
+										"get-all-final-paper",
+										":seminarOID"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "2",
+											"description": "user is supervisor in that seminar"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get final-paper-zip of a seminar as student",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/paper/get-all-final-paper/:seminarOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"paper",
+										"get-all-final-paper",
+										":seminarOID"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "3",
+											"description": "user is student in that seminar"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "ReviewController",
+			"item": [
+				{
+					"name": "getReviewOIDsOfPaper",
+					"item": [
+						{
+							"name": "Get a list of review OIDs of a paper as author",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"array\",\r",
+											"    \"items\": {\r",
+											"        \"type\": \"object\",\r",
+											"        \"properties\": {\r",
+											"            \"reviewOID\": {\r",
+											"                \"type\": \"integer\"\r",
+											"            },\r",
+											"            \"paperOID\": {\r",
+											"                \"type\": \"integer\"\r",
+											"            },\r",
+											"            \"reviewerOID\": {\r",
+											"                \"type\": \"integer\"\r",
+											"            }\r",
+											"        },\r",
+											"        \"required\": [\"reviewOID\", \"paperOID\", \"reviewerOID\"]\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"    pm.response.to.have.jsonSchema (schema);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should have a length of 3\", function () {\r",
+											"    var responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.be.an('array').with.lengthOf(3);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/review/get-reviewoids-from-paper/:paperOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"review",
+										"get-reviewoids-from-paper",
+										":paperOID"
+									],
+									"variable": [
+										{
+											"key": "paperOID",
+											"value": "14",
+											"description": "user is author of that paper"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a list of review OIDs of a paper as reviewer",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"array\",\r",
+											"    \"items\": {\r",
+											"        \"type\": \"object\",\r",
+											"        \"properties\": {\r",
+											"            \"reviewOID\": {\r",
+											"                \"type\": \"integer\"\r",
+											"            },\r",
+											"            \"paperOID\": {\r",
+											"                \"type\": \"integer\"\r",
+											"            },\r",
+											"            \"reviewerOID\": {\r",
+											"                \"type\": \"integer\"\r",
+											"            }\r",
+											"        },\r",
+											"        \"required\": [\"reviewOID\", \"paperOID\", \"reviewerOID\"]\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"    pm.response.to.have.jsonSchema (schema);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should have a length of 1\", function () {\r",
+											"    var responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.be.an('array').with.lengthOf(1);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/review/get-reviewoids-from-paper/:paperOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"review",
+										"get-reviewoids-from-paper",
+										":paperOID"
+									],
+									"variable": [
+										{
+											"key": "paperOID",
+											"value": "15",
+											"description": "user is reviewer of that paper"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a list of review OIDs of not existing review",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/review/get-reviewoids-from-paper/:paperOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"review",
+										"get-reviewoids-from-paper",
+										":paperOID"
+									],
+									"variable": [
+										{
+											"key": "paperOID",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "getReviewerUserOfPaper",
+					"item": [
+						{
+							"name": "Get a list of user who review a paper as supervisor or course-admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"array\",\r",
+											"    \"items\": {\r",
+											"        \"type\": \"object\",\r",
+											"        \"properties\": {\r",
+											"            \"userOID\": {\r",
+											"                \"type\": \"integer\"\r",
+											"            },\r",
+											"            \"firstname\": {\r",
+											"                \"type\": \"string\"\r",
+											"            },\r",
+											"            \"lastname\": {\r",
+											"                \"type\": \"string\"\r",
+											"            },\r",
+											"            \"mail\": {\r",
+											"                \"type\": \"string\",\r",
+											"                \"format\": \"email\"\r",
+											"            }\r",
+											"        },\r",
+											"        \"required\": [\"userOID\", \"firstname\", \"lastname\", \"mail\"]\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"    pm.response.to.have.jsonSchema (schema);\r",
+											"  });\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/review/get-reviewer-of-paper/:paperOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"review",
+										"get-reviewer-of-paper",
+										":paperOID"
+									],
+									"variable": [
+										{
+											"key": "paperOID",
+											"value": "1",
+											"description": "user is supervisor in seminar of the paper"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a list of user who review a paper as student",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/review/get-reviewer-of-paper/:paperOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"review",
+										"get-reviewer-of-paper",
+										":paperOID"
+									],
+									"variable": [
+										{
+											"key": "paperOID",
+											"value": "14",
+											"description": "user is course admin in seminar of the paper"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a list of user of not existing paper",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/review/get-reviewer-of-paper/:paperOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"review",
+										"get-reviewer-of-paper",
+										":paperOID"
+									],
+									"variable": [
+										{
+											"key": "paperOID",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "rateReview",
+					"item": [
+						{
+							"name": "Set a rating of a paper as reviewer",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Review successfully rated\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "reviewOID",
+											"value": "34",
+											"description": "user is reviewer of that review",
+											"type": "text"
+										},
+										{
+											"key": "rating",
+											"value": "3",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/review/rate",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"review",
+										"rate"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Set a rating of a not existing paper",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "reviewOID",
+											"value": "0",
+											"type": "text"
+										},
+										{
+											"key": "rating",
+											"value": "3",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/review/rate",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"review",
+										"rate"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Set a rating of a paper not as reviewer",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "reviewOID",
+											"value": "1",
+											"description": "user is not a reviewer of that review",
+											"type": "text"
+										},
+										{
+											"key": "rating",
+											"value": "3",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/review/rate",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"review",
+										"rate"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "SeminarController",
+			"item": [
+				{
+					"name": "getSeminars",
+					"item": [
+						{
+							"name": "Get a list of existing seminars",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200 or 403\", function () {\r",
+											"    pm.expect(pm.response.code).to.be.oneOf([200, 403]);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field if status code is 403\", function () {\r",
+											"    if(pm.response.code === 403){\r",
+											"    \tconst responseBody = pm.response.json();\r",
+											"        pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"array\",\r",
+											"    \"items\": {\r",
+											"        \"type\": \"object\",\r",
+											"        \"properties\": {\r",
+											"            \"seminarOID\": {\r",
+											"                \"type\": \"integer\"\r",
+											"            },\r",
+											"            \"description\": {\r",
+											"                \"type\": \"string\"\r",
+											"            },\r",
+											"            \"assignmentkey\": {\r",
+											"                \"type\": \"string\",\r",
+											"                \"format\": \"uuid\"\r",
+											"            },\r",
+											"            \"phase\": {\r",
+											"                \"type\": \"integer\"\r",
+											"            },\r",
+											"            \"createdAt\": {\r",
+											"                \"type\": \"string\",\r",
+											"                \"format\": \"date-time\"\r",
+											"            }\r",
+											"        },\r",
+											"        \"required\": [\"seminarOID\", \"description\", \"assignmentkey\", \"phase\", \"createdAt\"]\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"pm.test('Schema validation if status code is 200', () => {\r",
+											"    if(pm.response.code === 200){\r",
+											"        pm.response.to.have.jsonSchema (schema);\r",
+											"    }\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/seminar/all",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										"all"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "getSeminar",
+					"item": [
+						{
+							"name": "Get a specific seminar as a member",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"object\",\r",
+											"    \"properties\": {\r",
+											"        \"description\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"phase\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"roleassignments\": {\r",
+											"            \"type\": \"array\",\r",
+											"            \"items\": {\r",
+											"                \"type\": \"object\",\r",
+											"                \"properties\": {\r",
+											"                    \"userOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"seminarOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"roleOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"phase3paperOID\": {\r",
+											"                        \"type\": [\"integer\", \"null\"]\r",
+											"                    },\r",
+											"                    \"phase7paperOID\": {\r",
+											"                        \"type\": [\"integer\", \"null\"]\r",
+											"                    }\r",
+											"                },\r",
+											"                \"required\": [\"userOID\", \"seminarOID\", \"roleOID\", \"phase3paperOID\", \"phase7paperOID\"]\r",
+											"            }\r",
+											"        }\r",
+											"    },\r",
+											"    \"required\": [\"description\", \"phase\", \"roleassignments\"]\r",
+											"}\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"    pm.response.to.have.jsonSchema (schema);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/seminar/:seminarOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										":seminarOID"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"description": "user is member of that seminar"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a specific not existing seminar",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/seminar/:seminarOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										":seminarOID"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "gotoNextPhase",
+					"item": [
+						{
+							"name": "Go to next phase of a seminar as course admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"\r",
+											"    pm.expect(responseBody.msg).to.satisfy(function (msg) {\r",
+											"        return msg === \"Phase successfully changed.\" || msg === \"Seminar is already in the last phase.\";\r",
+											"    });\r",
+											"\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/seminar/:seminarOID/go-to-next-phase",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										":seminarOID",
+										"go-to-next-phase"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"description": "user is course admin in that seminar"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Go to next phase of a seminar as supervisor",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/seminar/:seminarOID/go-to-next-phase",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										":seminarOID",
+										"go-to-next-phase"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "2",
+											"description": "user is supervisor in that seminar"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Go to next phase of a seminar as student",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/seminar/:seminarOID/go-to-next-phase",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										":seminarOID",
+										"go-to-next-phase"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "3",
+											"description": "user is student in that seminar"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "updateUserInSeminar",
+					"item": [
+						{
+							"name": "Update a user role in a seminar as course admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"user successfully changed.\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "userOID",
+											"value": "5",
+											"type": "text"
+										},
+										{
+											"key": "roleOID",
+											"value": "3",
+											"type": "text"
+										},
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"description": "user is course admin in that seminar",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/seminar/update-user",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										"update-user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update a user role in a seminar as course admin with missing parameters",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Missing required parameters.\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "userOID",
+											"value": "5",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "roleOID",
+											"value": "3",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"description": "user is course admin in that seminar",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/seminar/update-user",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										"update-user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update a user role in a seminar as course admin with invalid roleOID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"error\", \"Invalid roleOID\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "userOID",
+											"value": "5",
+											"type": "text"
+										},
+										{
+											"key": "roleOID",
+											"value": "30",
+											"type": "text"
+										},
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"description": "user is course admin in that seminar",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/seminar/update-user",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										"update-user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update a user role in a seminar as supervisor",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"user successfully changed.\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "userOID",
+											"value": "5",
+											"type": "text"
+										},
+										{
+											"key": "roleOID",
+											"value": "3",
+											"type": "text"
+										},
+										{
+											"key": "seminarOID",
+											"value": "2",
+											"description": "user is supervisor in that seminar",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/seminar/update-user",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										"update-user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update a user role in a seminar as student",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "userOID",
+											"value": "5",
+											"type": "text"
+										},
+										{
+											"key": "roleOID",
+											"value": "3",
+											"type": "text"
+										},
+										{
+											"key": "seminarOID",
+											"value": "3",
+											"description": "user is student in that seminar",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/seminar/update-user",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										"update-user"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "getUserList",
+					"item": [
+						{
+							"name": "Get a list of sers in a seminar as course admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"object\",\r",
+											"    \"properties\": {\r",
+											"        \"seminarOID\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"description\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"phase\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"assignmentkey\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"createdAt\": {\r",
+											"            \"type\": \"string\",\r",
+											"            \"format\": \"date-time\"\r",
+											"        },\r",
+											"        \"updatedAt\": {\r",
+											"            \"type\": \"string\",\r",
+											"            \"format\": \"date-time\"\r",
+											"        },\r",
+											"        \"roleassignments\": {\r",
+											"            \"type\": \"array\",\r",
+											"            \"items\": {\r",
+											"                \"type\": \"object\",\r",
+											"                \"properties\": {\r",
+											"                    \"userOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"seminarOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"roleOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"phase3paperOID\": {\r",
+											"                        \"type\": [\"integer\", \"null\"]\r",
+											"                    },\r",
+											"                    \"phase7paperOID\": {\r",
+											"                        \"type\": [\"integer\", \"null\"]\r",
+											"                    },\r",
+											"                    \"userO\": {\r",
+											"                        \"type\": \"object\",\r",
+											"                        \"properties\": {\r",
+											"                            \"userOID\": {\r",
+											"                                \"type\": \"integer\"\r",
+											"                            },\r",
+											"                            \"firstname\": {\r",
+											"                                \"type\": \"string\"\r",
+											"                            },\r",
+											"                            \"lastname\": {\r",
+											"                                \"type\": \"string\"\r",
+											"                            },\r",
+											"                            \"mail\": {\r",
+											"                                \"type\": \"string\",\r",
+											"                                \"format\": \"email\"\r",
+											"                            },\r",
+											"                            \"isAdmin\": {\r",
+											"                                \"type\": \"boolean\"\r",
+											"                            },\r",
+											"                            \"userOIDStudent_concepts\": {\r",
+											"                                \"type\": \"array\",\r",
+											"                                \"items\": {\r",
+											"                                    \"type\": \"object\",\r",
+											"                                    \"properties\": {\r",
+											"                                        \"conceptOID\": {\r",
+											"                                            \"type\": \"integer\"\r",
+											"                                        },\r",
+											"                                        \"text\": {\r",
+											"                                            \"type\": \"string\"\r",
+											"                                        },\r",
+											"                                        \"userOIDSupervisor\": {\r",
+											"                                            \"type\": [\"integer\", \"null\"]\r",
+											"                                        },\r",
+											"                                        \"userOIDStudent\": {\r",
+											"                                            \"type\": \"integer\"\r",
+											"                                        },\r",
+											"                                        \"feedback\": {\r",
+											"                                            \"type\": [\"string\", \"null\"]\r",
+											"                                        },\r",
+											"                                        \"seminarOID\": {\r",
+											"                                            \"type\": \"integer\"\r",
+											"                                        },\r",
+											"                                        \"accepted\": {\r",
+											"                                            \"type\": [\"boolean\", \"null\"]\r",
+											"                                        },\r",
+											"                                        \"attachmentOID\": {\r",
+											"                                            \"type\": [\"integer\", \"null\"]\r",
+											"                                        },\r",
+											"                                        \"createdAt\": {\r",
+											"                                            \"type\": \"string\",\r",
+											"                                            \"format\": \"date-time\"\r",
+											"                                        },\r",
+											"                                        \"updatedAt\": {\r",
+											"                                            \"type\": \"string\",\r",
+											"                                            \"format\": \"date-time\"\r",
+											"                                        },\r",
+											"                                        \"userOIDSupervisor_user\": {\r",
+											"                                            \"type\": [\"object\", \"null\"],\r",
+											"                                            \"properties\": {\r",
+											"                                                \"userOID\": {\r",
+											"                                                    \"type\": [\"integer\", \"null\"]\r",
+											"                                                },\r",
+											"                                                \"firstname\": {\r",
+											"                                                    \"type\": [\"string\", \"null\"]\r",
+											"                                                },\r",
+											"                                                \"lastname\": {\r",
+											"                                                    \"type\": [\"string\", \"null\"]\r",
+											"                                                },\r",
+											"                                                \"mail\": {\r",
+											"                                                    \"type\": [\"string\", \"null\"],\r",
+											"                                                    \"format\": \"email\"\r",
+											"                                                }\r",
+											"                                            }\r",
+											"                                        },\r",
+											"                                        \"attachmentO\": {\r",
+											"                                            \"type\": [\"object\", \"null\"],\r",
+											"                                            \"properties\": {\r",
+											"                                                \"attachmentOID\": {\r",
+											"                                                    \"type\": [\"integer\", \"null\"]\r",
+											"                                                },\r",
+											"                                                \"filename\": {\r",
+											"                                                    \"type\": [\"string\", \"null\"]\r",
+											"                                                }\r",
+											"                                            }\r",
+											"                                        }\r",
+											"                                    },\r",
+											"                                    \"required\": [\"conceptOID\", \"text\", \"userOIDStudent\", \"seminarOID\"]\r",
+											"                                }\r",
+											"                            }\r",
+											"                        },\r",
+											"                        \"required\": [\"userOID\", \"firstname\", \"lastname\", \"mail\", \"isAdmin\", \"userOIDStudent_concepts\"]\r",
+											"                    }\r",
+											"                },\r",
+											"                \"required\": [\"userOID\", \"seminarOID\", \"roleOID\", \"phase3paperOID\", \"phase7paperOID\", \"userO\"]\r",
+											"            }\r",
+											"        }\r",
+											"    },\r",
+											"    \"required\": [\"seminarOID\", \"description\", \"phase\", \"assignmentkey\", \"createdAt\", \"updatedAt\", \"roleassignments\"]\r",
+											"}\r",
+											"\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"    pm.response.to.have.jsonSchema (schema);\r",
+											"  });"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/seminar/:seminarOID/participants",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										":seminarOID",
+										"participants"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"description": "user is course admin in that seminar"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a list of sers in a seminar as supervisor  t",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"object\",\r",
+											"    \"properties\": {\r",
+											"        \"seminarOID\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"description\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"phase\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"assignmentkey\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"createdAt\": {\r",
+											"            \"type\": \"string\",\r",
+											"            \"format\": \"date-time\"\r",
+											"        },\r",
+											"        \"updatedAt\": {\r",
+											"            \"type\": \"string\",\r",
+											"            \"format\": \"date-time\"\r",
+											"        },\r",
+											"        \"roleassignments\": {\r",
+											"            \"type\": \"array\",\r",
+											"            \"items\": {\r",
+											"                \"type\": \"object\",\r",
+											"                \"properties\": {\r",
+											"                    \"userOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"seminarOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"roleOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"phase3paperOID\": {\r",
+											"                        \"type\": [\"integer\", \"null\"]\r",
+											"                    },\r",
+											"                    \"phase7paperOID\": {\r",
+											"                        \"type\": [\"integer\", \"null\"]\r",
+											"                    },\r",
+											"                    \"userO\": {\r",
+											"                        \"type\": \"object\",\r",
+											"                        \"properties\": {\r",
+											"                            \"userOID\": {\r",
+											"                                \"type\": \"integer\"\r",
+											"                            },\r",
+											"                            \"firstname\": {\r",
+											"                                \"type\": \"string\"\r",
+											"                            },\r",
+											"                            \"lastname\": {\r",
+											"                                \"type\": \"string\"\r",
+											"                            },\r",
+											"                            \"mail\": {\r",
+											"                                \"type\": \"string\",\r",
+											"                                \"format\": \"email\"\r",
+											"                            },\r",
+											"                            \"isAdmin\": {\r",
+											"                                \"type\": \"boolean\"\r",
+											"                            },\r",
+											"                            \"userOIDStudent_concepts\": {\r",
+											"                                \"type\": \"array\",\r",
+											"                                \"items\": {\r",
+											"                                    \"type\": \"object\",\r",
+											"                                    \"properties\": {\r",
+											"                                        \"conceptOID\": {\r",
+											"                                            \"type\": \"integer\"\r",
+											"                                        },\r",
+											"                                        \"text\": {\r",
+											"                                            \"type\": \"string\"\r",
+											"                                        },\r",
+											"                                        \"userOIDSupervisor\": {\r",
+											"                                            \"type\": [\"integer\", \"null\"]\r",
+											"                                        },\r",
+											"                                        \"userOIDStudent\": {\r",
+											"                                            \"type\": \"integer\"\r",
+											"                                        },\r",
+											"                                        \"feedback\": {\r",
+											"                                            \"type\": [\"string\", \"null\"]\r",
+											"                                        },\r",
+											"                                        \"seminarOID\": {\r",
+											"                                            \"type\": \"integer\"\r",
+											"                                        },\r",
+											"                                        \"accepted\": {\r",
+											"                                            \"type\": [\"boolean\", \"null\"]\r",
+											"                                        },\r",
+											"                                        \"attachmentOID\": {\r",
+											"                                            \"type\": [\"integer\", \"null\"]\r",
+											"                                        },\r",
+											"                                        \"createdAt\": {\r",
+											"                                            \"type\": \"string\",\r",
+											"                                            \"format\": \"date-time\"\r",
+											"                                        },\r",
+											"                                        \"updatedAt\": {\r",
+											"                                            \"type\": \"string\",\r",
+											"                                            \"format\": \"date-time\"\r",
+											"                                        },\r",
+											"                                        \"userOIDSupervisor_user\": {\r",
+											"                                            \"type\": [\"object\", \"null\"],\r",
+											"                                            \"properties\": {\r",
+											"                                                \"userOID\": {\r",
+											"                                                    \"type\": [\"integer\", \"null\"]\r",
+											"                                                },\r",
+											"                                                \"firstname\": {\r",
+											"                                                    \"type\": [\"string\", \"null\"]\r",
+											"                                                },\r",
+											"                                                \"lastname\": {\r",
+											"                                                    \"type\": [\"string\", \"null\"]\r",
+											"                                                },\r",
+											"                                                \"mail\": {\r",
+											"                                                    \"type\": [\"string\", \"null\"],\r",
+											"                                                    \"format\": \"email\"\r",
+											"                                                }\r",
+											"                                            }\r",
+											"                                        },\r",
+											"                                        \"attachmentO\": {\r",
+											"                                            \"type\": [\"object\", \"null\"],\r",
+											"                                            \"properties\": {\r",
+											"                                                \"attachmentOID\": {\r",
+											"                                                    \"type\": [\"integer\", \"null\"]\r",
+											"                                                },\r",
+											"                                                \"filename\": {\r",
+											"                                                    \"type\": [\"string\", \"null\"]\r",
+											"                                                }\r",
+											"                                            }\r",
+											"                                        }\r",
+											"                                    },\r",
+											"                                    \"required\": [\"conceptOID\", \"text\", \"userOIDStudent\", \"seminarOID\"]\r",
+											"                                }\r",
+											"                            }\r",
+											"                        },\r",
+											"                        \"required\": [\"userOID\", \"firstname\", \"lastname\", \"mail\", \"isAdmin\", \"userOIDStudent_concepts\"]\r",
+											"                    }\r",
+											"                },\r",
+											"                \"required\": [\"userOID\", \"seminarOID\", \"roleOID\", \"phase3paperOID\", \"phase7paperOID\", \"userO\"]\r",
+											"            }\r",
+											"        }\r",
+											"    },\r",
+											"    \"required\": [\"seminarOID\", \"description\", \"phase\", \"assignmentkey\", \"createdAt\", \"updatedAt\", \"roleassignments\"]\r",
+											"}\r",
+											"\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"    pm.response.to.have.jsonSchema (schema);\r",
+											"  });"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/seminar/:seminarOID/participants",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										":seminarOID",
+										"participants"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "2",
+											"description": "user is supervisor in that seminar"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a list of sers in a seminar as student",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/seminar/:seminarOID/participants",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										":seminarOID",
+										"participants"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "3",
+											"description": "user is student in that seminar"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "evaluateConcept",
+					"item": [
+						{
+							"name": "Evaluate a concepte of a student in a seminar as course admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200 or 409\", function () {\r",
+											"    pm.expect(pm.response.code).to.be.oneOf([200, 409]);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field if status code is 409\", function () {\r",
+											"    if(pm.response.code === 409){\r",
+											"        const responseBody = pm.response.json();\r",
+											"        pm.expect(responseBody).to.have.property(\"msg\", \"Concept already accepted.\");\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"object\",\r",
+											"    \"properties\": {\r",
+											"        \"conceptOID\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"text\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"userOIDSupervisor\": {\r",
+											"            \"type\": [\"integer\", \"null\"]\r",
+											"        },\r",
+											"        \"userOIDStudent\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"feedback\": {\r",
+											"            \"type\": [\"string\", \"null\"]\r",
+											"        },\r",
+											"        \"seminarOID\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"accepted\": {\r",
+											"            \"type\": [\"boolean\", \"null\"]\r",
+											"        },\r",
+											"        \"attachmentOID\": {\r",
+											"            \"type\": [\"integer\", \"null\"]\r",
+											"        },\r",
+											"        \"createdAt\": {\r",
+											"            \"type\": \"string\",\r",
+											"            \"format\": \"date-time\"\r",
+											"        },\r",
+											"        \"updatedAt\": {\r",
+											"            \"type\": \"string\",\r",
+											"            \"format\": \"date-time\"\r",
+											"        }\r",
+											"    },\r",
+											"    \"required\": [\"conceptOID\", \"text\", \"userOIDStudent\", \"seminarOID\", \"createdAt\", \"updatedAt\"]\r",
+											"}\r",
+											"\r",
+											"pm.test('Schema validation if status code is 200', () => {\r",
+											"    if(pm.response.code === 200){\r",
+											"        pm.response.to.have.jsonSchema (schema);\r",
+											"    }\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "conceptOID",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "accepted",
+											"value": "true",
+											"type": "text"
+										},
+										{
+											"key": "feedback",
+											"value": "pm_{{$randomLoremWords}}",
+											"type": "text"
+										},
+										{
+											"key": "userOIDSupervisor",
+											"value": "8",
+											"type": "text"
+										},
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"description": "user is course admin in that seminar",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/seminar/evaluate-concept",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										"evaluate-concept"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Evaluate a concepte of a student in a seminar as course admin with missing parameters",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"  pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Missing required parameters.\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "conceptOID",
+											"value": "7",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "accepted",
+											"value": "true",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "feedback",
+											"value": "test",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "userOIDSupervisor",
+											"value": "8",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"description": "user is course admin in that seminar",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/seminar/evaluate-concept",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										"evaluate-concept"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Evaluate a concepte of a student in a seminar as supervisor",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"  pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "conceptOID",
+											"value": "7",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "accepted",
+											"value": "true",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "feedback",
+											"value": "test",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "userOIDSupervisor",
+											"value": "8",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "seminarOID",
+											"value": "2",
+											"description": "user is supervisor in that seminar",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/seminar/evaluate-concept",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										"evaluate-concept"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Evaluate a concepte of a student in a seminar as student",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"  pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "conceptOID",
+											"value": "7",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "accepted",
+											"value": "true",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "feedback",
+											"value": "test",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "userOIDSupervisor",
+											"value": "8",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "seminarOID",
+											"value": "3",
+											"description": "user is student in that seminar",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/seminar/evaluate-concept",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										"evaluate-concept"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "createSeminar",
+					"item": [
+						{
+							"name": "Create a new seminar",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200 or 403\", function () {\r",
+											"    pm.expect(pm.response.code).to.be.oneOf([200, 403]);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field if status code is 403\", function () {\r",
+											"    if(pm.response.code === 403){\r",
+											"    \tconst responseBody = pm.response.json();\r",
+											"        pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"object\",\r",
+											"    \"properties\": {\r",
+											"        \"seminarOID\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"description\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"phase\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"assignmentkey\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"updatedAt\": {\r",
+											"            \"type\": \"string\",\r",
+											"            \"format\": \"date-time\"\r",
+											"        },\r",
+											"        \"createdAt\": {\r",
+											"            \"type\": \"string\",\r",
+											"            \"format\": \"date-time\"\r",
+											"        }\r",
+											"    },\r",
+											"    \"required\": [\"seminarOID\", \"description\", \"phase\", \"assignmentkey\", \"updatedAt\", \"createdAt\"]\r",
+											"}\r",
+											"\r",
+											"\r",
+											"pm.test('Schema validation if status code is 200', () => {\r",
+											"    if(pm.response.code === 200){\r",
+											"        pm.response.to.have.jsonSchema (schema);\r",
+											"    }\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "test_{{$randomLoremWords}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/seminar",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "getStudent",
+					"item": [
+						{
+							"name": "Get a student of a seminar with specific information as course admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"object\",\r",
+											"    \"properties\": {\r",
+											"        \"userOID\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"firstname\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"lastname\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"mail\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"isAdmin\": {\r",
+											"            \"type\": \"boolean\"\r",
+											"        },\r",
+											"        \"userOIDStudent_concepts\": {\r",
+											"            \"type\": \"array\",\r",
+											"            \"items\": {\r",
+											"                \"type\": \"object\",\r",
+											"                \"properties\": {\r",
+											"                    \"conceptOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"accepted\": {\r",
+											"                        \"type\": \"boolean\"\r",
+											"                    },\r",
+											"                    \"userOIDSupervisor\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"text\": {\r",
+											"                        \"type\": \"string\"\r",
+											"                    },\r",
+											"                    \"attachmentOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"feedback\": {\r",
+											"                        \"type\": \"string\"\r",
+											"                    },\r",
+											"                    \"createdAt\": {\r",
+											"                        \"type\": \"string\",\r",
+											"                        \"format\": \"date-time\"\r",
+											"                    },\r",
+											"                    \"seminarOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"userOIDSupervisor_user\": {\r",
+											"                        \"type\": \"object\",\r",
+											"                        \"properties\": {\r",
+											"                            \"userOID\": {\r",
+											"                                \"type\": \"integer\"\r",
+											"                            },\r",
+											"                            \"firstname\": {\r",
+											"                                \"type\": \"string\"\r",
+											"                            },\r",
+											"                            \"lastname\": {\r",
+											"                                \"type\": \"string\"\r",
+											"                            },\r",
+											"                            \"mail\": {\r",
+											"                                \"type\": \"string\"\r",
+											"                            }\r",
+											"                        },\r",
+											"                        \"required\": [\"userOID\", \"firstname\", \"lastname\", \"mail\"]\r",
+											"                    },\r",
+											"                    \"attachmentO\": {\r",
+											"                        \"type\": \"object\",\r",
+											"                        \"properties\": {\r",
+											"                            \"attachmentOID\": {\r",
+											"                                \"type\": \"integer\"\r",
+											"                            },\r",
+											"                            \"filename\": {\r",
+											"                                \"type\": \"string\"\r",
+											"                            }\r",
+											"                        },\r",
+											"                        \"required\": [\"attachmentOID\", \"filename\"]\r",
+											"                    }\r",
+											"                },\r",
+											"                \"required\": [\"conceptOID\", \"accepted\", \"userOIDSupervisor\", \"text\", \"attachmentOID\", \"feedback\", \"createdAt\", \"seminarOID\", \"userOIDSupervisor_user\", \"attachmentO\"]\r",
+											"            }\r",
+											"        },\r",
+											"        \"papers\": {\r",
+											"            \"type\": \"array\",\r",
+											"            \"items\": {\r",
+											"                \"type\": \"object\",\r",
+											"                \"properties\": {\r",
+											"                    \"paperOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"attachmentOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"seminarOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"createdAt\": {\r",
+											"                        \"type\": \"string\",\r",
+											"                        \"format\": \"date-time\"\r",
+											"                    },\r",
+											"                    \"attachmentO\": {\r",
+											"                        \"type\": \"object\",\r",
+											"                        \"properties\": {\r",
+											"                            \"attachmentOID\": {\r",
+											"                                \"type\": \"integer\"\r",
+											"                            },\r",
+											"                            \"filename\": {\r",
+											"                                \"type\": \"string\"\r",
+											"                            }\r",
+											"                        },\r",
+											"                        \"required\": [\"attachmentOID\", \"filename\"]\r",
+											"                    }\r",
+											"                },\r",
+											"                \"required\": [\"paperOID\", \"attachmentOID\", \"seminarOID\", \"createdAt\", \"attachmentO\"]\r",
+											"            }\r",
+											"        },\r",
+											"        \"roleassignments\": {\r",
+											"            \"type\": \"array\",\r",
+											"            \"items\": {\r",
+											"                \"type\": \"object\",\r",
+											"                \"properties\": {\r",
+											"                    \"phase3paperOID\": {\r",
+											"                        \"type\": [\"integer\", \"null\"]\r",
+											"                    },\r",
+											"                    \"phase7paperOID\": {\r",
+											"                        \"type\": [\"integer\", \"null\"]\r",
+											"                    }\r",
+											"                },\r",
+											"                \"required\": [\"phase3paperOID\", \"phase7paperOID\"]\r",
+											"            }\r",
+											"        }\r",
+											"    },\r",
+											"    \"required\": [\"userOID\", \"firstname\", \"lastname\", \"mail\", \"isAdmin\", \"userOIDStudent_concepts\", \"papers\", \"roleassignments\"]\r",
+											"}\r",
+											"\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"    pm.response.to.have.jsonSchema (schema);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/seminar/:seminarOID/get-student/:userOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										":seminarOID",
+										"get-student",
+										":userOID"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"description": "user is course admin in that seminar"
+										},
+										{
+											"key": "userOID",
+											"value": "4"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a student of a seminar with specific information as supervisor",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"object\",\r",
+											"    \"properties\": {\r",
+											"        \"userOID\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"firstname\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"lastname\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"mail\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"isAdmin\": {\r",
+											"            \"type\": \"boolean\"\r",
+											"        },\r",
+											"        \"userOIDStudent_concepts\": {\r",
+											"            \"type\": \"array\",\r",
+											"            \"items\": {\r",
+											"                \"type\": \"object\",\r",
+											"                \"properties\": {\r",
+											"                    \"conceptOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"accepted\": {\r",
+											"                        \"type\": \"boolean\"\r",
+											"                    },\r",
+											"                    \"userOIDSupervisor\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"text\": {\r",
+											"                        \"type\": \"string\"\r",
+											"                    },\r",
+											"                    \"attachmentOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"feedback\": {\r",
+											"                        \"type\": \"string\"\r",
+											"                    },\r",
+											"                    \"createdAt\": {\r",
+											"                        \"type\": \"string\",\r",
+											"                        \"format\": \"date-time\"\r",
+											"                    },\r",
+											"                    \"seminarOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"userOIDSupervisor_user\": {\r",
+											"                        \"type\": \"object\",\r",
+											"                        \"properties\": {\r",
+											"                            \"userOID\": {\r",
+											"                                \"type\": \"integer\"\r",
+											"                            },\r",
+											"                            \"firstname\": {\r",
+											"                                \"type\": \"string\"\r",
+											"                            },\r",
+											"                            \"lastname\": {\r",
+											"                                \"type\": \"string\"\r",
+											"                            },\r",
+											"                            \"mail\": {\r",
+											"                                \"type\": \"string\"\r",
+											"                            }\r",
+											"                        },\r",
+											"                        \"required\": [\"userOID\", \"firstname\", \"lastname\", \"mail\"]\r",
+											"                    },\r",
+											"                    \"attachmentO\": {\r",
+											"                        \"type\": \"object\",\r",
+											"                        \"properties\": {\r",
+											"                            \"attachmentOID\": {\r",
+											"                                \"type\": \"integer\"\r",
+											"                            },\r",
+											"                            \"filename\": {\r",
+											"                                \"type\": \"string\"\r",
+											"                            }\r",
+											"                        },\r",
+											"                        \"required\": [\"attachmentOID\", \"filename\"]\r",
+											"                    }\r",
+											"                },\r",
+											"                \"required\": [\"conceptOID\", \"accepted\", \"userOIDSupervisor\", \"text\", \"attachmentOID\", \"feedback\", \"createdAt\", \"seminarOID\", \"userOIDSupervisor_user\", \"attachmentO\"]\r",
+											"            }\r",
+											"        },\r",
+											"        \"papers\": {\r",
+											"            \"type\": \"array\",\r",
+											"            \"items\": {\r",
+											"                \"type\": \"object\",\r",
+											"                \"properties\": {\r",
+											"                    \"paperOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"attachmentOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"seminarOID\": {\r",
+											"                        \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"createdAt\": {\r",
+											"                        \"type\": \"string\",\r",
+											"                        \"format\": \"date-time\"\r",
+											"                    },\r",
+											"                    \"attachmentO\": {\r",
+											"                        \"type\": \"object\",\r",
+											"                        \"properties\": {\r",
+											"                            \"attachmentOID\": {\r",
+											"                                \"type\": \"integer\"\r",
+											"                            },\r",
+											"                            \"filename\": {\r",
+											"                                \"type\": \"string\"\r",
+											"                            }\r",
+											"                        },\r",
+											"                        \"required\": [\"attachmentOID\", \"filename\"]\r",
+											"                    }\r",
+											"                },\r",
+											"                \"required\": [\"paperOID\", \"attachmentOID\", \"seminarOID\", \"createdAt\", \"attachmentO\"]\r",
+											"            }\r",
+											"        },\r",
+											"        \"roleassignments\": {\r",
+											"            \"type\": \"array\",\r",
+											"            \"items\": {\r",
+											"                \"type\": \"object\",\r",
+											"                \"properties\": {\r",
+											"                    \"phase3paperOID\": {\r",
+											"                        \"type\": [\"integer\", \"null\"]\r",
+											"                    },\r",
+											"                    \"phase7paperOID\": {\r",
+											"                        \"type\": [\"integer\", \"null\"]\r",
+											"                    }\r",
+											"                },\r",
+											"                \"required\": [\"phase3paperOID\", \"phase7paperOID\"]\r",
+											"            }\r",
+											"        }\r",
+											"    },\r",
+											"    \"required\": [\"userOID\", \"firstname\", \"lastname\", \"mail\", \"isAdmin\", \"userOIDStudent_concepts\", \"papers\", \"roleassignments\"]\r",
+											"}\r",
+											"\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"    pm.response.to.have.jsonSchema (schema);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/seminar/:seminarOID/get-student/:userOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										":seminarOID",
+										"get-student",
+										":userOID"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "2",
+											"description": "user is supervisor in that seminar"
+										},
+										{
+											"key": "userOID",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a student of a seminar with specific information as student",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"  pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/seminar/:seminarOID/get-student/:userOID",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										":seminarOID",
+										"get-student",
+										":userOID"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "3",
+											"description": "user is student in that seminar"
+										},
+										{
+											"key": "userOID",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "enterSeminar",
+					"item": [
+						{
+							"name": "Enter a existing seminar with an assignmentkey",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200 or 403\", function () {\r",
+											"    pm.expect(pm.response.code).to.be.oneOf([200, 400]);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field if status code is 400\", function () {\r",
+											"    if(pm.response.code === 400){\r",
+											"    \tconst responseBody = pm.response.json();\r",
+											"        pm.expect(responseBody).to.have.property(\"error\", \"User already in seminar\");\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"object\",\r",
+											"    \"properties\": {\r",
+											"        \"seminarOID\": {\r",
+											"            \"type\": \"integer\"\r",
+											"        }\r",
+											"    },\r",
+											"    \"required\": [\"seminarOID\"]\r",
+											"}\r",
+											"\r",
+											"pm.test('Schema validation if status code is 200', () => {\r",
+											"    if(pm.response.code === 200){\r",
+											"        pm.response.to.have.jsonSchema (schema);\r",
+											"    }\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/seminar/enter-seminar/:assignmentkey",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										"enter-seminar",
+										":assignmentkey"
+									],
+									"variable": [
+										{
+											"key": "assignmentkey",
+											"value": "f250e71f-712e-43f1-820c-dc6952210d33"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Enter a not existing seminar with an assignmentkey",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {\r",
+											"    pm.response.to.have.status(404);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"error\", \"Seminar not found\");\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/seminar/enter-seminar/:assignmentkey",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										"enter-seminar",
+										":assignmentkey"
+									],
+									"variable": [
+										{
+											"key": "assignmentkey",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "getSupervisorList",
+					"item": [
+						{
+							"name": "Get a list of supervisor of a seminar as member",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"array\",\r",
+											"    \"items\": {\r",
+											"        \"type\": \"object\",\r",
+											"        \"properties\": {\r",
+											"            \"userOID\": {\r",
+											"                \"type\": \"integer\"\r",
+											"            },\r",
+											"            \"firstname\": {\r",
+											"                \"type\": [\"string\", \"null\"],\r",
+											"                \"nullable\": true\r",
+											"            },\r",
+											"            \"lastname\": {\r",
+											"                \"type\": [\"string\", \"null\"],\r",
+											"                \"nullable\": true\r",
+											"            },\r",
+											"            \"mail\": {\r",
+											"                \"type\": \"string\"\r",
+											"            }\r",
+											"        },\r",
+											"        \"required\": [\"userOID\", \"mail\"]\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"    pm.response.to.have.jsonSchema (schema);\r",
+											"  });"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/seminar/:seminarOID/supervisor-list",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										":seminarOID",
+										"supervisor-list"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"description": "user is member of that seminar"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a list of supervisor of a seminar as not member",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/seminar/:seminarOID/supervisor-list",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										":seminarOID",
+										"supervisor-list"
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "0",
+											"description": "user is not member of that seminar"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "getAddableUsers",
+					"item": [
+						{
+							"name": "Get a list of OIDC users which can be added to a seminar",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"array\",\r",
+											"    \"items\": {\r",
+											"        \"type\": \"object\",\r",
+											"        \"properties\": {\r",
+											"            \"userOID\": {\r",
+											"                \"type\": \"integer\"\r",
+											"            },\r",
+											"            \"firstname\": {\r",
+											"                \"type\": [\"string\", \"null\"],\r",
+											"                \"nullable\": true\r",
+											"            },\r",
+											"            \"lastname\": {\r",
+											"                \"type\": [\"string\", \"null\"],\r",
+											"                \"nullable\": true\r",
+											"            },\r",
+											"            \"mail\": {\r",
+											"                \"type\": \"string\"\r",
+											"            }\r",
+											"        },\r",
+											"        \"required\": [\"userOID\", \"mail\"]\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"    pm.response.to.have.jsonSchema (schema);\r",
+											"  });"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/seminar/:seminarOID/addable-users/",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										":seminarOID",
+										"addable-users",
+										""
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get a list of OIDC users which can be added to a not existing seminar",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"  pm.test(\"Status code is 404\", function () {\r",
+											"    pm.response.to.have.status(404);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"error\", \"Seminar not found\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/seminar/:seminarOID/addable-users/",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										":seminarOID",
+										"addable-users",
+										""
+									],
+									"variable": [
+										{
+											"key": "seminarOID",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "UserController",
+			"item": [
+				{
+					"name": "assignToSeminar",
+					"item": [
+						{
+							"name": "Assign a user to a seminar as system admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200, 409\", function () {\r",
+											"    pm.expect(pm.response.code).to.be.oneOf([200, 409, 403]);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"object\",\r",
+											"    \"properties\": {\r",
+											"        \"userOID\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"seminarOID\": {\r",
+											"            \"type\": \"string\"\r",
+											"        },\r",
+											"        \"roleOID\": {\r",
+											"            \"type\": \"string\"\r",
+											"        }\r",
+											"    },\r",
+											"    \"required\": [\"userOID\", \"seminarOID\", \"roleOID\"]\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field if status code is 403 or 409\", function () {\r",
+											"    if(pm.response.code === 403){\r",
+											"        const responseBody = pm.response.json();\r",
+											"        pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
+											"    } else if(pm.response.code === 409){\r",
+											"        const responseBody = pm.response.json();\r",
+											"        pm.expect(responseBody).to.have.property(\"error\", \"User already assigned to this seminar.\");\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"pm.test('Schema validation if status code is 200', () => {\r",
+											"    if(pm.response.code === 200){\r",
+											"        pm.response.to.have.jsonSchema (schema);\r",
+											"    }\r",
+											"  });"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "userOID",
+											"value": "45",
+											"type": "text"
+										},
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "roleOID",
+											"value": "3",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/user/assign-to-seminar",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"user",
+										"assign-to-seminar"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Assign a user to a seminar as system admin Assign with missing parameters",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field \", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"error\", \"Missing parameters.\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "userOID",
+											"value": "45",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "roleOID",
+											"value": "3",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/user/assign-to-seminar",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"user",
+										"assign-to-seminar"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Assign a not existing user to a seminar as system admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {\r",
+											"    pm.response.to.have.status(404);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field \", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"error\", \"User not found.\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "userOID",
+											"value": "0",
+											"type": "text"
+										},
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "roleOID",
+											"value": "3",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/user/assign-to-seminar",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"user",
+										"assign-to-seminar"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Assign a user to a not existing seminar as system admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {\r",
+											"    pm.response.to.have.status(404);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'error' field \", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.have.property(\"error\", \"Seminar not found.\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "userOID",
+											"value": "45",
+											"type": "text"
+										},
+										{
+											"key": "seminarOID",
+											"value": "0",
+											"type": "text"
+										},
+										{
+											"key": "roleOID",
+											"value": "3",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/user/assign-to-seminar",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"user",
+										"assign-to-seminar"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "getAssignedSeminars",
+					"item": [
+						{
+							"name": "Get a list of assigned seminars",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"var schema = {\r",
+											"    \"type\": \"array\",\r",
+											"    \"items\": {\r",
+											"        \"type\": \"object\",\r",
+											"        \"properties\": {\r",
+											"            \"seminarOID\": {\r",
+											"                \"type\": \"integer\"\r",
+											"            },\r",
+											"            \"description\": {\r",
+											"                \"type\": \"string\"\r",
+											"            },\r",
+											"            \"phase\": {\r",
+											"                \"type\": \"integer\"\r",
+											"            },\r",
+											"            \"roleassignments\": {\r",
+											"                \"type\": \"array\",\r",
+											"                \"items\": {\r",
+											"                    \"type\": \"object\",\r",
+											"                    \"properties\": {\r",
+											"                        \"roleOID\": {\r",
+											"                            \"type\": \"integer\"\r",
+											"                        }\r",
+											"                    },\r",
+											"                    \"required\": [\"roleOID\"]\r",
+											"                }\r",
+											"            }\r",
+											"        },\r",
+											"        \"required\": [\"seminarOID\", \"description\", \"phase\", \"roleassignments\"]\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"pm.test('Schema validation', () => {\r",
+											"    pm.response.to.have.jsonSchema (schema);\r",
+											"  });"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{backendUrl}}/user/assigned-seminars",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"user",
+										"assigned-seminars"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "request authstatus",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{backendUrl}}/authstatus",
+					"host": [
+						"{{backendUrl}}"
+					],
+					"path": [
+						"authstatus"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "backendUrl",
+			"value": "https://jupiter.fh-swf.de/conference/api"
+		}
+	]
+}

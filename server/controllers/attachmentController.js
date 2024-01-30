@@ -31,9 +31,10 @@ const createAttachment = async (file, t) => {
 
 /**
  * Returns the file associated with the given attachmentOID.
- * @param req
- * @param res
- * @returns {Promise<*>}
+ *
+ * @param {Object} req - The HTTP request object containing the attachmentOID.
+ * @param {Object} res - The HTTP response object for sending the attachment or an error response.
+ * @returns {Promise<void>} - A Promise that resolves with the attachment as a response or an error response.
  */
 const getAttachment = async (req, res) => {
     try {
@@ -59,6 +60,7 @@ const getAttachment = async (req, res) => {
 
 /**
  * This function determines to which entity (Chatmessage, Concept, or Paper) a given attachmentOID belongs.
+ *
  * @param attachmentOID - The attachmentOID to be associated.
  * @throws {Error} - Throws an error if attachmentOID is null.
  * @returns {Promise<Object|null>} - The found object of the associated entity or null.
@@ -88,9 +90,10 @@ const getAttachmentDetails = async (attachmentOID) => {
 
 /**
  * Checks if the given attachmentOID belongs to a concept in the database.
- * @param attachmentOID
- * @throws {Error} - Throws an error if attachmentOID is null.
- * @returns {Promise<Model|null>}
+ *
+ * @param {number} attachmentOID - The attachmentOID to check.
+ * @returns {Promise<Object|null>} - A Promise that resolves to the Concept if the attachment is associated with one, or null if not found.
+ * @throws {Error} - Throws an error if attachmentOID is null or if there's an error during the database query.
  */
 const AttachmentIsConcept = async (attachmentOID) => {
     if(!attachmentOID){
@@ -107,10 +110,10 @@ const AttachmentIsConcept = async (attachmentOID) => {
 
 /**
  * Checks if the given attachmentOID belongs to a paper in the database.
- * @param attachmentOID
- * @throws {Error} - Throws an error if attachmentOID is null.
- * @returns {Promise<Model|null>}
- * @constructor
+ *
+ * @param {number} attachmentOID - The attachmentOID to check.
+ * @returns {Promise<Paper|null>} - A Promise that resolves to the Paper if the attachment is associated with one, or null if not found.
+ * @throws {Error} - Throws an error if attachmentOID is null or if there's an error during the database query.
  */
 const AttachmentIsPaper = async (attachmentOID) => {
     if(!attachmentOID){
@@ -127,16 +130,15 @@ const AttachmentIsPaper = async (attachmentOID) => {
 
 /**
  * Checks if the given attachmentOID belongs to a chatmessage in the database.
- * @param attachmentOID
- * @throws {Error} - Throws an error if attachmentOID is null.
- * @returns {Promise<Model|null>}
- * @constructor
+ *
+ * @param {number} attachmentOID - The attachmentOID to check.
+ * @returns {Promise<Chatmessage|null>} - A Promise that resolves to the Chatmessage if the attachment is associated with one, or null if not found.
+ * @throws {Error} - Throws an error if attachmentOID is null or if there's an error during the database query.
  */
 const AttachmentIsChatmessage = async (attachmentOID) => {
     if(!attachmentOID){
         throw new Error("attachmentOID is null");
     }
-
 
     const chatmessage = await Chatmessage.findOne({
         where: {

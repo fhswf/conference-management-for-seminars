@@ -27,10 +27,11 @@ const {getPhaseOfSeminar} = require("../controllers/seminarController");
  * Checks if the user is authenticated.
  * If user has logged in with OIDC, the access token will be checked for expiration.
  * If the access token is expired, a new one will be requested with the refresh token.
- * @param req
- * @param res
- * @param next
- * @returns {Promise<*>}
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @param {function} next - The next middleware function.
+ * @returns {void}
  */
 async function isAuthenticated(req, res, next) {
     if (!req.isAuthenticated()) {
@@ -93,9 +94,10 @@ async function isAuthenticated(req, res, next) {
 /**
  * Checks if the user is a student in the seminar.
  * Needs the seminarOID in the request body or as a parameter.
- * @param req
- * @param res
- * @param next
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @param {function} next - The next middleware function.
  * @returns {Promise<*>}
  */
 async function isStudentInSeminar(req, res, next) {
@@ -121,9 +123,10 @@ async function isStudentInSeminar(req, res, next) {
 /**
  * Checks if the user is a supervisor in the seminar.
  * Needs the seminarOID in the request body or as a parameter.
- * @param req
- * @param res
- * @param next
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @param {function} next - The next middleware function.
  * @returns {Promise<*>}
  */
 async function isSupervisorInSeminar(req, res, next) {
@@ -150,9 +153,10 @@ async function isSupervisorInSeminar(req, res, next) {
 /**
  * Checks if the user is a course admin in the seminar.
  * Needs the seminarOID in the request body or as a parameter.
- * @param req
- * @param res
- * @param next
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @param {function} next - The next middleware function.
  * @returns {Promise<*>}
  */
 async function isCourseAdminInSeminar(req, res, next) {
@@ -206,6 +210,7 @@ async function isSupervisorOrStudentInSeminar(req, res, next) {
 /**
  * Checks if the user is a course admin or a supervisor in the seminar with the given seminarOID or paperOID.
  * Needs the seminarOID or paperOID in the request body or as a parameter.
+ *
  * @param {Object} req - The HTTP request object.
  * @param {Object} res - The HTTP response object.
  * @param {function} next - The next middleware function.
@@ -243,9 +248,10 @@ async function isCourseAdminOrSupervisorInSeminar(req, res, next) {
 /**
  * Checks if the user is the author of the concept with the given conceptOID.
  * Needs the conceptOID in the request body or as a parameter.
- * @param req
- * @param res
- * @param next
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @param {function} next - The next middleware function.
  * @returns {Promise<*>}
  */
 async function isConceptAuthor(req, res, next) {
@@ -271,9 +277,10 @@ async function isConceptAuthor(req, res, next) {
 /**
  * Checks if the user is permitted to access the file with the given attachmentOID.
  * Needs the attachmentOID as a parameter.
- * @param req
- * @param res
- * @param next
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @param {function} next - The next middleware function.
  * @returns {Promise<*>}
  */
 async function isPermittedToAccessFile(req, res, next) {
@@ -318,9 +325,10 @@ async function isPermittedToAccessFile(req, res, next) {
 /**
  * Checks if the user is a member of the seminar with the given seminarOID.
  * Needs the seminarOID in the request body or as a parameter.
- * @param req
- * @param res
- * @param next
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @param {function} next - The next middleware function.
  * @returns {Promise<*>}
  */
 async function isMemberOfSeminar(req, res, next) {
@@ -343,6 +351,15 @@ async function isMemberOfSeminar(req, res, next) {
     }
 }
 
+/**
+ * Middleware to check if the authenticated user is a system admin.
+ * It checks the user's role to determine if they have system admin privileges.
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @param {function} next - The next middleware function.
+ * @returns {Promise<*>}
+ */
 async function isSystemAdmin(req, res, next) {
     try {
         const userOID = req.user.userOID;
@@ -361,9 +378,10 @@ async function isSystemAdmin(req, res, next) {
 /**
  * Checks if the user is a participant of the chat with the given chatmessageOID or reviewOID.
  * Needs the chatmessageOID and reviewOID in the request body or as a parameter.
- * @param req
- * @param res
- * @param next
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @param {function} next - The next middleware function.
  * @returns {Promise<*>}
  */
 async function isChatParticipant(req, res, next) {
@@ -389,9 +407,10 @@ async function isChatParticipant(req, res, next) {
 
 /**
  * Checks if the user is a reviewer or author of the paper with the given paperOID.
- * @param req
- * @param res
- * @param next
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @param {function} next - The next middleware function.
  * @returns {Promise<*>}
  */
 async function isReviewerOrAuthorOfPaper(req, res, next) {
@@ -475,6 +494,15 @@ async function getSeminarOIDWithPaperOrReviewOID(paperOID, reviewOID) {
     return null;
 }
 
+/**
+ * Middleware to check if the authenticated user is a reviewer of a specific review.
+ * It verifies if the user is the assigned reviewer for the given review.
+ *
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * @param {function} next - The next middleware function.
+ * @returns {Promise<*>}
+ */
 async function isReviewer(req, res, next) {
     try {
         if (!req.user.userOID || !req.body.reviewOID) {
