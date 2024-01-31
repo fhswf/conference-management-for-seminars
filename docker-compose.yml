@@ -10,6 +10,8 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     networks:
       - conference-management
+    volumes:
+      - /var/data/conference/db:/var/lib/mysql
 
   express-server:
     container_name: conference-api
@@ -17,7 +19,11 @@ services:
     restart: always
     depends_on:
       - dbserver
+    extra_hosts:
+      - "login.ki.fh-swf.de:172.17.38.210"
+      - "www.ki.fh-swf.de:172.17.38.210"
     environment:
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
       - FRONTEND_URL=${FRONTEND_URL}
       - COOKIE_SECRET=${COOKIE_SECRET}
       - DB_TYPE=mariadb
@@ -58,4 +64,3 @@ services:
 networks:
   conference-management:
     driver: bridge
-

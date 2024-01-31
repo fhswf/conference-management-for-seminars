@@ -15,7 +15,7 @@ const fileUpload = require('express-fileupload');
 const app = express();
 app.set('trust proxy', true);
 // ------------------------------ middleware ------------------------------
-const {isAuthenticated} = require("./middleware/authMiddleware");
+const { isAuthenticated } = require("./middleware/authMiddleware");
 
 app.use(cors({
     origin: `${process.env.FRONTEND_URL}`,
@@ -24,7 +24,7 @@ app.use(cors({
 
 app.use(bodyParser.json());
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(fileUpload());
 
@@ -119,10 +119,12 @@ app.post('/conference/api/lti/launch', passport.authenticate('lti', {
 
 app.get('/conference/api/login', passport.authenticate('openidconnect'));
 
-app.get('/conference/api/login/callback', passport.authenticate('openidconnect', {failureRedirect: `${process.env.FRONTEND_URL}`}), function (req, res) {
-        res.redirect('/conference/api/success');
-    }
-);
+app.get('/conference/api/login/callback',
+    passport.authenticate('openidconnect',
+        {
+            successRedirect: '/conference/api/success',
+            failureRedirect: `${process.env.FRONTEND_URL}`
+        }));
 
 app.get('/conference/api/success', function (req, res) {
     //console.log(req.user);
@@ -154,7 +156,7 @@ app.get('/conference/api/authstatus', (req, res) => {
             }
         });
     }
-    return res.status(401).json({msg: "Not authenticated"});
+    return res.status(401).json({ msg: "Not authenticated" });
 });
 
 app.get('/conference/api', (req, res) => {
@@ -173,7 +175,7 @@ app.get('/conference/api/logout', isAuthenticated, (req, res) => {
     req.logout(() => {
         //console.log(req.user);
         //console.log(req.session);
-        res.status(200).json({url: redirectUrl});
+        res.status(200).json({ url: redirectUrl });
     });
 });
 
