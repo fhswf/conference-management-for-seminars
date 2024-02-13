@@ -142,7 +142,7 @@ app.get('/conference/api/error-oidc', function (req, res) {
 });
 
 app.get('/conference/api/authstatus', (req, res) => {
-    console.log("APP CHCECK AUTH");
+    //console.log("APP CHCECK AUTH");
     if (req.isAuthenticated()) {
         return res.status(200).json({
             user: {

@@ -89,6 +89,21 @@ const uploadConcept = async (req, res) => {
             return res.status(403).json({error: "You are not allowed to upload a Concept for this seminar."})
         }
 
+        if (supervisorOID) {
+            const givenUserIsSupervisor = await RoleAssignment.findOne({
+                where: {
+                    userOID: supervisorOID,
+                    roleOID: 2,
+                    seminarOID: seminarOID
+                }
+            });
+
+            if (!givenUserIsSupervisor) {
+                await t.rollback();
+                return res.status(409).send({msg: "User is not a supervisor of this seminar."});
+            }
+        }
+
         let attachment = null;
         if(file && !await isValidPdf(file)){
             await t.rollback();

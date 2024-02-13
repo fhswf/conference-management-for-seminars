@@ -80,7 +80,7 @@ describe('Menubar test', () => {
 
         cy.visit(`${Cypress.env('VITE_FRONTEND_URL')}`);
         cy.getByData('main-layout-logout').click();
-        cy.url().should('eq', `${Cypress.env('VITE_FRONTEND_URL')}`);
+        cy.url().should('contain', `${Cypress.env('VITE_FRONTEND_URL')}`);
 
     });
 

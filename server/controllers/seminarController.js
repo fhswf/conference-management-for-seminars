@@ -335,6 +335,19 @@ const evaluateConcept = async (req, res) => {
             return res.status(409).send({msg: "Concept already accepted."});
         }
 
+        const givenUserIsSupervisor = await RoleAssignment.findOne({
+            where: {
+                userOID: userOIDSupervisor,
+                roleOID: 2,
+                seminarOID: concept.seminarOID
+            }
+        });
+
+        if (!givenUserIsSupervisor) {
+            await t.rollback();
+            return res.status(409).send({msg: "User is not a supervisor of this seminar."});
+        }
+
         //const concept = await Concept.update(
         const [updatedRows] = await Concept.update(
             {
@@ -563,7 +576,7 @@ const enterSeminar = async (req, res) => {
             defaults: {
                 userOID: userOID,
                 seminarOID: seminar.seminarOID,
-                roleOID: 3,
+                roleOID: 3, // 3 = Student, default role
             }
         });
 

@@ -21,7 +21,9 @@
 
 INSERT INTO `user` (`userOID`, `firstname`, `lastname`, `mail`, `isAdmin`) VALUES ('1', 'Conf', 'Test', 'conference-test@example.com', '1');
 
-INSERT INTO `oidcuser` (`subject`, `userOID`) VALUES ('bc029b52-c990-4efd-88bb-f5e11e504cbb', '1');
+-- Keycloak ID of Test User "conference_test", User should have UserOID 1
+ INSERT INTO `oidcuser` (`subject`, `userOID`) VALUES ('ca47eaa2-5fbe-4f86-b89b-af10a798490a', '1');
+-- INSERT INTO `oidcuser` (`subject`, `userOID`) VALUES ('bc029b52-c990-4efd-88bb-f5e11e504cbb', '1');
 -- INSERT INTO `oidcuser` (`subject`, `userOID`) VALUES ('1610d512-5920-4a7e-8136-0883ab7afe59', '1');
 
 INSERT INTO `user` (`userOID`, `firstName`, `lastName`, `mail`, `isAdmin`) VALUES
@@ -103,7 +105,7 @@ INSERT IGNORE INTO `roles` (`roleOID`, `description`) VALUES (3, 'student');
 commit;
 
 -- paper have the the same attachment
-INSERT INTO `paper` (`paperOID`, `seminarOID`, `authorOID`, `attachmentOID`, `createdAt`, `updatedAt`) VALUES 
+INSERT INTO `paper` (`paperOID`, `seminarOID`, `authorOID`, `attachmentOID`, `createdAt`, `updatedAt`) VALUES
 (1, '2', '7', '1', '2023-12-06 20:35:46.000000', '2023-12-06 20:35:46.000000'),
 (2, '2', '42', '2', '2023-12-06 20:35:46.000000', '2023-12-06 20:35:46.000000'),
 (3, '2', '15', '2', '2023-12-06 20:35:46.000000', '2023-12-06 20:35:46.000000'),
@@ -131,7 +133,7 @@ INSERT INTO `paper` (`paperOID`, `seminarOID`, `authorOID`, `attachmentOID`, `cr
  (24, '3', '48', '4', '2023-12-06 20:35:46.000000', '2023-12-06 20:35:46.000000'),
  (25, '3', '20', '4', '2023-12-06 20:35:46.000000', '2023-12-06 20:35:46.000000');
 -- ,
--- 
+--
 -- (26, '4', '18', '1', '2023-12-06 20:35:46.000000', '2023-12-06 20:35:46.000000'),
 -- (27, '4', '8', '1', '2023-12-06 20:35:46.000000', '2023-12-06 20:35:46.000000'),
 -- (28, '4', '45', '1', '2023-12-06 20:35:46.000000', '2023-12-06 20:35:46.000000'),
@@ -209,7 +211,7 @@ commit;
 
 
 -- create some concepts, concepts have the same attachment per seminar for testing
-INSERT INTO `concept` (`conceptOID`, `text`, `userOIDSupervisor`, `userOIDStudent`, `feedback`, `seminarOID`, `accepted`, `attachmentOID`, `createdAt`, `updatedAt`) VALUES 
+INSERT INTO `concept` (`conceptOID`, `text`, `userOIDSupervisor`, `userOIDStudent`, `feedback`, `seminarOID`, `accepted`, `attachmentOID`, `createdAt`, `updatedAt`) VALUES
 (1, 'Mein Konzept2', '11', '7', 'Gut!', '1', '1', '1', '2023-12-06 19:40:04.000000', '2023-12-06 19:40:04.000000'),
 (2, 'Mein Konzept3', '8', '42', 'Bitte ... verbessern!', '1', '0', NULL, '2023-12-06 19:40:04.000000', '2023-12-06 19:40:04.000000'),
 (3, 'Mein Konzept4', '11', '15', 'Gut!', '1', '1', NULL, '2023-12-06 19:40:04.000000', '2023-12-06 19:40:04.000000'),

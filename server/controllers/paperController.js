@@ -330,7 +330,15 @@ async function getAllFinalPaperZip(req, res) {
         archive.pipe(res);
 
         papers.forEach((paper) => {
-            const filename = paper.userO.firstname + "_" + paper.userO.lastname + "_" + paper.phase7paperO.attachmentO.filename;
+            //const filename = paper.userO.firstname + "_" + paper.userO.lastname + "_" + paper.phase7paperO.attachmentO.filename;
+
+            let filename = null;
+            if (paper.userO.firstname && paper.userO.lastname)
+                filename = paper.userO.firstname + "_" + paper.userO.lastname + "_" + filename;
+            else
+                filename = paper.userO.mail + "_" + filename;
+
+
             const fileData = paper.phase7paperO.attachmentO.file;
 
             if (!Buffer.isBuffer(fileData)) {
