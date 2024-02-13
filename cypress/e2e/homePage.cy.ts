@@ -127,6 +127,7 @@ describe('HomePage', () => {
     describe('Enter Seminar', () => {
         // Enter Seminar
         it('should redirect if key is valid', function () {
+            cy.reload();
             cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/seminar/enter-seminar/validSeminarKey`, {
                 statusCode: 200,
                 body: {seminarOID: "123"},
@@ -141,6 +142,7 @@ describe('HomePage', () => {
 
 
         it('should display an alert if seminar key is invalid', function () {
+            cy.reload();
             cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/seminar/enter-seminar/invalidSeminarKey`, {
                 statusCode: 404,
                 body: { "error": "Seminar not found" },
@@ -155,6 +157,7 @@ describe('HomePage', () => {
         });
 
         it('should display an alert if already entered the seminar', function () {
+            cy.reload();
             cy.intercept('POST', `${Cypress.env('VITE_BACKEND_URL')}/seminar/enter-seminar/alreadyEnteredSeminarKey`, {
                 statusCode: 400,
                 body: { "error": "User already in seminar" },

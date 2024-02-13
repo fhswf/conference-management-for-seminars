@@ -83,6 +83,7 @@ const createMessage = async (req, res) => {
         }
 
         if (file && file.data && !await isValidPdf(file.data)) {
+            await t.rollback();
             return res.status(415).json({error: 'Unsupported Media Type; Only PDF files are allowed'});
         }
 

@@ -51,7 +51,6 @@ async function getReviewerUserOfPaper(req, res) {
  * @returns {Promise<void>} - A Promise that resolves when reviewers are assigned to papers.
  */
 async function assignReviewer(seminarOID, t) {
-    // Jeder User (Student) eines Seminars soll 2 Reviewe Eintrag mit sich als Reviewer bekommen
     let assignments = [];
 
     // all students in seminar who have a concept and a paper
@@ -82,7 +81,7 @@ async function assignReviewer(seminarOID, t) {
     });
 
     // for randomness, possible to mix studentsInSeminar-array here
-    mixArray(studentsInSeminar)
+    //mixArray(studentsInSeminar)
 
     // users do not review themselves: at least 3 students in the seminar
     // users do not review each other: at least 4 students in the seminar
@@ -106,7 +105,7 @@ async function assignReviewer(seminarOID, t) {
             supervisor: student.userOIDStudent_concepts[0].userOIDSupervisor
         });
 
-        console.log(studentsInSeminar);
+        //console.log(studentsInSeminar);
     }
 
     // for every assignment create three review entries
@@ -124,7 +123,7 @@ async function assignReviewer(seminarOID, t) {
             reviewerOID: assignment.supervisor,
         }, {transaction: t});
     }
-
+    console.log(assignments);
     console.log("ende");
 }
 
@@ -265,7 +264,7 @@ async function userIsAuthorOfReview(userOID, reviewOID) {
     });
 
     if (review) {
-        return review.paperO.authorOID || null;
+        return review.paperO.authorOID === userOID;
     } else {
         return null;
     }

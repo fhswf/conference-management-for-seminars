@@ -5,7 +5,7 @@ describe('LoginPage Test', () => {
       body: 'Hello World',
     }).as('loginPage');
 
-    cy.visit('http://192.168.0.206:5173/conference/login');
+    cy.visit(`${Cypress.env('VITE_FRONTEND_URL')}/login`);
 
     cy.contains('Login').should('exist');
     cy.get('button').should('exist')

@@ -34,6 +34,7 @@ describe('memberDetailPage', () => {
     });
 
     it('Should contain the mainlayout', function () {
+        cy.reload();
         cy.getByData('main-layout').should('exist');
     });
 
@@ -50,6 +51,7 @@ describe('memberDetailPage', () => {
         });
 
         it('should display concepts correctly in table', function () {
+            cy.reload();
             cy.getByData('table-concepts').should('exist')
                 .find('tbody tr').should('have.length', this.member.userOIDStudent_concepts.length);
 
@@ -114,6 +116,7 @@ describe('memberDetailPage', () => {
     });
 
     it('should display reviewer if some are assigned', function () {
+        cy.reload();
         if (this.reviewer.length > 0) {
             cy.getByData('header-reviewer').should('exist').should('have.text', 'Reviewer:');
             cy.getByData('reviewer-list').should('exist').find('li').should('have.length', this.reviewer.length);

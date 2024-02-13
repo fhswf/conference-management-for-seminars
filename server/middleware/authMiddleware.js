@@ -55,7 +55,7 @@ async function isAuthenticated(req, res, next) {
 
         let newAccessToken = null;
         if (isAccessTokenExpired(req.user.accessToken)) {
-            console.log("refreshing token");
+            //console.log("refreshing token");
             try {
                 //set new tokens
                 const tokens = await refreshAccessToken(req.user.refreshToken);
@@ -69,7 +69,7 @@ async function isAuthenticated(req, res, next) {
                     req.session.passport.user.idToken = tokens.id_token;
                 }
             } catch (e) {
-                console.error(e);
+                //console.error(e);
                 req.logout(() => {
                 });
                 return res.status(401).json({msg: "Logged out because token could not be refreshed"});
@@ -78,7 +78,7 @@ async function isAuthenticated(req, res, next) {
 
         // check if token is active
         //const tokenActive = newAccessToken ? await introspectToken(newAccessToken) : await introspectToken(req.user.accessToken);
-        // setted to true, because if the introspectToken is commented out
+        // setted to true, because the introspectToken is commented out
         const tokenActive = true;
 
         if (tokenActive) {
@@ -454,16 +454,16 @@ async function isAllowedToGetOrCreateMessage(req, res, next) {
         const seminarOID = await getSeminarOIDWithPaperOrReviewOID(req.params.paperOID || req.body.paperOID, req.params.reviewOID || req.body.reviewOID);
         const phase = await getPhaseOfSeminar(seminarOID);
         const userOID = req.user.userOID;
-        const paperOID = req.params.paperOID || req.body.paperOID;
+        //const paperOID = req.params.paperOID || req.body.paperOID;
         const reviewOID = req.params.reviewOID || req.body.reviewOID;
 
-        if (await userIsAuthorOfPaper(userOID, paperOID) || await userIsAuthorOfReview(userOID, reviewOID)) {
+        if (await userIsAuthorOfReview(userOID, reviewOID)) {
             if (phase >= 6) {
                 return next();
             } else {
                 return res.status(403).json({msg: "Not in review reading phase"});
             }
-        } else if (await userIsReviewerOfPaper(userOID, paperOID) || await userIsReviewerOfReviewOID(userOID, reviewOID)) {
+        } else if (await userIsReviewerOfReviewOID(userOID, reviewOID)) {
             if (phase >= 5) {
                 return next();
             } else {

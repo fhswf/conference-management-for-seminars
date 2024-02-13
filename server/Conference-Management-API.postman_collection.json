@@ -816,6 +816,7 @@
 										},
 										{
 											"key": "file",
+											"description": "'run collection' may fail because the file is not sent.",
 											"type": "file",
 											"src": "/C:/Users/Oliver/Downloads/testChat.zip"
 										},
@@ -850,13 +851,13 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 404\", function () {\r",
-											"    pm.response.to.have.status(404);\r",
+											"pm.test(\"Status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
 											"});\r",
 											"\r",
-											"pm.test(\"Response should contain the expected 'error' field\", function () {\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
 											"    const responseBody = pm.response.json();\r",
-											"    pm.expect(responseBody).to.have.property(\"error\", \"Review Not Found\");\r",
+											"    pm.expect(responseBody).to.have.property(\"msg\", \"Not authorized\");\r",
 											"});\r",
 											"\r",
 											"pm.test(\"Response should be a valid JSON\", function () {\r",
@@ -886,7 +887,7 @@
 										},
 										{
 											"key": "paperOID",
-											"value": "14",
+											"value": "13",
 											"type": "text"
 										},
 										{
@@ -1337,6 +1338,79 @@
 										{
 											"key": "supervisorOID",
 											"value": "14",
+											"type": "text"
+										},
+										{
+											"key": "seminarOID",
+											"value": "3",
+											"description": "user is student in that seminar",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/concepts",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"concepts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Upload Concept as student with invalid supervisor",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403 or 409\", function () {\r",
+											"    pm.expect(pm.response.code).to.be.oneOf([403, 409]);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected message\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    if(pm.response.code === 403){\r",
+											"        pm.expect(responseBody).to.have.property(\"error\", \"You are not allowed to upload a Concept for this seminar.\");\r",
+											"    } else if(pm.response.code === 409){\r",
+											"        pm.expect(responseBody).to.have.property(\"msg\", \"User is not a supervisor of this seminar.\");\r",
+											"    }\r",
+											"    \r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "text",
+											"value": "pm_{{$randomLoremWords}}",
+											"type": "text"
+										},
+										{
+											"key": "file",
+											"type": "file",
+											"src": [],
+											"disabled": true
+										},
+										{
+											"key": "supervisorOID",
+											"value": "0",
+											"description": "User 0 is not a supervisor in that seminar",
 											"type": "text"
 										},
 										{
@@ -2081,6 +2155,7 @@
 										},
 										{
 											"key": "file",
+											"description": "'run collection' may fail because the file is not sent.",
 											"type": "file",
 											"src": "/C:/Users/Oliver/Downloads/testChat.zip"
 										}
@@ -4026,6 +4101,7 @@
 										{
 											"key": "userOIDSupervisor",
 											"value": "8",
+											"description": "User 0 is not a supervisor in that seminar",
 											"type": "text"
 										},
 										{
@@ -4103,6 +4179,80 @@
 											"value": "8",
 											"type": "text",
 											"disabled": true
+										},
+										{
+											"key": "seminarOID",
+											"value": "1",
+											"description": "user is course admin in that seminar",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{backendUrl}}/seminar/evaluate-concept",
+									"host": [
+										"{{backendUrl}}"
+									],
+									"path": [
+										"seminar",
+										"evaluate-concept"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Evaluate a concepte of a student in a seminar as course admin with invalid supervisor",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"  pm.test(\"Status code is 409\", function () {\r",
+											"    pm.response.to.have.status(409);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should contain the expected 'msg' field\", function () {\r",
+											"    const responseBody = pm.response.json();\r",
+											"    pm.expect(responseBody).to.satisfy((response) => {\r",
+											"        return response.msg === \"Concept already accepted.\" || response.msg === \"User is not a supervisor of this seminar.\";\r",
+											"    });\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response should be a valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "conceptOID",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "accepted",
+											"value": "true",
+											"type": "text"
+										},
+										{
+											"key": "feedback",
+											"value": "test",
+											"type": "text"
+										},
+										{
+											"key": "userOIDSupervisor",
+											"value": "0",
+											"description": "User 0 is not a supervisor in that seminar",
+											"type": "text"
 										},
 										{
 											"key": "seminarOID",
@@ -4350,7 +4500,7 @@
 									"formdata": [
 										{
 											"key": "name",
-											"value": "test_{{$randomLoremWords}}",
+											"value": "pm_{{$randomLoremWords}}",
 											"type": "text"
 										}
 									]
